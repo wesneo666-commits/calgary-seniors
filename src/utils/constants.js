@@ -75,6 +75,20 @@ export const SERVICE_AREA_GROUPS = [
 // Flat list of all service areas — used for filter logic and chips
 export const SERVICE_AREAS = SERVICE_AREA_GROUPS.flatMap((g) => g.items)
 
+// Parent category icons for cards
+export const GROUP_ICONS = {
+  'Getting help at home': { emoji: '🏠', bg: '#e8f4fd', color: '#1a5276' },
+  'Health & wellness':    { emoji: '🩺', bg: '#d4edda', color: '#1a6635' },
+  'Social & community':   { emoji: '🤝', bg: '#ede7f6', color: '#4a148c' },
+  'Practical support':    { emoji: '🔧', bg: '#fff3cd', color: '#7d4a00' },
+  'Safety & crisis':      { emoji: '🛡️', bg: '#fde8ea', color: '#8b1a24' },
+}
+
+// Lookup: service area value → parent group name
+export const SERVICE_AREA_TO_GROUP = Object.fromEntries(
+  SERVICE_AREA_GROUPS.flatMap((g) => g.items.map((item) => [item.value, g.group]))
+)
+
 export const QUADRANTS = [
   { value: 'NW', label: 'NW – Northwest' },
   { value: 'NE', label: 'NE – Northeast' },

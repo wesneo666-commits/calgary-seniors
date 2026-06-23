@@ -63,6 +63,8 @@ export default function ResultsList({
   onPage,
   sort,
   onSort,
+  layout,
+  onLayout,
 }) {
   const isFiltered = Object.values(filters).some((v) => v !== '')
   const isEmpty = totalResults === 0
@@ -88,18 +90,38 @@ export default function ResultsList({
         </p>
 
         {!isEmpty && (
-          <div className="sort-control">
-            <label htmlFor="sort-select" className="sort-label">Sort by</label>
-            <select
-              id="sort-select"
-              className="sort-select"
-              value={sort}
-              onChange={(e) => onSort(e.target.value)}
-            >
-              <option value="relevance">Best match</option>
-              <option value="name-az">Program name (A–Z)</option>
-              <option value="org-az">Organization (A–Z)</option>
-            </select>
+          <div className="toolbar-right">
+            <div className="layout-toggle" role="group" aria-label="Layout">
+              <button
+                className={`layout-toggle-btn${layout === '1col' ? ' layout-toggle-btn--active' : ''}`}
+                onClick={() => onLayout('1col')}
+                aria-pressed={layout === '1col'}
+                title="Single column"
+              >
+                ☰ 1 col
+              </button>
+              <button
+                className={`layout-toggle-btn${layout === '2col' ? ' layout-toggle-btn--active' : ''}`}
+                onClick={() => onLayout('2col')}
+                aria-pressed={layout === '2col'}
+                title="Two columns"
+              >
+                ⊞ 2 col
+              </button>
+            </div>
+            <div className="sort-control">
+              <label htmlFor="sort-select" className="sort-label">Sort by</label>
+              <select
+                id="sort-select"
+                className="sort-select"
+                value={sort}
+                onChange={(e) => onSort(e.target.value)}
+              >
+                <option value="relevance">Best match</option>
+                <option value="name-az">Program name (A–Z)</option>
+                <option value="org-az">Organization (A–Z)</option>
+              </select>
+            </div>
           </div>
         )}
       </div>
@@ -117,7 +139,7 @@ export default function ResultsList({
         </div>
       ) : (
         <>
-          <ul className="results-list" role="list">
+          <ul className={`results-list${layout === '1col' ? ' results-list--1col' : ''}`} role="list">
             {results.map((program) => (
               <li key={program.id} role="listitem">
                 <ProgramCard program={program} onSelect={onSelect} />

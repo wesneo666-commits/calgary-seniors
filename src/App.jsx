@@ -4,10 +4,12 @@ import SearchBar from './components/SearchBar.jsx'
 import FilterPanel from './components/FilterPanel.jsx'
 import ResultsList from './components/ResultsList.jsx'
 import ProgramDetail from './components/ProgramDetail.jsx'
-import FontSizeControl from './components/FontSizeControl.jsx'
+import HelpModal from './components/HelpModal.jsx'
+import AboutModal from './components/AboutModal.jsx'
+import AccessibilityPanel from './components/AccessibilityPanel.jsx'
 import { filterPrograms, sortResults } from './utils/search.js'
 import Footer from './components/Footer.jsx'
-import { useFontSize } from './hooks/useFontSize.js'
+import { useAccessibility } from './hooks/useAccessibility.js'
 
 const EMPTY_FILTERS = {
   query: '',
@@ -20,11 +22,15 @@ const EMPTY_FILTERS = {
 export const PAGE_SIZE = 20
 
 export default function App() {
-  const { sizeIndex, setSizeIndex } = useFontSize()
+  const { prefs, set } = useAccessibility()
+  const [showA11y, setShowA11y] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
+  const [showAbout, setShowAbout] = useState(false)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [selectedProgram, setSelectedProgram] = useState(null)
   const [page, setPage] = useState(1)
-  const [sort, setSort] = useState('relevance')
+  const [sort, setSort] = useState('name-az')
+  const [layout, setLayout] = useState('2col')
 
   const setFilter = useCallback((key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
@@ -51,6 +57,12 @@ export default function App() {
   useEffect(() => {
     setPage(1)
   }, [filters])
+
+  // Auto-switch sort: relevance when searching, A-Z when browsing
+  useEffect(() => {
+    if (filters.query && sort === 'name-az') setSort('relevance')
+    else if (!filters.query && sort === 'relevance') setSort('name-az')
+  }, [filters.query])
 
   const totalPages = Math.ceil(allResults.length / PAGE_SIZE)
   const pageResults = allResults.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -81,7 +93,26 @@ export default function App() {
               <h1>Calgary Seniors Resource Guide</h1>
               <p>Find Programs and Services in Calgary, Alberta!</p>
             </div>
-            <FontSizeControl sizeIndex={sizeIndex} setSizeIndex={setSizeIndex} />
+            <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help — how to use this guide">
+              Need help?
+            </button>
+            <div className="a11y-btn-wrap">
+              <button
+                className="a11y-toggle-btn"
+                onClick={() => setShowA11y((v) => !v)}
+                aria-expanded={showA11y}
+                aria-label="Accessibility preferences"
+              >
+                Aa Accessibility ▾
+              </button>
+              {showA11y && (
+                <AccessibilityPanel
+                  prefs={prefs}
+                  set={set}
+                  onClose={() => setShowA11y(false)}
+                />
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -122,12 +153,14 @@ export default function App() {
               }}
               sort={sort}
               onSort={(s) => { setSort(s); setPage(1) }}
+              layout={layout}
+              onLayout={setLayout}
             />
           </section>
         </div>
       </main>
 
-      <Footer />
+      <Footer onAbout={() => setShowAbout(true)} />
 
       {selectedProgram && (
         <ProgramDetail
@@ -135,6 +168,9 @@ export default function App() {
           onClose={() => setSelectedProgram(null)}
         />
       )}
+
+      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
     </>
   )
 }

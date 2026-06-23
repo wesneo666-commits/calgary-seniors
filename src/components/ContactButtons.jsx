@@ -1,8 +1,7 @@
 export default function ContactButtons({ program }) {
   const { phone, email, programWebsite, orgWebsite } = program
-  const website = programWebsite || orgWebsite
 
-  if (!phone && !email && !website) return null
+  if (!phone && !email && !programWebsite && !orgWebsite) return null
 
   return (
     <div className="contact-buttons">
@@ -24,15 +23,26 @@ export default function ContactButtons({ program }) {
           <span aria-hidden="true">✉️</span> Email
         </a>
       )}
-      {website && (
+      {programWebsite && (
         <a
-          href={website}
+          href={programWebsite}
           target="_blank"
           rel="noopener noreferrer"
           className="contact-btn contact-btn-web"
-          aria-label={`Visit website for ${program.programName} (opens in new tab)`}
+          aria-label={`Visit program page for ${program.programName} (opens in new tab)`}
         >
-          <span aria-hidden="true">🌐</span> Visit Website
+          <span aria-hidden="true">🌐</span> Program page
+        </a>
+      )}
+      {orgWebsite && orgWebsite !== programWebsite && (
+        <a
+          href={orgWebsite}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="contact-btn contact-btn-web-org"
+          aria-label={`Visit ${program.organization} website (opens in new tab)`}
+        >
+          <span aria-hidden="true">🏢</span> Organization website
         </a>
       )}
     </div>

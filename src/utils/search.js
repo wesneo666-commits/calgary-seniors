@@ -1,4 +1,5 @@
 import { postalToQuadrant } from './postal.js'
+import { SERVICE_AREA_GROUPS } from './constants.js'
 
 /**
  * Returns programs matching the given filters.
@@ -10,10 +11,16 @@ export function filterPrograms(programs, filters) {
   const { query, quadrant, serviceArea, cost, format } = filters
 
   const queryNorm = query ? query.trim().toLowerCase() : ''
-  const queryTokens = queryNorm ? queryNorm.split(/\s+/).filter(Boolean) : []
+
+  // Detect postal code early so we can skip text search for it
+  const detectedQuadrant = queryNorm ? postalToQuadrant(queryNorm) : null
+  const isPostalQuery = !!detectedQuadrant
+
+  // Only tokenize when the query is not a postal code
+  const queryTokens = queryNorm && !isPostalQuery ? queryNorm.split(/\s+/).filter(Boolean) : []
 
   return programs.filter((p) => {
-    // Text search across all relevant fields
+    // Text search across all relevant fields (skipped when query is a postal code)
     if (queryTokens.length > 0) {
       const searchable = [
         p.organization,
@@ -23,7 +30,7 @@ export function filterPrograms(programs, filters) {
         p.keywords.join(' '),
         p.serviceArea.join(' '),
         p.intendedPopulation.join(' '),
-        p.quadrant.join(' '),       // "NW" matches "northwest" token? No — but "nw" matches "nw"
+        p.quadrant.join(' '),
         p.determinant.join(' '),
         p.address,
       ]
@@ -41,17 +48,23 @@ export function filterPrograms(programs, filters) {
       if (!queryTokens.every((token) => normalized.includes(token))) return false
     }
 
-    // Quadrant dropdown filter — also detects postal code typed in search box
-    const activeQuadrant = quadrant || (queryNorm ? postalToQuadrant(queryNorm) : null)
+    // Quadrant filter — dropdown selection or postal code typed in search box
+    const activeQuadrant = quadrant || detectedQuadrant
     if (activeQuadrant && activeQuadrant !== 'City-wide') {
       const hasQuadrant =
         p.quadrant.includes(activeQuadrant) || p.quadrant.includes('City-wide')
       if (!hasQuadrant) return false
     }
 
-    // Service area filter
+    // Service area filter — supports both sub-category and parent group selection
     if (serviceArea) {
-      if (!p.serviceArea.includes(serviceArea)) return false
+      if (serviceArea.startsWith('_group_')) {
+        const groupName = serviceArea.slice(7)
+        const groupValues = SERVICE_AREA_GROUPS.find((g) => g.group === groupName)?.items.map((i) => i.value) ?? []
+        if (!p.serviceArea.some((sa) => groupValues.includes(sa))) return false
+      } else {
+        if (!p.serviceArea.includes(serviceArea)) return false
+      }
     }
 
     // Cost filter
