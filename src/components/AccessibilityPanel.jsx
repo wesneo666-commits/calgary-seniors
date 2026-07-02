@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { TEXT_SIZES, FONTS, SPACINGS } from '../hooks/useAccessibility.js'
 
-export default function AccessibilityPanel({ prefs, set, onClose }) {
+export default function AccessibilityPanel({ prefs, set, reset, onClose }) {
   const panelRef = useRef(null)
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function AccessibilityPanel({ prefs, set, onClose }) {
   }, [onClose])
 
   return (
-    <div className="a11y-panel" ref={panelRef} role="region" aria-label="Accessibility preferences">
+    <div className="a11y-panel" ref={panelRef} role="region" aria-label="Display settings">
       <div className="a11y-grid">
 
         {/* Text size */}
@@ -100,6 +100,12 @@ export default function AccessibilityPanel({ prefs, set, onClose }) {
           </div>
         </div>
 
+      </div>
+
+      <div className="a11y-reset-row">
+        <button type="button" className="a11y-reset-btn" onClick={reset}>
+          ↺ Reset to Default
+        </button>
       </div>
     </div>
   )

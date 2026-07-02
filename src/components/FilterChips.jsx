@@ -1,4 +1,4 @@
-import { SERVICE_AREAS, SERVICE_AREA_GROUPS, QUADRANTS, COST_TYPES, FORMAT_TYPES } from '../utils/constants.js'
+import { QUADRANTS, COST_TYPES, FORMAT_TYPES, serviceAreaLabel } from '../utils/constants.js'
 
 function labelFor(key, value) {
   switch (key) {
@@ -7,10 +7,7 @@ function labelFor(key, value) {
     case 'quadrant':
       return QUADRANTS.find((q) => q.value === value)?.label ?? value
     case 'serviceArea':
-      if (value.startsWith('_group_')) {
-        return SERVICE_AREA_GROUPS.find((g) => g.group === value.slice(7))?.group ?? value.slice(7)
-      }
-      return SERVICE_AREAS.find((s) => s.value === value)?.label ?? value
+      return serviceAreaLabel(value)
     case 'cost':
       return COST_TYPES.find((c) => c.value === value)?.label ?? value
     case 'format':

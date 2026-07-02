@@ -1,11 +1,18 @@
 import { postalToQuadrant } from './postal.js'
 import { SERVICE_AREA_GROUPS } from './constants.js'
+import { interpretQuery } from './mockAI.js'
 
 /**
  * Returns programs matching the given filters.
  * All filters are AND-combined; empty/null values skip that filter.
  * Multi-word queries use AND logic per token so "fitness northwest" finds
  * programs that contain both "fitness" AND "northwest" (or "nw") anywhere.
+ *
+ * Plain-language queries (e.g. "I'm looking for fitness programs in NE
+ * Calgary") are interpreted via the mock AI parser: recognized location
+ * phrases become an effective quadrant filter, and filler words are
+ * stripped before the AND-token text match so the sentence doesn't fail
+ * to match just because "i'm" or "looking" never appears in program text.
  */
 export function filterPrograms(programs, filters) {
   const { query, quadrant, serviceArea, cost, format } = filters
@@ -16,8 +23,14 @@ export function filterPrograms(programs, filters) {
   const detectedQuadrant = queryNorm ? postalToQuadrant(queryNorm) : null
   const isPostalQuery = !!detectedQuadrant
 
-  // Only tokenize when the query is not a postal code
-  const queryTokens = queryNorm && !isPostalQuery ? queryNorm.split(/\s+/).filter(Boolean) : []
+  const aiParsed = queryNorm && !isPostalQuery ? interpretQuery(queryNorm) : null
+  const aiQuadrant = aiParsed?.quadrant ?? null
+
+  // When the mock AI recognized something (a location phrase, category, or
+  // "free"), search against its cleaned keyword list instead of the raw
+  // sentence. Otherwise fall back to the raw query, unchanged from before.
+  const textForTokens = aiParsed?.hasInterpretation ? aiParsed.cleanedKeywords : queryNorm
+  const queryTokens = textForTokens && !isPostalQuery ? textForTokens.split(/\s+/).filter(Boolean) : []
 
   return programs.filter((p) => {
     // Text search across all relevant fields (skipped when query is a postal code)
@@ -48,8 +61,9 @@ export function filterPrograms(programs, filters) {
       if (!queryTokens.every((token) => normalized.includes(token))) return false
     }
 
-    // Quadrant filter — dropdown selection or postal code typed in search box
-    const activeQuadrant = quadrant || detectedQuadrant
+    // Quadrant filter — dropdown selection, postal code, or a plain-language
+    // location phrase like "north east" typed in the search box
+    const activeQuadrant = quadrant || detectedQuadrant || aiQuadrant
     if (activeQuadrant && activeQuadrant !== 'City-wide') {
       const hasQuadrant =
         p.quadrant.includes(activeQuadrant) || p.quadrant.includes('City-wide')

@@ -1,5 +1,6 @@
 import CostBadge from './CostBadge.jsx'
 import { SERVICE_AREAS, GROUP_ICONS, SERVICE_AREA_TO_GROUP } from '../utils/constants.js'
+import { cleanPopulationTags } from '../utils/program.js'
 
 function friendlyServiceLabel(value) {
   return SERVICE_AREAS.find((s) => s.value === value)?.label ?? value
@@ -7,6 +8,7 @@ function friendlyServiceLabel(value) {
 
 export default function ProgramCard({ program, onSelect }) {
   const serviceLabels = program.serviceArea.map(friendlyServiceLabel).slice(0, 2)
+  const population = cleanPopulationTags(program.intendedPopulation)
 
   const parentGroups = [...new Set(
     program.serviceArea.map((sa) => SERVICE_AREA_TO_GROUP[sa]).filter(Boolean)
@@ -57,11 +59,25 @@ export default function ProgramCard({ program, onSelect }) {
           </div>
         )}
 
-        <div className="card-footer">
-          <CostBadge cost={program.cost} />
-          {program.format.map((f) => (
-            <span key={f} className="badge badge-format">{f}</span>
-          ))}
+        <div className="card-info-grid">
+          <div className="card-info-col">
+            <CostBadge cost={program.cost} />
+          </div>
+          <div className="card-info-col">
+            {program.quadrant.map((q) => (
+              <span key={q} className="badge badge-quad">{q}</span>
+            ))}
+          </div>
+          <div className="card-info-col">
+            {program.format.map((f) => (
+              <span key={f} className="badge badge-format">{f}</span>
+            ))}
+          </div>
+          <div className="card-info-col">
+            {population.length > 0 && (
+              <span className="badge badge-population">{population[0]}</span>
+            )}
+          </div>
         </div>
       </button>
     </article>

@@ -7,6 +7,9 @@ import ProgramDetail from './components/ProgramDetail.jsx'
 import HelpModal from './components/HelpModal.jsx'
 import AboutModal from './components/AboutModal.jsx'
 import AccessibilityPanel from './components/AccessibilityPanel.jsx'
+import HeroGuidance from './components/HeroGuidance.jsx'
+import WizardLanding from './components/WizardLanding.jsx'
+import ChatWidget from './components/ChatWidget.jsx'
 import { filterPrograms, sortResults } from './utils/search.js'
 import Footer from './components/Footer.jsx'
 import { useAccessibility } from './hooks/useAccessibility.js'
@@ -22,7 +25,7 @@ const EMPTY_FILTERS = {
 export const PAGE_SIZE = 20
 
 export default function App() {
-  const { prefs, set } = useAccessibility()
+  const { prefs, set, reset: resetA11y } = useAccessibility()
   const [showA11y, setShowA11y] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
@@ -31,6 +34,7 @@ export default function App() {
   const [page, setPage] = useState(1)
   const [sort, setSort] = useState('name-az')
   const [layout, setLayout] = useState('2col')
+  const [landingMode, setLandingMode] = useState('direct') // 'direct' | 'wizard' — A/B toggle for UAT (Session 3, 2026-06-25)
 
   const setFilter = useCallback((key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
@@ -43,6 +47,12 @@ export default function App() {
   const clearFilters = useCallback(() => {
     setFilters(EMPTY_FILTERS)
     setSort('relevance')
+  }, [])
+
+  const applyChatFilters = useCallback((chatFilters) => {
+    setFilters({ ...EMPTY_FILTERS, ...chatFilters })
+    setLandingMode('direct')
+    document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' })
   }, [])
 
   const allResults = useMemo(() => {
@@ -68,6 +78,7 @@ export default function App() {
   const pageResults = allResults.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const hasActiveFilters = Object.values(filters).some((v) => v !== '')
+  const showWizard = landingMode === 'wizard' && !hasActiveFilters
 
   return (
     <>
@@ -93,22 +104,41 @@ export default function App() {
               <h1>Calgary Seniors Resource Guide</h1>
               <p>Find Programs and Services in Calgary, Alberta!</p>
             </div>
-            <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help — how to use this guide">
-              Need help?
+            <div className="landing-mode-toggle" role="group" aria-label="Landing page style (UAT testing)">
+              <button
+                type="button"
+                className={`landing-mode-btn${landingMode === 'direct' ? ' landing-mode-btn--active' : ''}`}
+                onClick={() => setLandingMode('direct')}
+                aria-pressed={landingMode === 'direct'}
+              >
+                Direct search
+              </button>
+              <button
+                type="button"
+                className={`landing-mode-btn${landingMode === 'wizard' ? ' landing-mode-btn--active' : ''}`}
+                onClick={() => setLandingMode('wizard')}
+                aria-pressed={landingMode === 'wizard'}
+              >
+                Guided
+              </button>
+            </div>
+            <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="How to use this guide">
+              How to use this
             </button>
             <div className="a11y-btn-wrap">
               <button
                 className="a11y-toggle-btn"
                 onClick={() => setShowA11y((v) => !v)}
                 aria-expanded={showA11y}
-                aria-label="Accessibility preferences"
+                aria-label="Display settings"
               >
-                Aa Accessibility ▾
+                Aa Display Settings ▾
               </button>
               {showA11y && (
                 <AccessibilityPanel
                   prefs={prefs}
                   set={set}
+                  reset={resetA11y}
                   onClose={() => setShowA11y(false)}
                 />
               )}
@@ -123,41 +153,46 @@ export default function App() {
             value={filters.query}
             onChange={(v) => setFilter('query', v)}
           />
+          <HeroGuidance />
         </div>
       </div>
 
       <main id="main-content" className="container">
-        <div className="main-layout">
-          <aside aria-label="Filters">
-            <FilterPanel
-              filters={filters}
-              onFilterChange={setFilter}
-              onClear={clearFilters}
-              hasActive={hasActiveFilters}
-            />
-          </aside>
+        {showWizard ? (
+          <WizardLanding onPickGroup={(group) => setFilter('serviceArea', `_group_${group}`)} />
+        ) : (
+          <div className="main-layout">
+            <aside aria-label="Filters">
+              <FilterPanel
+                filters={filters}
+                onFilterChange={setFilter}
+                onClear={clearFilters}
+                hasActive={hasActiveFilters}
+              />
+            </aside>
 
-          <section aria-label="Search results" aria-live="polite">
-            <ResultsList
-              results={pageResults}
-              totalResults={allResults.length}
-              totalCount={programs.length}
-              filters={filters}
-              onRemove={removeFilter}
-              onSelect={setSelectedProgram}
-              page={page}
-              totalPages={totalPages}
-              onPage={(p) => {
-                setPage(p)
-                document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' })
-              }}
-              sort={sort}
-              onSort={(s) => { setSort(s); setPage(1) }}
-              layout={layout}
-              onLayout={setLayout}
-            />
-          </section>
-        </div>
+            <section aria-label="Search results" aria-live="polite">
+              <ResultsList
+                results={pageResults}
+                totalResults={allResults.length}
+                totalCount={programs.length}
+                filters={filters}
+                onRemove={removeFilter}
+                onSelect={setSelectedProgram}
+                page={page}
+                totalPages={totalPages}
+                onPage={(p) => {
+                  setPage(p)
+                  document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' })
+                }}
+                sort={sort}
+                onSort={(s) => { setSort(s); setPage(1) }}
+                layout={layout}
+                onLayout={setLayout}
+              />
+            </section>
+          </div>
+        )}
       </main>
 
       <Footer onAbout={() => setShowAbout(true)} />
@@ -171,6 +206,8 @@ export default function App() {
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
       {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
+
+      <ChatWidget onApplyFilters={applyChatFilters} />
     </>
   )
 }

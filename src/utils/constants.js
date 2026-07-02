@@ -89,6 +89,13 @@ export const SERVICE_AREA_TO_GROUP = Object.fromEntries(
   SERVICE_AREA_GROUPS.flatMap((g) => g.items.map((item) => [item.value, g.group]))
 )
 
+// Display label for a filters.serviceArea value: '' | '_group_X' | item value
+export function serviceAreaLabel(value) {
+  if (!value) return 'All types'
+  if (value.startsWith('_group_')) return value.slice(7)
+  return SERVICE_AREAS.find((s) => s.value === value)?.label ?? value
+}
+
 export const QUADRANTS = [
   { value: 'NW', label: 'NW – Northwest' },
   { value: 'NE', label: 'NE – Northeast' },

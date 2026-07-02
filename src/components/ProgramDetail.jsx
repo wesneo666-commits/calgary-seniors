@@ -2,15 +2,10 @@ import { useEffect, useRef } from 'react'
 import CostBadge from './CostBadge.jsx'
 import ContactButtons from './ContactButtons.jsx'
 import { SERVICE_AREAS } from '../utils/constants.js'
+import { cleanPopulationTags } from '../utils/program.js'
 
 function friendlyServiceLabel(value) {
   return SERVICE_AREAS.find((s) => s.value === value)?.label ?? value
-}
-
-function cleanPopulationTags(values) {
-  return values
-    .filter((v) => v !== 'None (general population)')
-    .map((v) => (v === 'Older adults (no age specified)' ? 'Older adults' : v))
 }
 
 function normalizeEligibility(value) {

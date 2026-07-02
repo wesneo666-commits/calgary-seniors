@@ -18,9 +18,9 @@ export default function ContactButtons({ program }) {
         <a
           href={`mailto:${email}`}
           className="contact-btn contact-btn-email"
-          aria-label={`Email ${program.organization}`}
+          aria-label={`Email ${program.organization}: ${email}`}
         >
-          <span aria-hidden="true">✉️</span> Email
+          <span aria-hidden="true">✉️</span> Email: {email}
         </a>
       )}
       {programWebsite && (

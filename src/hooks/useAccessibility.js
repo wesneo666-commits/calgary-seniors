@@ -10,7 +10,7 @@ export const TEXT_SIZES = [
 export const FONTS = [
   { key: 'standard', label: 'Standard',         family: "'Segoe UI', system-ui, sans-serif" },
   { key: 'readable', label: 'Readable (Arial)',  family: 'Arial, Helvetica, sans-serif' },
-  { key: 'wide',     label: 'Wide (Verdana)',    family: 'Verdana, Geneva, sans-serif' },
+  { key: 'wide',     label: 'Spacious (Verdana)', family: 'Verdana, Geneva, sans-serif' },
 ]
 
 export const SPACINGS = [
@@ -21,17 +21,19 @@ export const SPACINGS = [
 
 const KEY = 'csrg-accessibility'
 
+export const DEFAULT_PREFS = { sizeIndex: 0, contrast: 'normal', fontKey: 'standard', spacing: 'normal' }
+
 function load() {
   try {
     const stored = JSON.parse(localStorage.getItem(KEY) || '{}')
     return {
-      sizeIndex: typeof stored.sizeIndex === 'number' ? stored.sizeIndex : 0,
-      contrast:  stored.contrast  || 'normal',
-      fontKey:   stored.fontKey   || 'standard',
-      spacing:   stored.spacing   || 'normal',
+      sizeIndex: typeof stored.sizeIndex === 'number' ? stored.sizeIndex : DEFAULT_PREFS.sizeIndex,
+      contrast:  stored.contrast  || DEFAULT_PREFS.contrast,
+      fontKey:   stored.fontKey   || DEFAULT_PREFS.fontKey,
+      spacing:   stored.spacing   || DEFAULT_PREFS.spacing,
     }
   } catch {
-    return { sizeIndex: 0, contrast: 'normal', fontKey: 'standard', spacing: 'normal' }
+    return { ...DEFAULT_PREFS }
   }
 }
 
@@ -54,5 +56,9 @@ export function useAccessibility() {
     setPrefs((p) => ({ ...p, [key]: value }))
   }
 
-  return { prefs, set }
+  function reset() {
+    setPrefs({ ...DEFAULT_PREFS })
+  }
+
+  return { prefs, set, reset }
 }

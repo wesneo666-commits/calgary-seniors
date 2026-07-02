@@ -17,6 +17,7 @@
     "@vitejs/plugin-react": "^4.3.1",
     "csv-parse": "^6.2.1",
     "playwright": "^1.60.0",
+    "serve": "^14.2.6",
     "vite": "^5.4.2"
   }
 }
