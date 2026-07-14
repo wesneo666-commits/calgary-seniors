@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import CostBadge from './CostBadge.jsx'
 import ContactButtons from './ContactButtons.jsx'
-import { SERVICE_AREAS } from '../utils/constants.js'
+import { SERVICE_AREAS, quadrantFullLabel } from '../utils/constants.js'
 import { cleanPopulationTags, extractRegistrationUrl, parseContactEmail, parsePhones } from '../utils/program.js'
 
 function friendlyServiceLabel(value) {
@@ -196,7 +196,7 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
           <div className="detail-badges">
             <CostBadge cost={program.cost} />
             {program.quadrant.map((q) => (
-              <span key={q} className="badge badge-quad">{q}</span>
+              <span key={q} className="badge badge-quad">{quadrantFullLabel(q)}</span>
             ))}
             {program.format.map((f) => (
               <span key={f} className="badge badge-format">{f}</span>

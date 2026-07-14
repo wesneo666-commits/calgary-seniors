@@ -20,7 +20,7 @@ export default function Footer({ onAbout }) {
               className="footer-org-link-action"
               href={`mailto:?subject=${encodeURIComponent('Suggest a correction — Calgary Seniors Resource Directory')}`}
             >
-              ✏ Suggest a correction
+              ✏️ Suggest a correction
             </a>
           </div>
           <div className="footer-org-link">

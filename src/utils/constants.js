@@ -100,6 +100,13 @@ export const QUADRANTS = [
   { value: 'City-wide', label: 'City-wide' },
 ]
 
+// Full quadrant name for program-card/detail badges — abbreviations like "SW"
+// read poorly for the target audience, so badges spell out "Southwest".
+const QUADRANT_FULL_LABEL = { NW: 'Northwest', NE: 'Northeast', SW: 'Southwest', SE: 'Southeast' }
+export function quadrantFullLabel(value) {
+  return QUADRANT_FULL_LABEL[value] ?? value
+}
+
 export const COST_TYPES = [
   { value: 'Free',    label: 'Free' },
   { value: 'At-cost', label: 'Paid' },

@@ -14,7 +14,7 @@
   --color-border:        #d0d0d0;
   --color-border-focus:  var(--color-primary);
 
-  --color-text:          #1a1a1a;
+  --color-text:          #000000;
   --color-text-secondary:#444444;
   --color-text-inverse:  #ffffff;
 
@@ -1742,6 +1742,18 @@ a:hover { color: var(--color-primary-dark); }
   .chat-panel { width: calc(100vw - 2 * var(--space-lg)); }
 }
 
+/* Dims the page behind the display-settings panel on mobile, where the panel
+   grows tall enough to otherwise cover the search bar with no visual cue
+   that it's a floating overlay (Priority 1 "mobile header" bug). Declared
+   before the mobile media query below so that query's display:block wins. */
+.a11y-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 199;
+}
+
 /* Mobile header — no breakpoint existed here at all, causing overflow/clipping
    (Session 4 "mobile header" bug). Stack the row and let controls wrap.
    Kept at the end of the file so it wins the cascade over the equal-specificity
@@ -1766,10 +1778,15 @@ a:hover { color: var(--color-primary-dark); }
     min-width: unset;
     width: calc(100vw - 32px);
     max-width: 360px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
     right: auto;
     left: 0;
   }
   .a11y-grid {
     grid-template-columns: 1fr;
+  }
+  .a11y-backdrop {
+    display: block;
   }
 }

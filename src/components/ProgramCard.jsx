@@ -1,5 +1,5 @@
 import CostBadge from './CostBadge.jsx'
-import { SERVICE_AREAS } from '../utils/constants.js'
+import { SERVICE_AREAS, quadrantFullLabel } from '../utils/constants.js'
 import { cleanPopulationTags } from '../utils/program.js'
 
 function friendlyServiceLabel(value) {
@@ -43,7 +43,7 @@ export default function ProgramCard({ program, onSelect }) {
           </div>
           <div className="card-info-line">
             {program.quadrant.map((q) => (
-              <span key={q} className="badge badge-quad">{q}</span>
+              <span key={q} className="badge badge-quad">{quadrantFullLabel(q)}</span>
             ))}
           </div>
           <div className="card-info-line">

@@ -168,12 +168,15 @@ export default function App() {
                 Aa Display Settings ▾
               </button>
               {showA11y && (
-                <AccessibilityPanel
-                  prefs={prefs}
-                  set={set}
-                  reset={resetA11y}
-                  onClose={() => setShowA11y(false)}
-                />
+                <>
+                  <div className="a11y-backdrop" aria-hidden="true" />
+                  <AccessibilityPanel
+                    prefs={prefs}
+                    set={set}
+                    reset={resetA11y}
+                    onClose={() => setShowA11y(false)}
+                  />
+                </>
               )}
             </div>
           </div>
