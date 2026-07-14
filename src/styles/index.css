@@ -987,7 +987,7 @@ a:hover { color: var(--color-primary-dark); }
   background: var(--color-surface);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
-  border: 2px solid transparent;
+  border: 2px solid var(--color-border);
   transition: box-shadow 0.15s, border-color 0.15s;
   overflow: hidden;
 }
@@ -1288,12 +1288,14 @@ a:hover { color: var(--color-primary-dark); }
 .contact-btn-register { background: var(--color-accent);       color: var(--color-text-inverse); }
 .contact-btn-web      { background: transparent; border: 2px solid var(--color-primary);        color: var(--color-primary); }
 .contact-btn-web-org  { background: transparent; border: 2px solid var(--color-text-secondary); color: var(--color-text-secondary); }
+.contact-btn-form     { background: transparent; border: 2px solid var(--color-primary-light);  color: var(--color-primary); }
 
 .contact-btn-phone:hover    { background: var(--color-primary-dark);      color: var(--color-text-inverse); }
 .contact-btn-email:hover    { background: var(--color-primary);            color: var(--color-text-inverse); }
 .contact-btn-register:hover { background: var(--color-accent-dark);       color: var(--color-text-inverse); }
 .contact-btn-web:hover      { background: var(--color-primary);            color: var(--color-text-inverse); border-color: var(--color-primary); }
 .contact-btn-web-org:hover  { background: var(--color-text-secondary);     color: var(--color-text-inverse); }
+.contact-btn-form:hover     { background: var(--color-primary-light);      color: var(--color-text-inverse); }
 
 /* Plain copyable email — REQ-034. Clicking/selecting this text must not
    trigger a mailto: popup the way the button above does. */
@@ -1529,6 +1531,7 @@ a:hover { color: var(--color-primary-dark); }
      the underlying URL here. */
   .contact-btn-web[href]::after,
   .contact-btn-web-org[href]::after,
+  .contact-btn-form[href]::after,
   .contact-btn-register[href]::after {
     content: " (" attr(href) ")";
     font-size: 8pt;

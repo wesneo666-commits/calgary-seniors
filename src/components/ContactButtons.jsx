@@ -1,22 +1,26 @@
-import { extractRegistrationUrl } from '../utils/program.js'
+import { extractRegistrationUrl, parseContactEmail, parsePhones } from '../utils/program.js'
 
 export default function ContactButtons({ program }) {
-  const { phone, email, programWebsite, orgWebsite, howToAccess } = program
+  const { programWebsite, orgWebsite, howToAccess } = program
+  const phones = parsePhones(program.phone)
+  const { address: email, contactFormUrl } = parseContactEmail(program.email)
   const registrationUrl = extractRegistrationUrl(howToAccess)
 
-  if (!phone && !email && !programWebsite && !orgWebsite && !registrationUrl) return null
+  const hasAnyContact = phones.length > 0 || email || contactFormUrl || programWebsite || orgWebsite || registrationUrl
+  if (!hasAnyContact) return null
 
   return (
     <div className="contact-buttons">
-      {phone && (
+      {phones.map((entry, i) => (
         <a
-          href={`tel:${phone.replace(/\s/g, '')}`}
+          key={`${entry.number}-${i}`}
+          href={`tel:${entry.number.replace(/\s/g, '')}`}
           className="contact-btn contact-btn-phone"
-          aria-label={`Call ${program.organization}: ${phone}`}
+          aria-label={`Call ${program.organization}${entry.label ? ` (${entry.label})` : ''}: ${entry.number}`}
         >
-          <span aria-hidden="true">📞</span> Call: {phone}
+          <span aria-hidden="true">📞</span> {entry.label ? `${entry.label}: ` : 'Call: '}{entry.number}
         </a>
-      )}
+      ))}
       {email && (
         <a
           href={`mailto:${email}`}
@@ -24,6 +28,17 @@ export default function ContactButtons({ program }) {
           aria-label={`Email ${program.organization}: ${email}`}
         >
           <span aria-hidden="true">✉️</span> Email: {email}
+        </a>
+      )}
+      {contactFormUrl && (
+        <a
+          href={contactFormUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="contact-btn contact-btn-form"
+          aria-label={`Open contact form for ${program.organization} (opens in new tab)`}
+        >
+          <span aria-hidden="true">📋</span> Contact form
         </a>
       )}
       {registrationUrl && (

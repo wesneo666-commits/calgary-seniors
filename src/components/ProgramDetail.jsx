@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import CostBadge from './CostBadge.jsx'
 import ContactButtons from './ContactButtons.jsx'
 import { SERVICE_AREAS } from '../utils/constants.js'
-import { cleanPopulationTags, extractRegistrationUrl } from '../utils/program.js'
+import { cleanPopulationTags, extractRegistrationUrl, parseContactEmail, parsePhones } from '../utils/program.js'
 
 function friendlyServiceLabel(value) {
   return SERVICE_AREAS.find((s) => s.value === value)?.label ?? value
@@ -104,7 +104,15 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
   const friendlyServiceAreas = program.serviceArea.map(friendlyServiceLabel)
   const population = cleanPopulationTags(program.intendedPopulation)
   const eligibility = normalizeEligibility(program.eligibility)
-  const hasContactInfo = !!(program.phone || program.email || program.programWebsite || program.orgWebsite || extractRegistrationUrl(program.howToAccess))
+  const { address: contactEmail, contactFormUrl } = parseContactEmail(program.email)
+  const hasContactInfo = !!(
+    parsePhones(program.phone).length > 0
+    || contactEmail
+    || contactFormUrl
+    || program.programWebsite
+    || program.orgWebsite
+    || extractRegistrationUrl(program.howToAccess)
+  )
   const mailtoBody = encodeURIComponent(`Take a look at this program on the Calgary Seniors Resource Directory:\n${shareUrlFor(program)}`)
 
   return (
