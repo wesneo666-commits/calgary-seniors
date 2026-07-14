@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import CostBadge from './CostBadge.jsx'
 import ContactButtons from './ContactButtons.jsx'
 import { SERVICE_AREAS } from '../utils/constants.js'
-import { cleanPopulationTags } from '../utils/program.js'
+import { cleanPopulationTags, extractRegistrationUrl } from '../utils/program.js'
 
 function friendlyServiceLabel(value) {
   return SERVICE_AREAS.find((s) => s.value === value)?.label ?? value
@@ -39,18 +39,29 @@ function TagRow({ label, values }) {
   )
 }
 
+function shareUrlFor(program) {
+  return `${window.location.origin}${window.location.pathname}?program=${encodeURIComponent(program.id)}`
+}
+
 const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
-export default function ProgramDetail({ program, onClose }) {
+export default function ProgramDetail({ program, onClose, backLabel = '← Back to results' }) {
   const closeRef = useRef(null)
   const overlayRef = useRef(null)
   const panelRef = useRef(null)
+  const shareRef = useRef(null)
+  const [shareOpen, setShareOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => { closeRef.current?.focus() }, [program])
 
   useEffect(() => {
     function handleKey(e) {
-      if (e.key === 'Escape') { onClose(); return }
+      if (e.key === 'Escape') {
+        if (shareOpen) { setShareOpen(false); return }
+        onClose()
+        return
+      }
 
       if (e.key === 'Tab' && panelRef.current) {
         const focusable = [...panelRef.current.querySelectorAll(FOCUSABLE)]
@@ -66,7 +77,15 @@ export default function ProgramDetail({ program, onClose }) {
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [onClose])
+  }, [onClose, shareOpen])
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (shareOpen && shareRef.current && !shareRef.current.contains(e.target)) setShareOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [shareOpen])
 
   function handleOverlayClick(e) {
     if (e.target === overlayRef.current) onClose()
@@ -76,13 +95,17 @@ export default function ProgramDetail({ program, onClose }) {
     window.print()
   }
 
-  function handleShare() {
-    navigator.clipboard.writeText(window.location.href).catch(() => {})
+  function handleCopyUrl() {
+    navigator.clipboard.writeText(shareUrlFor(program)).catch(() => {})
+    setCopied(true)
+    setTimeout(() => setShareOpen(false), 700)
   }
 
   const friendlyServiceAreas = program.serviceArea.map(friendlyServiceLabel)
   const population = cleanPopulationTags(program.intendedPopulation)
   const eligibility = normalizeEligibility(program.eligibility)
+  const hasContactInfo = !!(program.phone || program.email || program.programWebsite || program.orgWebsite || extractRegistrationUrl(program.howToAccess))
+  const mailtoBody = encodeURIComponent(`Take a look at this program on the Calgary Seniors Resource Directory:\n${shareUrlFor(program)}`)
 
   return (
     <div
@@ -96,7 +119,7 @@ export default function ProgramDetail({ program, onClose }) {
       <div className="detail-panel" ref={panelRef}>
 
         <div className="print-only-header">
-          <span>Calgary Seniors Resource Guide</span>
+          <span>Calgary Seniors Resource Directory</span>
           <span>Printed {new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
         </div>
 
@@ -108,15 +131,38 @@ export default function ProgramDetail({ program, onClose }) {
             onClick={onClose}
             aria-label="Close program details"
           >
-            ← Back to results
+            {backLabel}
           </button>
           <div className="detail-actions">
             <button className="detail-action-btn" onClick={handlePrint} aria-label="Print this resource">
               🖨 Print
             </button>
-            <button className="detail-action-btn" onClick={handleShare} aria-label="Copy link to this resource">
-              🔗 Share
-            </button>
+            <div className="share-wrap" ref={shareRef}>
+              <button
+                className="detail-action-btn"
+                onClick={() => { setShareOpen((o) => !o); setCopied(false) }}
+                aria-haspopup="menu"
+                aria-expanded={shareOpen}
+                aria-label="Share this resource"
+              >
+                🔗 Share
+              </button>
+              {shareOpen && (
+                <div className="share-menu" role="menu" aria-label="Share options">
+                  <button className="share-menu-item" role="menuitem" onClick={handleCopyUrl}>
+                    {copied ? '✓ Copied!' : '📋 Copy URL'}
+                  </button>
+                  <a
+                    className="share-menu-item"
+                    role="menuitem"
+                    href={`mailto:?subject=${encodeURIComponent(`Take a look: ${program.programName}`)}&body=${mailtoBody}`}
+                    onClick={() => setShareOpen(false)}
+                  >
+                    ✉️ Share by email
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -136,7 +182,7 @@ export default function ProgramDetail({ program, onClose }) {
 
         <hr className="detail-divider" />
 
-        {/* Cost / location / format moved into body */}
+        {/* Cost / location / format */}
         <div className="detail-section">
           <span className="detail-label">Cost, location & format</span>
           <div className="detail-badges">
@@ -149,6 +195,17 @@ export default function ProgramDetail({ program, onClose }) {
             ))}
           </div>
         </div>
+
+        {/* Get in touch moved up, directly under cost/location/format — REQ-039 */}
+        {hasContactInfo && (
+          <>
+            <div className="detail-section">
+              <span className="detail-label">Get in touch</span>
+              <ContactButtons program={program} />
+            </div>
+            <hr className="detail-divider" />
+          </>
+        )}
 
         <div className="detail-section">
           <span className="detail-label">About this resource</span>
@@ -166,35 +223,12 @@ export default function ProgramDetail({ program, onClose }) {
           <TagRow label="Who this serves" values={population} />
         )}
 
-        {(program.phone || program.email || program.programWebsite || program.orgWebsite) && (
-          <>
-            <hr className="detail-divider" />
-            <div className="detail-section">
-              <span className="detail-label">Get in touch</span>
-              <ContactButtons program={program} />
-            </div>
-          </>
-        )}
-
-        <hr className="detail-divider" />
-
-        <div className="detail-suggest-row">
-          <span className="detail-suggest-label">Is this information out of date?</span>
-          <a
-            href={`mailto:?subject=${encodeURIComponent(`Suggest update: ${program.programName} — ${program.organization}`)}`}
-            className="suggest-update-link"
-            aria-label={`Suggest an update for ${program.programName}`}
-          >
-            ✏ Suggest an update
-          </a>
-        </div>
-
         <button
           className="detail-close-btn"
           onClick={onClose}
           aria-label="Close program details"
         >
-          ← Back to results
+          {backLabel}
         </button>
       </div>
     </div>

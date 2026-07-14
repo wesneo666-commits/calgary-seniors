@@ -6,6 +6,7 @@ export default function WizardLanding({ onPickGroup }) {
       <h2 className="wizard-landing-title">What are you looking for today?</h2>
       <p className="wizard-landing-subtitle">
         Choose a category below, or use the search bar above to look for something specific.
+        This directory covers non-medical, community-based supports only.
       </p>
       <div className="wizard-landing-grid">
         {SERVICE_AREA_GROUPS.map((group) => {

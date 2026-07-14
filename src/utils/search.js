@@ -26,6 +26,12 @@ export function filterPrograms(programs, filters) {
   const aiParsed = queryNorm && !isPostalQuery ? interpretQuery(queryNorm) : null
   const aiQuadrant = aiParsed?.quadrant ?? null
 
+  // Location supports multiple simultaneous selections (e.g. NW + NE) — REQ-020.
+  // Dropdown/postal/AI-detected quadrants are folded into the same selection set.
+  const activeQuadrants = new Set(quadrant || [])
+  if (detectedQuadrant) activeQuadrants.add(detectedQuadrant)
+  if (aiQuadrant) activeQuadrants.add(aiQuadrant)
+
   // When the mock AI recognized something (a location phrase, category, or
   // "free"), search against its cleaned keyword list instead of the raw
   // sentence. Otherwise fall back to the raw query, unchanged from before.
@@ -61,12 +67,12 @@ export function filterPrograms(programs, filters) {
       if (!queryTokens.every((token) => normalized.includes(token))) return false
     }
 
-    // Quadrant filter — dropdown selection, postal code, or a plain-language
-    // location phrase like "north east" typed in the search box
-    const activeQuadrant = quadrant || detectedQuadrant || aiQuadrant
-    if (activeQuadrant && activeQuadrant !== 'City-wide') {
+    // Quadrant filter — one or more checkbox selections, postal code, or a
+    // plain-language location phrase like "north east" typed in the search box.
+    // A program matches if it carries any selected quadrant, or is tagged City-wide.
+    if (activeQuadrants.size > 0 && !activeQuadrants.has('City-wide')) {
       const hasQuadrant =
-        p.quadrant.includes(activeQuadrant) || p.quadrant.includes('City-wide')
+        p.quadrant.some((q) => activeQuadrants.has(q)) || p.quadrant.includes('City-wide')
       if (!hasQuadrant) return false
     }
 

@@ -2,14 +2,16 @@ import ProgramCard from './ProgramCard.jsx'
 import FilterChips from './FilterChips.jsx'
 import Pagination from './Pagination.jsx'
 import { QUADRANTS, SERVICE_AREAS } from '../utils/constants.js'
-import { PAGE_SIZE } from '../App.jsx'
+import { PAGE_SIZE, isFilterActive } from '../App.jsx'
 
 function emptyMessage(filters) {
   const { query, quadrant, serviceArea, cost } = filters
-  const qLabel = quadrant ? (QUADRANTS.find((q) => q.value === quadrant)?.label ?? quadrant) : null
+  const qLabel = quadrant.length > 0
+    ? quadrant.map((q) => QUADRANTS.find((qq) => qq.value === q)?.label ?? q).join(', ')
+    : null
   const sLabel = serviceArea ? (SERVICE_AREAS.find((s) => s.value === serviceArea)?.label ?? serviceArea) : null
 
-  if (query && quadrant) {
+  if (query && quadrant.length > 0) {
     return {
       heading: `No results for "${query}" in ${qLabel}`,
       hint: 'Try removing the location filter to search all of Calgary, or use different keywords.',
@@ -33,13 +35,13 @@ function emptyMessage(filters) {
       hint: 'Check your spelling, try a shorter keyword, or browse using the filters on the left.',
     }
   }
-  if (quadrant && serviceArea) {
+  if (quadrant.length > 0 && serviceArea) {
     return {
       heading: `No ${sLabel} programs in ${qLabel}`,
       hint: 'Try selecting "All of Calgary" to see programs city-wide, or choose a different service type.',
     }
   }
-  if (quadrant) {
+  if (quadrant.length > 0) {
     return {
       heading: `No programs found in ${qLabel} matching your filters`,
       hint: 'Try selecting "All of Calgary" or removing a filter.',
@@ -66,7 +68,7 @@ export default function ResultsList({
   layout,
   onLayout,
 }) {
-  const isFiltered = Object.values(filters).some((v) => v !== '')
+  const isFiltered = Object.values(filters).some(isFilterActive)
   const isEmpty = totalResults === 0
   const { heading, hint } = isEmpty ? emptyMessage(filters) : {}
 

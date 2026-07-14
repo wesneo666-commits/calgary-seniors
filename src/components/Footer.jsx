@@ -12,14 +12,38 @@ export default function Footer({ onAbout }) {
             <p className="footer-note">Information is sourced from the Calgary Seniors Resource Society Environmental Scan. Contact individual organizations to confirm current availability.</p>
           </div>
         </div>
+
+        <div className="footer-org-links">
+          <div className="footer-org-link">
+            <p className="footer-org-link-label">Is your organization's listing out of date?</p>
+            <a
+              className="footer-org-link-action"
+              href={`mailto:?subject=${encodeURIComponent('Suggest a correction — Calgary Seniors Resource Directory')}`}
+            >
+              ✏ Suggest a correction
+            </a>
+          </div>
+          <div className="footer-org-link">
+            <p className="footer-org-link-label">
+              Represent an organization that isn't listed yet? Every program is reviewed for credibility before it's added.
+            </p>
+            <a
+              className="footer-org-link-action"
+              href={`mailto:?subject=${encodeURIComponent('Request to be added — Calgary Seniors Resource Directory')}`}
+            >
+              🏢 Request to be added
+            </a>
+          </div>
+        </div>
+
         <div className="footer-funding">
           <p className="footer-funding-label">Funding acknowledgment</p>
-          <p>This resource guide was made possible with support from the <strong>City of Calgary</strong> and <strong>the Province of Alberta</strong>. We acknowledge the traditional territories of the peoples of the Treaty 7 region.</p>
+          <p>The development of this directory was funded by the <strong>University of Calgary Centre on Aging</strong>, the <strong>Brenda Strafford Foundation Chair in Geriatric Medicine</strong>, and the <strong>Canadian Institutes of Health Research Betty Havens Prize for Knowledge Mobilization in Aging</strong>.</p>
         </div>
         <div className="footer-bottom">
           <p>© {new Date().getFullYear()} Calgary Seniors Resource Society</p>
           <button className="footer-about-btn" onClick={onAbout}>
-            About this guide
+            About this directory
           </button>
         </div>
       </div>

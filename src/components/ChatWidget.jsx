@@ -47,7 +47,7 @@ export default function ChatWidget({ onApplyFilters }) {
     const parsed = interpretQuery(text)
     const derivedFilters = {
       query: parsed?.hasInterpretation ? parsed.cleanedKeywords : text,
-      quadrant: parsed?.quadrant || '',
+      quadrant: parsed?.quadrant ? [parsed.quadrant] : [],
       serviceArea: '',
       cost: parsed?.costFree ? 'Free' : '',
       format: '',

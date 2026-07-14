@@ -16,13 +16,21 @@ import { useAccessibility } from './hooks/useAccessibility.js'
 
 const EMPTY_FILTERS = {
   query: '',
-  quadrant: '',
+  quadrant: [],
   serviceArea: '',
   cost: '',
   format: '',
 }
 
+export function isFilterActive(value) {
+  return Array.isArray(value) ? value.length > 0 : value !== ''
+}
+
 export const PAGE_SIZE = 20
+
+function getSharedProgramId() {
+  return new URLSearchParams(window.location.search).get('program')
+}
 
 export default function App() {
   const { prefs, set, reset: resetA11y } = useAccessibility()
@@ -35,13 +43,28 @@ export default function App() {
   const [sort, setSort] = useState('name-az')
   const [layout, setLayout] = useState('2col')
   const [landingMode, setLandingMode] = useState('direct') // 'direct' | 'wizard' — A/B toggle for UAT (Session 3, 2026-06-25)
+  const [sharedProgramId, setSharedProgramId] = useState(getSharedProgramId)
+
+  // A copied/shared program link (?program=<id>) loads straight into a
+  // single-card view instead of the full app backdrop — REQ-042.
+  const sharedProgram = sharedProgramId ? programs.find((p) => p.id === sharedProgramId) : null
+
+  const exitSharedView = useCallback(() => {
+    window.history.pushState({}, '', window.location.pathname)
+    setSharedProgramId(null)
+  }, [])
 
   const setFilter = useCallback((key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }, [])
 
-  const removeFilter = useCallback((key) => {
-    setFilters((prev) => ({ ...prev, [key]: '' }))
+  const removeFilter = useCallback((key, value) => {
+    setFilters((prev) => {
+      if (Array.isArray(prev[key])) {
+        return { ...prev, [key]: prev[key].filter((v) => v !== value) }
+      }
+      return { ...prev, [key]: '' }
+    })
   }, [])
 
   const clearFilters = useCallback(() => {
@@ -77,8 +100,18 @@ export default function App() {
   const totalPages = Math.ceil(allResults.length / PAGE_SIZE)
   const pageResults = allResults.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  const hasActiveFilters = Object.values(filters).some((v) => v !== '')
+  const hasActiveFilters = Object.values(filters).some(isFilterActive)
   const showWizard = landingMode === 'wizard' && !hasActiveFilters
+
+  if (sharedProgram) {
+    return (
+      <ProgramDetail
+        program={sharedProgram}
+        onClose={exitSharedView}
+        backLabel="← Back to Calgary Seniors Resource Directory"
+      />
+    )
+  }
 
   return (
     <>
@@ -101,7 +134,7 @@ export default function App() {
               />
             </button>
             <div className="site-header-text">
-              <h1>Calgary Seniors Resource Guide</h1>
+              <h1>Calgary Seniors Resource Directory</h1>
               <p>Find Programs and Services in Calgary, Alberta!</p>
             </div>
             <div className="landing-mode-toggle" role="group" aria-label="Landing page style (UAT testing)">
@@ -122,7 +155,7 @@ export default function App() {
                 Guided
               </button>
             </div>
-            <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="How to use this guide">
+            <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="How to use this directory">
               How to use this
             </button>
             <div className="a11y-btn-wrap">

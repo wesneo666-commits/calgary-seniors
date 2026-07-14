@@ -39,11 +39,11 @@ export default function AboutModal({ onClose }) {
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
-      aria-label="About this guide"
+      aria-label="About this directory"
     >
       <div className="help-panel" ref={panelRef}>
         <div className="help-header">
-          <h2>About this guide</h2>
+          <h2>About this directory</h2>
           <button ref={closeRef} className="detail-close-btn" onClick={onClose} aria-label="Close">
             ✕ Close
           </button>
@@ -53,16 +53,15 @@ export default function AboutModal({ onClose }) {
           <div className="help-icon">📋</div>
           <div>
             <h3>What is this?</h3>
-            <p>The <strong>Calgary Seniors Resource Guide</strong> is a free, searchable directory of programs and services available to older adults living in Calgary, Alberta. It was created to make it easier for seniors, caregivers, and service navigators to find the right support — in one place.</p>
+            <p>The <strong>Calgary Seniors Resource Directory</strong> is a free, easy-to-use online directory of programs and services for adults aged 55+ living in Calgary. It brings together reliable, up-to-date information in one place to help older adults, caregivers, and service providers find the supports they need.</p>
           </div>
         </div>
 
         <div className="help-section">
           <div className="help-icon">📊</div>
           <div>
-            <h3>Where does the data come from?</h3>
-            <p>All listings are sourced from the <strong>Calgary Seniors Resource Society Environmental Scan</strong> — a comprehensive survey of programs and services operating across Calgary. The directory currently includes <strong>688 programs</strong> across health, social connection, practical support, home care, and more.</p>
-            <p style={{ marginTop: '8px' }}>Information is reviewed periodically. Always contact an organization directly to confirm current availability, hours, and eligibility.</p>
+            <h3>Where does the information come from?</h3>
+            <p>The directory was created through a comprehensive scan of community-based programs and services across Calgary. It currently includes <strong>688 listings</strong> covering areas that support healthy aging. Information is reviewed and updated periodically. However, program details can change so contact the organization directly to confirm availability and eligibility.</p>
           </div>
         </div>
 
@@ -70,15 +69,15 @@ export default function AboutModal({ onClose }) {
           <div className="help-icon">🔒</div>
           <div>
             <h3>Your privacy</h3>
-            <p>This guide does not collect any personal information. No account is needed. Your searches and filter selections are not recorded or stored.</p>
+            <p>You can use this directory without creating an account. We do not collect personal information, and your searches and filter preferences are not stored.</p>
           </div>
         </div>
 
         <div className="help-section">
           <div className="help-icon">🏢</div>
           <div>
-            <h3>Who built this?</h3>
-            <p>This guide was developed on behalf of the <strong>Calgary Seniors Resource Society</strong> as part of an ongoing effort to improve access to supports for Calgary's older adult community.</p>
+            <h3>Who created this?</h3>
+            <p>This directory was developed by organizations involved in Age-Friendly Calgary, including the University of Calgary Centre on Aging, Calgary Seniors' Resource Society, and Carya. It was created to improve access to information and help connect Calgary's growing older adult population with the supports they need.</p>
           </div>
         </div>
 

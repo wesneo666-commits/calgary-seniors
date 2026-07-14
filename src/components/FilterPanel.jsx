@@ -28,6 +28,44 @@ function CheckboxGroup({ label, options, value, onChange, allLabel }) {
   )
 }
 
+// Location supports selecting more than one quadrant at once (e.g. NW + NE) — REQ-020.
+function MultiCheckboxGroup({ label, options, values, onChange, allLabel }) {
+  const hasSelection = values.length > 0
+
+  function toggle(optValue) {
+    onChange(
+      values.includes(optValue)
+        ? values.filter((v) => v !== optValue)
+        : [...values, optValue]
+    )
+  }
+
+  return (
+    <div className={`filter-group${hasSelection ? ' filter-group--active' : ''}`}>
+      <span className="filter-group-label">{label}{hasSelection ? ' ✓' : ''}</span>
+      <div className="checkbox-options">
+        <button
+          className={`checkbox-option checkbox-option--all${!hasSelection ? ' checkbox-option--active' : ''}`}
+          onClick={() => onChange([])}
+          aria-pressed={!hasSelection}
+        >
+          {allLabel}
+        </button>
+        {options.map((opt) => (
+          <button
+            key={opt.value}
+            className={`checkbox-option${values.includes(opt.value) ? ' checkbox-option--active' : ''}`}
+            onClick={() => toggle(opt.value)}
+            aria-pressed={values.includes(opt.value)}
+          >
+            {values.includes(opt.value) ? '✓ ' : ''}{opt.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function FilterPanel({ filters, onFilterChange, onClear, hasActive }) {
   return (
     <div className="filter-panel" role="group" aria-label="Filter programs">
@@ -35,10 +73,10 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
         <h2>Filter Programs</h2>
       </div>
 
-      <CheckboxGroup
+      <MultiCheckboxGroup
         label="Location"
         options={QUADRANTS}
-        value={filters.quadrant}
+        values={filters.quadrant}
         onChange={(v) => onFilterChange('quadrant', v)}
         allLabel="All of Calgary"
       />
@@ -63,7 +101,7 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
       />
 
       <CheckboxGroup
-        label="Format"
+        label="Service Format"
         options={FORMAT_TYPES}
         value={filters.format}
         onChange={(v) => onFilterChange('format', v)}

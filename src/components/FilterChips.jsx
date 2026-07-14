@@ -22,22 +22,27 @@ const KEY_PREFIX = {
   quadrant: 'Location',
   serviceArea: 'Service',
   cost: 'Cost',
-  format: 'Format',
+  format: 'Service Format',
 }
 
 export default function FilterChips({ filters, onRemove }) {
-  const activeChips = Object.entries(filters).filter(([, v]) => v !== '')
+  // Location supports multiple simultaneous values (REQ-020), so it expands
+  // into one chip per selection instead of one chip for the whole filter.
+  const activeChips = Object.entries(filters).flatMap(([key, value]) => {
+    if (Array.isArray(value)) return value.map((v) => ({ key, value: v }))
+    return value !== '' ? [{ key, value }] : []
+  })
 
   if (activeChips.length === 0) return null
 
   return (
     <div className="filter-chips" role="group" aria-label="Active filters">
       <span className="filter-chips-label">Active filters:</span>
-      {activeChips.map(([key, value]) => (
+      {activeChips.map(({ key, value }) => (
         <button
-          key={key}
+          key={`${key}-${value}`}
           className="filter-chip"
-          onClick={() => onRemove(key)}
+          onClick={() => onRemove(key, value)}
           aria-label={`Remove filter: ${KEY_PREFIX[key]} ${labelFor(key, value)}`}
         >
           <span className="chip-prefix">{KEY_PREFIX[key]}:</span>

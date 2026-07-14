@@ -1023,35 +1023,6 @@ a:hover { color: var(--color-primary-dark); }
   outline-offset: -3px;
 }
 
-.detail-suggest-row {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-xs);
-}
-.detail-suggest-label {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-}
-.suggest-update-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-  height: var(--touch-target);
-  padding: 0 var(--space-md);
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  color: var(--color-primary);
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  white-space: nowrap;
-}
-.suggest-update-link:hover {
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
-}
-
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -1060,23 +1031,6 @@ a:hover { color: var(--color-primary-dark); }
   margin-bottom: 4px;
 }
 .card-header-text { flex: 1; min-width: 0; }
-.card-icons {
-  display: flex;
-  gap: 4px;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-.card-icon-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  font-size: 16px;
-  flex-shrink: 0;
-}
 .card-org {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
@@ -1094,7 +1048,7 @@ a:hover { color: var(--color-primary-dark); }
 }
 .card-description {
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  color: var(--color-text);
   line-height: 1.45;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1125,12 +1079,12 @@ a:hover { color: var(--color-primary-dark); }
 /* Cost / location / format / eligibility, shown in a fixed order — Session 3 decision (2026-06-25) */
 .card-info-grid {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
+  flex-direction: column;
+  gap: 4px;
   margin-top: auto;
   padding-top: 6px;
 }
-.card-info-col {
+.card-info-line {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -1230,6 +1184,38 @@ a:hover { color: var(--color-primary-dark); }
 }
 .detail-action-btn:hover { background: var(--color-bg); }
 
+/* Share dropdown — REQ-041 */
+.share-wrap { position: relative; }
+.share-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card-hover);
+  z-index: 210;
+  min-width: 190px;
+  overflow: hidden;
+}
+.share-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.share-menu-item:hover { background: var(--color-bg); }
+
 .detail-close-btn {
   height: var(--touch-target);
   padding: 0 var(--space-md);
@@ -1297,15 +1283,29 @@ a:hover { color: var(--color-primary-dark); }
   white-space: normal;
   word-break: break-word;
 }
-.contact-btn-phone   { background: var(--color-primary);      color: var(--color-text-inverse); }
-.contact-btn-email   { background: var(--color-primary-light); color: var(--color-text-inverse); }
-.contact-btn-web     { background: transparent; border: 2px solid var(--color-primary);        color: var(--color-primary); }
-.contact-btn-web-org { background: transparent; border: 2px solid var(--color-text-secondary); color: var(--color-text-secondary); }
+.contact-btn-phone    { background: var(--color-primary);      color: var(--color-text-inverse); }
+.contact-btn-email    { background: var(--color-primary-light); color: var(--color-text-inverse); }
+.contact-btn-register { background: var(--color-accent);       color: var(--color-text-inverse); }
+.contact-btn-web      { background: transparent; border: 2px solid var(--color-primary);        color: var(--color-primary); }
+.contact-btn-web-org  { background: transparent; border: 2px solid var(--color-text-secondary); color: var(--color-text-secondary); }
 
-.contact-btn-phone:hover   { background: var(--color-primary-dark);      color: var(--color-text-inverse); }
-.contact-btn-email:hover   { background: var(--color-primary);            color: var(--color-text-inverse); }
-.contact-btn-web:hover     { background: var(--color-primary);            color: var(--color-text-inverse); border-color: var(--color-primary); }
-.contact-btn-web-org:hover { background: var(--color-text-secondary);     color: var(--color-text-inverse); }
+.contact-btn-phone:hover    { background: var(--color-primary-dark);      color: var(--color-text-inverse); }
+.contact-btn-email:hover    { background: var(--color-primary);            color: var(--color-text-inverse); }
+.contact-btn-register:hover { background: var(--color-accent-dark);       color: var(--color-text-inverse); }
+.contact-btn-web:hover      { background: var(--color-primary);            color: var(--color-text-inverse); border-color: var(--color-primary); }
+.contact-btn-web-org:hover  { background: var(--color-text-secondary);     color: var(--color-text-inverse); }
+
+/* Plain copyable email — REQ-034. Clicking/selecting this text must not
+   trigger a mailto: popup the way the button above does. */
+.contact-email-plain {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+.contact-email-plain-value {
+  user-select: all;
+  color: var(--color-text);
+  font-weight: 600;
+}
 
 /* ─── Pagination ─────────────────────────────────────────────── */
 .pagination {
@@ -1388,6 +1388,34 @@ a:hover { color: var(--color-primary-dark); }
   opacity: 0.65 !important;
   font-size: var(--font-size-sm) !important;
 }
+/* Org-facing footer links — REQ-043 (suggest a correction) and REQ-044 (request to be added) */
+.footer-org-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  padding: var(--space-md) 0;
+  border-top: 1px solid rgba(255,255,255,0.2);
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  margin-bottom: var(--space-md);
+}
+.footer-org-link {
+  flex: 1 1 260px;
+}
+.footer-org-link-label {
+  font-size: var(--font-size-sm);
+  opacity: 0.85;
+  line-height: 1.5;
+  margin-bottom: var(--space-xs);
+}
+.footer-org-link-action {
+  display: inline-block;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: #ffffff;
+  text-decoration: underline;
+}
+.footer-org-link-action:hover { opacity: 0.8; }
+
 .footer-funding {
   padding: var(--space-md) 0;
   border-bottom: 1px solid rgba(255,255,255,0.2);
@@ -1442,7 +1470,8 @@ a:hover { color: var(--color-primary-dark); }
   .site-header,
   .search-section,
   main,
-  .site-footer { display: none !important; }
+  .site-footer,
+  .chat-widget { display: none !important; }
 
   .detail-overlay {
     position: static !important;
@@ -1464,7 +1493,6 @@ a:hover { color: var(--color-primary-dark); }
   }
 
   .detail-top-bar,
-  .detail-suggest-row,
   .detail-close-btn { display: none !important; }
 
   .print-only-header {
@@ -1494,6 +1522,17 @@ a:hover { color: var(--color-primary-dark); }
     min-height: auto !important;
     padding: 4pt 8pt !important;
     height: auto !important;
+  }
+
+  /* Phone/email already print their visible number/address as text (REQ-040).
+     Web/registration buttons only show a generic label on screen, so reveal
+     the underlying URL here. */
+  .contact-btn-web[href]::after,
+  .contact-btn-web-org[href]::after,
+  .contact-btn-register[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    word-break: break-all;
   }
 
   .detail-section { page-break-inside: avoid; }
@@ -1698,4 +1737,36 @@ a:hover { color: var(--color-primary-dark); }
 
 @media (max-width: 480px) {
   .chat-panel { width: calc(100vw - 2 * var(--space-lg)); }
+}
+
+/* Mobile header — no breakpoint existed here at all, causing overflow/clipping
+   (Session 4 "mobile header" bug). Stack the row and let controls wrap.
+   Kept at the end of the file so it wins the cascade over the equal-specificity
+   base rules for .a11y-panel/.a11y-grid defined earlier. */
+@media (max-width: 640px) {
+  .site-header-inner {
+    flex-wrap: wrap;
+  }
+  .site-header-text {
+    flex-basis: 100%;
+    order: 1;
+  }
+  .site-logo {
+    height: 48px;
+  }
+  .landing-mode-toggle,
+  .help-btn,
+  .a11y-btn-wrap {
+    order: 2;
+  }
+  .a11y-panel {
+    min-width: unset;
+    width: calc(100vw - 32px);
+    max-width: 360px;
+    right: auto;
+    left: 0;
+  }
+  .a11y-grid {
+    grid-template-columns: 1fr;
+  }
 }

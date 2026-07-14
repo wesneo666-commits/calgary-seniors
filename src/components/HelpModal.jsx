@@ -39,11 +39,11 @@ export default function HelpModal({ onClose }) {
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
-      aria-label="Help — how to use this guide"
+      aria-label="Help — how to use this directory"
     >
       <div className="help-panel" ref={panelRef}>
         <div className="help-header">
-          <h2>How to use this guide</h2>
+          <h2>How to use this directory</h2>
           <button ref={closeRef} className="detail-close-btn" onClick={onClose} aria-label="Close help">
             ✕ Close
           </button>
@@ -61,7 +61,7 @@ export default function HelpModal({ onClose }) {
           <div className="help-icon">🗂</div>
           <div>
             <h3>Use filters to narrow results</h3>
-            <p>On the left side, you'll find four filters: <strong>location</strong>, <strong>service type</strong>, <strong>cost</strong>, and <strong>format</strong>. You can use any combination. Active filters show as tags at the top of your results — click the <strong>✕</strong> on any tag to remove it.</p>
+            <p>On the left side, you'll find four filters: <strong>location</strong>, <strong>service type</strong>, <strong>cost</strong>, and <strong>service format</strong>. You can use any combination — location even lets you pick more than one area at once. Active filters show as tags at the top of your results — click the <strong>✕</strong> on any tag to remove it.</p>
           </div>
         </div>
 
