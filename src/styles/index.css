@@ -622,11 +622,15 @@ a:hover { color: var(--petal-slate-deep); }
 /* ─── Search bar ─────────────────────────────────────────────── */
 .search-section {
   background: var(--petal-slate-deep);
-  /* Faint four-petal rosette from the logo, cropped off the right edge */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23ffffff' opacity='0.05' transform='rotate(45 100 100)'%3E%3Cellipse cx='100' cy='52' rx='30' ry='46'/%3E%3Cellipse cx='100' cy='148' rx='30' ry='46'/%3E%3Cellipse cx='52' cy='100' rx='46' ry='30'/%3E%3Cellipse cx='148' cy='100' rx='46' ry='30'/%3E%3C/g%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right -50px center;
-  background-size: 280px;
+  /* Faint four-petal rosettes from the logo — one cropped off each edge.
+     The left one is smaller, lower, and turned differently so the pair
+     reads as a pattern, not a mirrored stamp. */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23ffffff' opacity='0.05' transform='rotate(20 100 100)'%3E%3Cellipse cx='100' cy='52' rx='30' ry='46'/%3E%3Cellipse cx='100' cy='148' rx='30' ry='46'/%3E%3Cellipse cx='52' cy='100' rx='46' ry='30'/%3E%3Cellipse cx='148' cy='100' rx='46' ry='30'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23ffffff' opacity='0.05' transform='rotate(45 100 100)'%3E%3Cellipse cx='100' cy='52' rx='30' ry='46'/%3E%3Cellipse cx='100' cy='148' rx='30' ry='46'/%3E%3Cellipse cx='52' cy='100' rx='46' ry='30'/%3E%3Cellipse cx='148' cy='100' rx='46' ry='30'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: left -60px center, right -50px center;
+  background-size: 220px, 280px;
   padding: var(--space-lg) 0;
 }
 .search-bar-outer {
@@ -748,6 +752,49 @@ a:hover { color: var(--petal-slate-deep); }
 .search-clear-btn:hover {
   background: oklch(0% 0 0 / 0.08);
   color: var(--color-text);
+}
+
+/* Voice dictation button — white like the input so the pair reads as one
+   control; flips to ember while recording (the accent already means "act") */
+.voice-btn {
+  height: 52px;
+  padding: 0 var(--space-md);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+  background: var(--color-surface);
+  color: var(--petal-slate-deep);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
+}
+.voice-btn:hover {
+  background: oklch(92% 0.015 235);
+}
+.voice-btn--listening,
+.voice-btn--listening:hover {
+  background: var(--petal-ember);
+  color: var(--color-text-inverse);
+}
+.voice-btn--listening .voice-btn-icon {
+  animation: voice-pulse 1.2s var(--ease-out) infinite;
+}
+@keyframes voice-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .voice-btn--listening .voice-btn-icon { animation: none; }
+}
+.search-hint--error {
+  color: #ffffff;
+  font-weight: 500;
 }
 
 .search-btn {
@@ -1260,12 +1307,12 @@ a:hover { color: var(--petal-slate-deep); }
 .badge {
   display: inline-flex;
   align-items: center;
-  height: 26px;
-  padding: 0 10px;
+  min-height: 26px;
+  padding: 2px 10px;
   border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
   font-weight: 600;
-  white-space: nowrap;
+  line-height: 1.25;
 }
 .badge-free    { background: var(--color-free-bg);    color: var(--color-free); }
 .badge-cost    { background: var(--color-cost-bg);    color: var(--color-cost); }
