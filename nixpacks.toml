@@ -1,0 +1,6 @@
+# Railway (Nixpacks) build configuration.
+# playwright is a local dev tool (scripts/screenshot.mjs); its npm postinstall
+# downloads ~500MB of browser binaries, which the deploy build doesn't need
+# and which can fail or time out on CI builders.
+[variables]
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1"
