@@ -61,14 +61,6 @@ function MultiCheckboxGroup({ label, options, values, onChange, allLabel }) {
             {values.includes(opt.value) ? '✓ ' : ''}{opt.label}
           </button>
         ))}
-        <button
-          className="checkbox-option checkbox-option--disabled"
-          disabled
-          aria-disabled="true"
-          title="Coming soon — not yet available for filtering"
-        >
-          Central Calgary
-        </button>
       </div>
     </div>
   )

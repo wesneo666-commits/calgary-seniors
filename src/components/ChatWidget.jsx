@@ -61,10 +61,6 @@ export default function ChatWidget({ onApplyFilters }) {
     } else {
       replyText = `I found ${matches.length} program${matches.length === 1 ? '' : 's'} for ${summary}. Here ${matches.length === 1 ? 'is' : 'are'} a few:`
     }
-    if (parsed?.centralRequested) {
-      replyText += ' (Calgary Centre isn’t tagged in our data yet, so this is showing all of Calgary.)'
-    }
-
     const userMsg = { id: nextMessageId++, from: 'user', text }
     const botMsg = {
       id: nextMessageId++,

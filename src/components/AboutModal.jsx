@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import programs from '../data/programs.json'
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'
 
@@ -61,7 +62,7 @@ export default function AboutModal({ onClose }) {
           <div className="help-icon">📊</div>
           <div>
             <h3>Where does the information come from?</h3>
-            <p>The directory was created through a comprehensive scan of community-based programs and services across Calgary. It currently includes <strong>688 listings</strong> covering areas that support healthy aging.</p>
+            <p>The directory was created through a comprehensive scan of community-based programs and services across Calgary. It currently includes <strong>{programs.length} listings</strong> covering areas that support healthy aging.</p>
             <p>Information is reviewed and updated periodically. However, program details can change so contact the organization directly to confirm availability and eligibility.</p>
           </div>
         </div>

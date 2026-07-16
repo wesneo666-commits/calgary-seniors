@@ -1,3 +1,5 @@
+import programs from '../data/programs.json'
+
 export default function Footer({ onAbout }) {
   return (
     <footer className="site-footer" role="contentinfo">
@@ -12,7 +14,7 @@ export default function Footer({ onAbout }) {
 
           <div className="footer-col">
             <h2 className="footer-heading">About the directory</h2>
-            <p>This directory lists <strong>688 programs and services</strong> available to seniors in Calgary.</p>
+            <p>This directory lists <strong>{programs.length} programs and services</strong> available to seniors in Calgary.</p>
             <p>Information is sourced from the Calgary Seniors Resource Society Environmental Scan. Contact individual organizations to confirm current availability.</p>
           </div>
 

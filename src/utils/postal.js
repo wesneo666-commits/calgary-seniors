@@ -11,6 +11,8 @@ const POSTAL_QUADRANT_MAP = {
   T2Z: 'SW', T3C: 'SW', T3E: 'SW', T3H: 'SW', T3Z: 'SW',
   // SE
   T1H: 'SE', T1J: 'SE', T1K: 'SE', T2G: 'SE', T2H: 'SE', T2J: 'SE',
+  // Central (downtown core + Beltline)
+  T2P: 'Central', T2R: 'Central',
 }
 
 export function postalToQuadrant(postal) {

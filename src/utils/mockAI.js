@@ -18,13 +18,10 @@ const LOCATION_PHRASES = [
   { re: /\bnorth\s*west\b|\bnorthwest\b|\bnw\b/, quadrant: 'NW', label: 'Northwest' },
   { re: /\bsouth\s*east\b|\bsoutheast\b|\bse\b/, quadrant: 'SE', label: 'Southeast' },
   { re: /\bsouth\s*west\b|\bsouthwest\b|\bsw\b/, quadrant: 'SW', label: 'Southwest' },
+  { re: /\bcentral\b|\bcentre\b|\bcenter\b|\bdowntown\b|\bbeltline\b/, quadrant: 'Central', label: 'Central' },
   { re: /\ball of calgary\b|\bcity[\s-]?wide\b|\banywhere\b/, quadrant: 'City-wide', label: 'all of Calgary' },
 ]
 
-// "Central/downtown Calgary" isn't a tagged quadrant yet — Calgary Centre is
-// still blocked on Kate's tagged program list (see open-questions.md). We
-// still recognize the phrase so the mock AI can respond honestly about it
-// instead of silently ignoring it.
 const CENTRAL_PHRASE = /\bcentral\b|\bcentre\b|\bcenter\b|\bdowntown\b|\bbeltline\b/
 
 const CATEGORY_SYNONYMS = [
@@ -72,8 +69,6 @@ export function interpretQuery(raw) {
       break
     }
   }
-  const centralRequested = !quadrant && CENTRAL_PHRASE.test(text)
-
   let serviceAreaValue = null
   let serviceAreaLabel = null
   for (const cat of CATEGORY_SYNONYMS) {
@@ -95,13 +90,12 @@ export function interpretQuery(raw) {
     .replace(/[.,!?]/g, ' ')
   const cleanedKeywords = stripStopwords(withoutPhrases.split(/\s+/)).join(' ').trim()
 
-  const hasInterpretation = !!(quadrant || centralRequested || serviceAreaValue || costFree)
+  const hasInterpretation = !!(quadrant || serviceAreaValue || costFree)
 
   return {
     hasInterpretation,
     quadrant,
     quadrantLabel,
-    centralRequested,
     serviceAreaValue,
     serviceAreaLabel,
     costFree,
@@ -120,8 +114,8 @@ export function describeInterpretation(result) {
   else if (result.cleanedKeywords) parts.push(`"${result.cleanedKeywords}"`)
 
   let where = ''
-  if (result.quadrantLabel) where = ` in ${result.quadrantLabel} Calgary`
-  else if (result.centralRequested) where = ' in central Calgary'
+  if (result.quadrant === 'City-wide') where = ' anywhere in Calgary'
+  else if (result.quadrantLabel) where = ` in ${result.quadrantLabel} Calgary`
 
   const costText = result.costFree ? ' that are free' : ''
 

@@ -2,7 +2,7 @@ import { postalToQuadrant } from '../utils/postal.js'
 import { interpretQuery, describeInterpretation } from '../utils/mockAI.js'
 import { useSpeechToText } from '../hooks/useSpeechToText.js'
 
-const QUADRANT_LABEL = { NW: 'Northwest', NE: 'Northeast', SW: 'Southwest', SE: 'Southeast' }
+const QUADRANT_LABEL = { NW: 'Northwest', NE: 'Northeast', SW: 'Southwest', SE: 'Southeast', Central: 'Central Calgary' }
 
 function MicIcon() {
   return (
@@ -95,12 +95,11 @@ export default function SearchBar({ value, onChange }) {
         </p>
       ) : detectedQuadrant ? (
         <p className="search-hint search-hint--detected" role="status">
-          Showing programs in <strong>{QUADRANT_LABEL[detectedQuadrant]} ({detectedQuadrant})</strong> — <button className="hint-clear-btn" onClick={() => onChange('')} type="button">clear</button>
+          Showing programs in <strong>{QUADRANT_LABEL[detectedQuadrant]}{detectedQuadrant !== 'Central' && ` (${detectedQuadrant})`}</strong> — <button className="hint-clear-btn" onClick={() => onChange('')} type="button">clear</button>
         </p>
       ) : aiSummary ? (
         <p className="search-hint search-hint--ai" role="status">
           <span className="ai-hint-badge" aria-hidden="true">Mock AI</span> Searching for {aiSummary}
-          {aiResult.centralRequested && ' — Calgary Centre isn’t tagged in our data yet, showing all of Calgary instead'}
           {' — '}<button className="hint-clear-btn" onClick={() => onChange('')} type="button">clear</button>
         </p>
       ) : (

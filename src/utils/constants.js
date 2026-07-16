@@ -109,12 +109,13 @@ export const QUADRANTS = [
   { value: 'NE', label: 'Northeast' },
   { value: 'SW', label: 'Southwest' },
   { value: 'SE', label: 'Southeast' },
+  { value: 'Central', label: 'Central Calgary' },
   { value: 'City-wide', label: 'City-wide' },
 ]
 
 // Full quadrant name for program-card/detail badges — abbreviations like "SW"
 // read poorly for the target audience, so badges spell out "Southwest".
-const QUADRANT_FULL_LABEL = { NW: 'Northwest', NE: 'Northeast', SW: 'Southwest', SE: 'Southeast' }
+const QUADRANT_FULL_LABEL = { NW: 'Northwest', NE: 'Northeast', SW: 'Southwest', SE: 'Southeast', Central: 'Central Calgary' }
 export function quadrantFullLabel(value) {
   return QUADRANT_FULL_LABEL[value] ?? value
 }
