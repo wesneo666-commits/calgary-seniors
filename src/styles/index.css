@@ -1432,6 +1432,19 @@ a:hover { color: var(--color-primary-dark); }
 }
 .footer-funding p { font-size: var(--font-size-sm); opacity: 0.85; line-height: 1.6; }
 .footer-funding strong { color: #ffffff; }
+.footer-funding-logo-wrap {
+  display: inline-block;
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-sm);
+  margin-top: var(--space-sm);
+}
+.footer-funding-logo {
+  display: block;
+  height: 32px;
+  width: auto;
+  max-width: 100%;
+}
 .footer-bottom {
   margin-top: var(--space-md);
   font-size: var(--font-size-sm);
