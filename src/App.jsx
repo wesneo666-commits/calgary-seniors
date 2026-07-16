@@ -152,7 +152,7 @@ export default function App() {
                 onClick={() => setLandingMode('wizard')}
                 aria-pressed={landingMode === 'wizard'}
               >
-                Guided
+                Guided directory
               </button>
             </div>
             <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="How to use this directory">

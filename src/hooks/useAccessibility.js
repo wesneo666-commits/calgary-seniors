@@ -21,7 +21,7 @@ export const SPACINGS = [
 
 const KEY = 'csrg-accessibility'
 
-export const DEFAULT_PREFS = { sizeIndex: 0, contrast: 'normal', fontKey: 'standard', spacing: 'normal' }
+export const DEFAULT_PREFS = { sizeIndex: 1, contrast: 'normal', fontKey: 'standard', spacing: 'normal' }
 
 function load() {
   try {

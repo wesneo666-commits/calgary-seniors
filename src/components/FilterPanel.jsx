@@ -61,6 +61,14 @@ function MultiCheckboxGroup({ label, options, values, onChange, allLabel }) {
             {values.includes(opt.value) ? '✓ ' : ''}{opt.label}
           </button>
         ))}
+        <button
+          className="checkbox-option checkbox-option--disabled"
+          disabled
+          aria-disabled="true"
+          title="Coming soon — not yet available for filtering"
+        >
+          Central Calgary
+        </button>
       </div>
     </div>
   )
@@ -114,14 +122,14 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
         </button>
       )}
 
-      <div className="filter-tips">
-        <p className="filter-tips-heading">How filters work</p>
+      <details className="filter-tips">
+        <summary className="filter-tips-heading">How filters work</summary>
         <ul className="filter-tips-list">
           <li>Tap any option to filter results</li>
           <li>You can apply more than one filter at a time</li>
           <li>Active filters appear as tags above your results — click the ✕ on any tag to remove it</li>
         </ul>
-      </div>
+      </details>
     </div>
   )
 }

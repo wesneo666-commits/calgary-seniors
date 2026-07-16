@@ -1,6 +1,4 @@
-import CostBadge from './CostBadge.jsx'
-import { SERVICE_AREAS, quadrantFullLabel } from '../utils/constants.js'
-import { cleanPopulationTags } from '../utils/program.js'
+import { SERVICE_AREAS } from '../utils/constants.js'
 
 function friendlyServiceLabel(value) {
   return SERVICE_AREAS.find((s) => s.value === value)?.label ?? value
@@ -8,7 +6,6 @@ function friendlyServiceLabel(value) {
 
 export default function ProgramCard({ program, onSelect }) {
   const serviceLabels = program.serviceArea.map(friendlyServiceLabel).slice(0, 2)
-  const population = cleanPopulationTags(program.intendedPopulation)
 
   return (
     <article>
@@ -24,8 +21,6 @@ export default function ProgramCard({ program, onSelect }) {
           </div>
         </div>
 
-        <p className="card-description">{program.description}</p>
-
         {serviceLabels.length > 0 && (
           <div className="card-service-tags">
             {serviceLabels.map((label) => (
@@ -36,27 +31,6 @@ export default function ProgramCard({ program, onSelect }) {
             )}
           </div>
         )}
-
-        <div className="card-info-grid">
-          <div className="card-info-line">
-            <CostBadge cost={program.cost} />
-          </div>
-          <div className="card-info-line">
-            {program.quadrant.map((q) => (
-              <span key={q} className="badge badge-quad">{quadrantFullLabel(q)}</span>
-            ))}
-          </div>
-          <div className="card-info-line">
-            {program.format.map((f) => (
-              <span key={f} className="badge badge-format">{f}</span>
-            ))}
-          </div>
-          {population.length > 0 && (
-            <div className="card-info-line">
-              <span className="badge badge-population">{population[0]}</span>
-            </div>
-          )}
-        </div>
       </button>
     </article>
   )

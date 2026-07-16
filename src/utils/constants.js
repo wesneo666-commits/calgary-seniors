@@ -93,10 +93,10 @@ export function serviceAreaLabel(value) {
 }
 
 export const QUADRANTS = [
-  { value: 'NW', label: 'NW – Northwest' },
-  { value: 'NE', label: 'NE – Northeast' },
-  { value: 'SW', label: 'SW – Southwest' },
-  { value: 'SE', label: 'SE – Southeast' },
+  { value: 'NW', label: 'Northwest' },
+  { value: 'NE', label: 'Northeast' },
+  { value: 'SW', label: 'Southwest' },
+  { value: 'SE', label: 'Southeast' },
   { value: 'City-wide', label: 'City-wide' },
 ]
 
