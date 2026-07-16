@@ -15,8 +15,7 @@ export default function WizardLanding({ onPickGroup }) {
             <button
               key={group.group}
               type="button"
-              className="wizard-landing-card"
-              style={{ '--wizard-card-bg': icon?.bg, '--wizard-card-color': icon?.color }}
+              className={`wizard-landing-card wizard-landing-card--${icon?.slug ?? 'home'}`}
               onClick={() => onPickGroup(group.group)}
             >
               <span className="wizard-landing-icon" aria-hidden="true">{icon?.emoji}</span>

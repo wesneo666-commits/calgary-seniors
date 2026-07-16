@@ -76,13 +76,25 @@ export const SERVICE_AREA_GROUPS = [
 export const SERVICE_AREAS = SERVICE_AREA_GROUPS.flatMap((g) => g.items)
 
 // Parent category icons — used by the landing-page icon navigation only
-// (removed from program cards per REQ-051)
+// (removed from program cards per REQ-051). Each group carries one petal of
+// the Calgary Seniors logo; the slug selects its petal colors in CSS.
 export const GROUP_ICONS = {
-  'Getting help at home': { emoji: '🏠', bg: '#e8f4fd', color: '#1a5276' },
-  'Health & wellness':    { emoji: '🩺', bg: '#d4edda', color: '#1a6635' },
-  'Social & community':   { emoji: '🤝', bg: '#ede7f6', color: '#4a148c' },
-  'Practical support':    { emoji: '🔧', bg: '#fff3cd', color: '#7d4a00' },
-  'Safety & crisis':      { emoji: '🛡️', bg: '#fde8ea', color: '#8b1a24' },
+  'Getting help at home': { emoji: '🏠', slug: 'home' },
+  'Health & wellness':    { emoji: '🩺', slug: 'health' },
+  'Social & community':   { emoji: '🤝', slug: 'social' },
+  'Practical support':    { emoji: '🔧', slug: 'practical' },
+  'Safety & crisis':      { emoji: '🛡️', slug: 'safety' },
+}
+
+// Petal slug for a service-area value (via its parent group) — colors the
+// service badges on cards and the detail view.
+const SERVICE_AREA_TO_SLUG = Object.fromEntries(
+  SERVICE_AREA_GROUPS.flatMap((g) =>
+    g.items.map((item) => [item.value, GROUP_ICONS[g.group]?.slug])
+  )
+)
+export function serviceGroupSlug(value) {
+  return SERVICE_AREA_TO_SLUG[value] ?? 'home'
 }
 
 // Display label for a filters.serviceArea value: '' | '_group_X' | item value

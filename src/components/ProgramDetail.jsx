@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import CostBadge from './CostBadge.jsx'
 import ContactButtons from './ContactButtons.jsx'
-import { SERVICE_AREAS, quadrantFullLabel } from '../utils/constants.js'
+import { SERVICE_AREAS, quadrantFullLabel, serviceGroupSlug } from '../utils/constants.js'
 import { cleanPopulationTags, extractRegistrationUrl, parseContactEmail, parsePhones } from '../utils/program.js'
 
 function friendlyServiceLabel(value) {
@@ -101,7 +101,10 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
     setTimeout(() => setShareOpen(false), 700)
   }
 
-  const friendlyServiceAreas = program.serviceArea.map(friendlyServiceLabel)
+  const friendlyServiceAreas = program.serviceArea.map((value) => ({
+    label: friendlyServiceLabel(value),
+    slug: serviceGroupSlug(value),
+  }))
   const population = cleanPopulationTags(program.intendedPopulation)
   const eligibility = normalizeEligibility(program.eligibility)
   const { address: contactEmail, contactFormUrl } = parseContactEmail(program.email)
@@ -182,8 +185,8 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
         {/* Header: service area type tags (most scannable identity info) */}
         {friendlyServiceAreas.length > 0 && (
           <div className="detail-badges">
-            {friendlyServiceAreas.map((s) => (
-              <span key={s} className="badge badge-service">{s}</span>
+            {friendlyServiceAreas.map(({ label, slug }) => (
+              <span key={label} className={`badge badge-service badge-service--${slug}`}>{label}</span>
             ))}
           </div>
         )}

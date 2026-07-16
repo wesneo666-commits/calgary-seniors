@@ -8,7 +8,7 @@ export const TEXT_SIZES = [
 ]
 
 export const FONTS = [
-  { key: 'standard', label: 'Standard',         family: "'Segoe UI', system-ui, sans-serif" },
+  { key: 'standard', label: 'Standard (Hyperlegible)', family: "'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif" },
   { key: 'readable', label: 'Readable (Arial)',  family: 'Arial, Helvetica, sans-serif' },
   { key: 'wide',     label: 'Spacious (Verdana)', family: 'Verdana, Geneva, sans-serif' },
 ]
@@ -47,7 +47,7 @@ export function useAccessibility() {
     html.dataset.spacing  = prefs.spacing
 
     const font = FONTS.find((f) => f.key === prefs.fontKey)
-    html.style.setProperty('--font-base', font ? font.family : "'Segoe UI', system-ui, sans-serif")
+    html.style.setProperty('--font-base', font ? font.family : "'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif")
 
     localStorage.setItem(KEY, JSON.stringify(prefs))
   }, [prefs])

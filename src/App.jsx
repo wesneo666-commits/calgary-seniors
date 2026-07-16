@@ -152,7 +152,7 @@ export default function App() {
                 onClick={() => setLandingMode('wizard')}
                 aria-pressed={landingMode === 'wizard'}
               >
-                Guided directory
+                Directory
               </button>
             </div>
             <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="How to use this directory">
@@ -163,9 +163,9 @@ export default function App() {
                 className="a11y-toggle-btn"
                 onClick={() => setShowA11y((v) => !v)}
                 aria-expanded={showA11y}
-                aria-label="Display settings"
+                aria-label="Website display settings"
               >
-                Aa Display Settings ▾
+                Website Display Settings ▾
               </button>
               {showA11y && (
                 <>
