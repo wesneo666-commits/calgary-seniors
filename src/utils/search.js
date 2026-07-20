@@ -3,6 +3,17 @@ import { SERVICE_AREA_GROUPS } from './constants.js'
 import { interpretQuery } from './mockAI.js'
 
 /**
+ * Two words match if the shorter is a prefix of the longer, provided the
+ * shared prefix is at least 5 characters. This tolerates common morphological
+ * variants (transport/transportation, access/accessible) without pulling in
+ * short-word false positives. Short tokens still match via plain substring.
+ */
+function prefixMatch(a, b) {
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a]
+  return short.length >= 5 && long.startsWith(short)
+}
+
+/**
  * Returns programs matching the given filters.
  * All filters are AND-combined; empty/null values skip that filter.
  * Multi-word queries use AND logic per token so "fitness northwest" finds
@@ -63,8 +74,14 @@ export function filterPrograms(programs, filters) {
         .replace(/\bsouthwest\b/g, 'sw southwest')
         .replace(/\bsoutheast\b/g, 'se southeast')
 
-      // Every token must appear somewhere (AND logic)
-      if (!queryTokens.every((token) => normalized.includes(token))) return false
+      // Every token must appear somewhere (AND logic). A token matches either
+      // as a plain substring, or as a stem/prefix of a word in the text — so
+      // "transportation" finds "transport" and "accessible" finds "access"
+      // (e.g. the SE-tagged "Wheelchair Access Transport" program).
+      const textWords = normalized.split(/[^a-z0-9]+/).filter(Boolean)
+      const tokenMatches = (token) =>
+        normalized.includes(token) || textWords.some((w) => prefixMatch(w, token))
+      if (!queryTokens.every(tokenMatches)) return false
     }
 
     // Quadrant filter — one or more checkbox selections, postal code, or a

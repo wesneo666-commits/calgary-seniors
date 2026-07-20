@@ -1859,6 +1859,9 @@ a:hover { color: var(--petal-slate-deep); }
   right: var(--space-lg);
   bottom: var(--space-lg);
   z-index: var(--z-chat);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 .chat-fab {
   width: 60px;
@@ -1877,6 +1880,60 @@ a:hover { color: var(--petal-slate-deep); }
               transform var(--dur-fast) var(--ease-out);
 }
 .chat-fab:hover { background: var(--petal-ember-deep); transform: scale(1.05); }
+
+/* Floating label so people know the bubble is an AI assistant. Clickable
+   (a larger, clearer target than the emoji alone), with a dismiss button. */
+.chat-fab-hint {
+  display: flex;
+  align-items: stretch;
+  background: var(--color-surface);
+  border: 2px solid var(--petal-ember);
+  border-radius: var(--radius-pill, 999px);
+  box-shadow: 0 4px 14px oklch(25% 0.05 40 / 0.25);
+  overflow: hidden;
+  animation: chat-hint-bob 2.4s var(--ease-out) 3;
+}
+.chat-fab-hint-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  background: transparent;
+  border: none;
+  padding: 8px var(--space-md);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+}
+.chat-fab-hint-title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--petal-ember-deep);
+}
+.chat-fab-hint-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+.chat-fab-hint-close {
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--color-border);
+  padding: 0 10px;
+  cursor: pointer;
+  color: var(--color-ink-soft);
+  font-size: 12px;
+  line-height: 1;
+}
+.chat-fab-hint-close:hover { color: var(--color-text); background: var(--color-surface-sunken); }
+
+@keyframes chat-hint-bob {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-fab-hint { animation: none; }
+}
 
 .chat-panel {
   position: absolute;
@@ -1984,6 +2041,26 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .chat-view-all-btn:hover { background: var(--petal-slate-ink); color: var(--color-text-inverse); }
 
+.chat-loc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: 6px var(--space-md) 0;
+}
+.chat-loc-chip {
+  background: var(--color-surface);
+  border: 2px solid var(--petal-slate-ink);
+  color: var(--petal-slate-ink);
+  border-radius: var(--radius-pill, 999px);
+  padding: 6px var(--space-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
+}
+.chat-loc-chip:hover { background: var(--petal-slate-ink); color: var(--color-text-inverse); }
+
 .chat-input-row {
   display: flex;
   gap: var(--space-xs);
@@ -2017,6 +2094,9 @@ a:hover { color: var(--petal-slate-deep); }
 
 @media (max-width: 480px) {
   .chat-panel { width: calc(100vw - 2 * var(--space-lg)); }
+  /* Keep the hint compact next to the bubble on small screens. */
+  .chat-fab-hint-sub { display: none; }
+  .chat-fab-hint-label { padding: 6px var(--space-sm); }
 }
 
 /* Dims the page behind the display-settings panel on mobile, where the panel

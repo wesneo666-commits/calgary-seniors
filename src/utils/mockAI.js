@@ -10,7 +10,8 @@ const STOPWORDS = new Set([
   'i', "i'm", 'im', 'a', 'an', 'the', 'for', 'in', 'of', 'to', 'at', 'near',
   'me', 'my', 'looking', 'look', 'find', 'show', 'want', 'need', 'some',
   'good', 'programs', 'program', 'services', 'service', 'around', 'that',
-  'are', 'is', 'any', 'please', 'calgary', 'help', 'with',
+  'are', 'is', 'any', 'please', 'calgary', 'help', 'with', 'and', 'get',
+  'getting', 'free', 'about', 'would', 'like', 'can', 'you',
 ])
 
 const LOCATION_PHRASES = [
@@ -24,13 +25,32 @@ const LOCATION_PHRASES = [
 
 const CENTRAL_PHRASE = /\bcentral\b|\bcentre\b|\bcenter\b|\bdowntown\b|\bbeltline\b/
 
+// Order matters: the first regex to match wins, so narrower categories are
+// listed before broader catch-alls they share words with (e.g. Arts & culture
+// before Lifelong learning so "art classes" isn't captured by "class").
 const CATEGORY_SYNONYMS = [
-  { re: /\bfitness|exercise|active|walking\b/, value: 'Fitness & physical activity' },
+  { re: /\barts?|paint|craft|music|danc|choir|singing|culture|cultural|theatre|theater|museum|pottery|drawing|knitting|quilt\b/, value: 'Arts & culture' },
+  { re: /\boutdoor|outdoors|hiking|hike|nature|gardening|garden\b/, value: 'Outdoor recreation' },
+  { re: /\benglish|esl|language|interpreter|translat\b/, value: 'Language & communication' },
+  { re: /\bnavigat|case manage|case worker|find (the right )?service|finding service|where (do i|to) start|don'?t know where|referral|connect me\b/, value: 'Service navigation & case management' },
+  { re: /\bhome support|home maintenance|housekeeping|house cleaning|cleaning|yard work|snow removal|handyman|repairs?|chores|around the house|help around|lawn|shovel\b/, value: 'Home support & maintenance' },
+  { re: /\bchronic|diabet|arthritis|cancer|copd|stroke|heart disease|disease|illness\b/, value: 'Chronic disease management' },
+  { re: /\baddiction|substance|alcohol|drinking|drugs?|sober\b/, value: 'Substance use & addictions' },
+  { re: /\babuse|mistreat|neglect\b/, value: 'Abuse prevention & response' },
+  { re: /\bfinancial literacy|budgeting|budget|taxes|tax return|money management\b/, value: 'Financial literacy' },
+  { re: /\badvance care|advanced care|future planning|end of life|estate planning|power of attorney|advance directive\b/, value: 'Advanced care & future planning' },
+  { re: /\bmoving|downsizing|downsize|relocat\b/, value: 'Moving & downsizing' },
+  { re: /\bdating|romance|intimacy\b/, value: 'Intimacy & dating' },
+  { re: /\bshelter|homeless|emergency housing\b/, value: 'Emergency shelters' },
+  { re: /\bintergenerational\b/, value: 'Intergenerational engagement' },
+  { re: /\bphysical health|wellness|health screening|blood pressure|foot care|nursing|flu shot|vaccin\b/, value: 'Physical health' },
+
+  { re: /\bfitness|exercise|active|activit|walking\b/, value: 'Fitness & physical activity' },
   { re: /\bfood|meals?|nutrition|eating\b/, value: 'Food & nutrition' },
   { re: /\bmental health|counsell?ing|anxiety|depression\b/, value: 'Mental health' },
-  { re: /\bhousing|apartment|downsizing\b/, value: 'Housing' },
-  { re: /\btransportation|transport|rides?|drive\b/, value: 'Transportation' },
-  { re: /\bsocial|friends|connection|lonely|loneliness\b/, value: 'Social connection' },
+  { re: /\bhousing|apartment|rental|renting\b/, value: 'Housing' },
+  { re: /\btransportation|transport|rides?|drive|getting around|get around|errands\b/, value: 'Transportation' },
+  { re: /\bsocial|socializ|friends|companionship|connection|lonely|loneliness|isolat|meet (new )?people\b/, value: 'Social connection' },
   { re: /\blegal\b/, value: 'Legal assistance' },
   { re: /\bmoney|financial|income|benefits?\b/, value: 'Income & financial assistance' },
   { re: /\btechnology|computer|internet|digital\b/, value: 'Digital literacy & technology' },
@@ -39,7 +59,7 @@ const CATEGORY_SYNONYMS = [
   { re: /\bvolunteer\b/, value: 'Volunteerism' },
   { re: /\bpet\b/, value: 'Pet care' },
   { re: /\bjob|employment|work\b/, value: 'Employment' },
-  { re: /\bsafety|abuse\b/, value: 'Personal safety' },
+  { re: /\bsafety\b/, value: 'Personal safety' },
   { re: /\bcrisis\b/, value: 'Crisis intervention' },
   { re: /\blearning|education|class(es)?\b/, value: 'Lifelong learning & education' },
   { re: /\bhome care|in-home\b/, value: 'In-home care' },
@@ -71,23 +91,35 @@ export function interpretQuery(raw) {
   }
   let serviceAreaValue = null
   let serviceAreaLabel = null
+  let matchedCatRe = null
   for (const cat of CATEGORY_SYNONYMS) {
     if (cat.re.test(text)) {
       serviceAreaValue = cat.value
       serviceAreaLabel = SERVICE_AREAS.find((s) => s.value === cat.value)?.label ?? cat.value
+      matchedCatRe = cat.re
       break
     }
   }
 
   const costFree = FREE_RE.test(text)
 
-  // Remaining meaningful keywords, with location/category phrase words and
-  // stopwords removed, used for a plain-text fallback search.
-  const withoutPhrases = text
+  // Remaining meaningful keywords: strip location phrases, the words that
+  // triggered the category (so "getting around" doesn't also filter within
+  // Transportation), and stopwords — leaving only genuinely extra terms like
+  // "wheelchair". These narrow results only when they add real signal.
+  let withoutPhrases = text
     .replace(/\bnorth\s*east\b|\bsouth\s*east\b|\bnorth\s*west\b|\bsouth\s*west\b/g, ' ')
     .replace(/\bnortheast\b|\bsoutheast\b|\bnorthwest\b|\bsouthwest\b/g, ' ')
+    .replace(/\b(ne|nw|se|sw)\b/g, ' ')
     .replace(CENTRAL_PHRASE, ' ')
     .replace(/[.,!?]/g, ' ')
+  if (matchedCatRe) {
+    // Remove the whole word(s) that triggered the category — the synonyms match
+    // prefixes ("paint", "diabet", "socializ"), so wrap each match in \w* to
+    // take the entire word and avoid leaving fragments like "ing" or "ize".
+    const inner = matchedCatRe.source.replace(/\\b/g, '')
+    withoutPhrases = withoutPhrases.replace(new RegExp(`\\b\\w*(?:${inner})\\w*\\b`, 'gi'), ' ')
+  }
   const cleanedKeywords = stripStopwords(withoutPhrases.split(/\s+/)).join(' ').trim()
 
   const hasInterpretation = !!(quadrant || serviceAreaValue || costFree)
