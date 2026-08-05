@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "import": "node scripts/import-programs.js"
+    "import": "node scripts/import-programs.js",
+    "screenshots:ab": "node scripts/capture-ab-screenshots.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

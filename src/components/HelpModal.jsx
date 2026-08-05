@@ -58,6 +58,14 @@ export default function HelpModal({ onClose }) {
         </div>
 
         <div className="help-section">
+          <div className="help-icon">🎙</div>
+          <div>
+            <h3>Search by voice</h3>
+            <p>Press the <strong>Voice search</strong> button next to the search box and speak what you're looking for — like "fitness classes in the northwest." While it hears you, the page shows <strong>Listening…</strong> and the button changes to <strong>Stop listening</strong>. Press it when you're finished, or pause and it will stop on its own. You can type instead at any time.</p>
+          </div>
+        </div>
+
+        <div className="help-section">
           <div className="help-icon">🗂</div>
           <div>
             <h3>Use filters to narrow results</h3>

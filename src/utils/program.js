@@ -13,7 +13,57 @@ export function extractRegistrationUrl(howToAccess) {
   return match ? match[0].replace(/[.,)]+$/, '') : null
 }
 
-const PHONE_NUMBER_RE = /\d[\d\s().-]{1,}\d|\d{3}/
+const PHONE_NUMBER_RE = /\d[\d\s().-]{1,}\d|\d{3}/g
+
+// Some numbers are written as a vanity mnemonic immediately followed by the
+// digit equivalent, e.g. "403-266-HELP (403-266-4357)" — the plain regex
+// above can't match letters, so it stops at "403-266" and silently drops the
+// rest. Only treat that as a truncation (and look for a fuller candidate
+// elsewhere in the string) when letters follow immediately or after a single
+// joining dash, the same way "266-HELP" is formatted as part of one token.
+// A period or space before the letters (e.g. "811. Tollfree: 1-866-...")
+// means the short match already ended its own clause — that's a complete,
+// legitimate number (Alberta's 811/211-style short codes), not a fragment.
+function looksTruncatedByLetters(text, endIndex) {
+  let i = endIndex
+  if (text[i] === '-') i++
+  return /[A-Za-z]/.test(text[i] ?? '')
+}
+
+// The line may list one number cleanly, or several alternates ("or 403-...",
+// "(Toll-Free) 1-800-..."). Keep picking the first candidate as the primary
+// number (unchanged behavior) unless it looks truncated, in which case
+// prefer the first candidate that resolves to a complete 10/11-digit number.
+function bestPhoneMatch(text) {
+  const candidates = [...text.matchAll(PHONE_NUMBER_RE)]
+  if (candidates.length === 0) return null
+  const firstMatch = candidates[0]
+  if (!looksTruncatedByLetters(text, firstMatch.index + firstMatch[0].length)) return firstMatch[0]
+  const full = candidates.find((m) => {
+    const digitCount = m[0].replace(/\D/g, '').length
+    return digitCount === 10 || digitCount === 11
+  })
+  return (full ?? firstMatch)[0]
+}
+
+// Source data mixes 403-266-1234 / (403) 266-1234 / 403.266.1234 / etc, and
+// the extraction regex above can't capture an opening "(" (it must start on
+// a digit), so raw matches sometimes read as the visibly broken
+// "403) 266-1234". Reformat standard 10/11-digit numbers to one consistent
+// dashed form (V4 P1, "standardize phone-number formatting", 2026-07-24).
+// Anything else (Alberta's short provincial codes like 310-xxxx, 3-digit
+// lines like 211/811, or a genuinely truncated source value) is left as-is —
+// there's no correct way to reformat a number that isn't 10/11 digits.
+function formatPhoneDigits(raw) {
+  const digits = raw.replace(/\D/g, '')
+  if (digits.length === 11 && digits[0] === '1') {
+    return `1-${digits.slice(1, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`
+  }
+  if (digits.length === 10) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`
+  }
+  return raw.trim()
+}
 
 // The "Phone" field is free text — usually one number, but some orgs list
 // multiple locations/departments separated by newlines (e.g.
@@ -26,13 +76,13 @@ export function parsePhones(phone) {
   const entries = []
   for (const line of lines) {
     const labelMatch = line.match(/^([^:]{1,40}):\s*(.+)$/)
-    const numberMatch = (labelMatch ? labelMatch[2] : line).match(PHONE_NUMBER_RE)
-    if (!numberMatch) continue
-    entries.push({ label: labelMatch ? labelMatch[1].trim() : null, number: numberMatch[0].trim() })
+    const bestNumber = bestPhoneMatch(labelMatch ? labelMatch[2] : line)
+    if (!bestNumber) continue
+    entries.push({ label: labelMatch ? labelMatch[1].trim() : null, number: formatPhoneDigits(bestNumber.trim()) })
   }
   if (entries.length === 0) {
-    const numberMatch = phone.match(PHONE_NUMBER_RE)
-    if (numberMatch) entries.push({ label: null, number: numberMatch[0].trim() })
+    const bestNumber = bestPhoneMatch(phone)
+    if (bestNumber) entries.push({ label: null, number: formatPhoneDigits(bestNumber.trim()) })
   }
   if (entries.length > 1) {
     entries.forEach((entry, i) => {

@@ -5,10 +5,11 @@ import { interpretQuery, describeInterpretation } from '../utils/mockAI.js'
 
 let nextMessageId = 1
 
+// Exact confirmed copy — V4 Round 10, 2026-07-24. Do not paraphrase.
 const GREETING = {
   id: 0,
   from: 'bot',
-  text: 'Hi! I\'m a mock AI assistant for testing this prototype — no real AI is connected yet. Try asking something like "I\'m looking for fitness programs in NE Calgary."',
+  text: 'Hi! I\'m a mock AI assistant for testing this prototype. What can I help you with?',
 }
 
 // When a search matches more than this many programs and no location was given,
@@ -29,7 +30,8 @@ const QUADRANT_OPTIONS = [
 // quadrant chips) rather than listing dozens of programs.
 function makeBotMessage(filters, summary, allowClarify = true) {
   const matches = filterPrograms(programs, filters)
-  const noLocation = filters.quadrant.length === 0
+  const queryLocation = filters.query ? interpretQuery(filters.query)?.quadrant : null
+  const noLocation = filters.quadrant.length === 0 && !queryLocation
   const clarify = allowClarify && noLocation && matches.length > BROAD_THRESHOLD
 
   let text
@@ -173,29 +175,10 @@ export default function ChatWidget({ onApplyFilters }) {
       }
     }
 
-    let derivedFilters
-    if (parsed?.hasInterpretation) {
-      // Apply what the mock AI recognized (category, quadrant, cost) as real
-      // filters instead of relying on a strict word-for-word text match. First
-      // keep the leftover keywords too, so specific terms like "wheelchair"
-      // still narrow the results.
-      const structured = {
-        query: '',
-        quadrant: parsed.quadrant ? [parsed.quadrant] : [],
-        serviceArea: parsed.serviceAreaValue || '',
-        cost: parsed.costFree ? 'Free' : '',
-        format: '',
-      }
-      const withKeywords = { ...structured, query: parsed.cleanedKeywords }
-      // The leftover words may just be conversational filler (e.g. "meet new
-      // people and socialize") that the category already captured — fall back
-      // to the structured filters so we return the recognized category instead
-      // of nothing.
-      derivedFilters = filterPrograms(programs, withKeywords).length > 0 ? withKeywords : structured
-    } else {
-      // Nothing recognized — plain text search on the raw input.
-      derivedFilters = { query: text, quadrant: [], serviceArea: '', cost: '', format: '' }
-    }
+    // Keep the original sentence as the single source of truth. Both the chat
+    // and main search now pass it through filterPrograms, so category, cost,
+    // location, leftover keywords, and structured fallback behave identically.
+    const derivedFilters = { query: text, quadrant: [], serviceArea: '', cost: '', format: '' }
 
     const summary = describeInterpretation(parsed) || `"${text}"`
     const botMsg = makeBotMessage(derivedFilters, summary)

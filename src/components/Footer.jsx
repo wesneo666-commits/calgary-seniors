@@ -7,9 +7,9 @@ export default function Footer({ onAbout }) {
         <div className="footer-columns">
           <div className="footer-brand">
             <div className="footer-logo-wrap">
-              <img src="/logo.webp" alt="Calgary Seniors Resource Society" className="footer-logo" />
+              <img src="/engage-logo.svg" alt="EngAGE: Calgary Directory for Aging Well" className="footer-logo" />
             </div>
-            <p className="footer-tagline">Supporting older adults in Calgary, Alberta</p>
+            <p className="footer-tagline">Calgary Directory for Aging Well</p>
           </div>
 
           <div className="footer-col">
@@ -23,12 +23,12 @@ export default function Footer({ onAbout }) {
             <p>Every listing is reviewed for credibility before it appears in the directory.</p>
             <ul className="footer-links">
               <li>
-                <a href={`mailto:?subject=${encodeURIComponent('Suggest a correction — Calgary Seniors Resource Directory')}`}>
+                <a href={`mailto:?subject=${encodeURIComponent('Suggest a correction — EngAGE')}`}>
                   Suggest a correction
                 </a>
               </li>
               <li>
-                <a href={`mailto:?subject=${encodeURIComponent('Request to be added — Calgary Seniors Resource Directory')}`}>
+                <a href={`mailto:?subject=${encodeURIComponent('Request to be added — EngAGE')}`}>
                   Request to be added
                 </a>
               </li>

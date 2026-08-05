@@ -66,11 +66,21 @@ function MultiCheckboxGroup({ label, options, values, onChange, allLabel }) {
   )
 }
 
-export default function FilterPanel({ filters, onFilterChange, onClear, hasActive }) {
+export default function FilterPanel({ filters, onFilterChange, onClear, hasActive, onCloseMobile, resultCount }) {
   return (
     <div className="filter-panel" role="group" aria-label="Filter programs">
       <div className="filter-panel-header">
         <h2>Filter Programs</h2>
+        {onCloseMobile && (
+          <button
+            type="button"
+            className="filter-panel-mobile-close"
+            onClick={onCloseMobile}
+            aria-label="Close filters"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       <MultiCheckboxGroup
@@ -122,6 +132,12 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
           <li>Active filters appear as tags above your results — click the ✕ on any tag to remove it</li>
         </ul>
       </details>
+
+      {onCloseMobile && (
+        <button type="button" className="filter-panel-mobile-apply" onClick={onCloseMobile}>
+          Show {resultCount} program{resultCount === 1 ? '' : 's'}
+        </button>
+      )}
     </div>
   )
 }

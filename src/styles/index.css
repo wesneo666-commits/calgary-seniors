@@ -1,19 +1,20 @@
 /* ═══════════════════════════════════════════════════════════════
-   Calgary Seniors Resource Directory — design system
-   The five petals of the Calgary Seniors logo map 1:1 to the five
-   service groups. Petal color is structural (category identity,
-   state), never ornament. Charcoal ink + rounded forms carry the
-   everyday warmth of the wordmark.
+   EngAGE: Calgary Directory for Aging Well — design system
+   The roadmap's botanical palette maps 1:1 to the five service
+   groups. Color is structural (category identity, state), never
+   ornament. Charcoal ink + rounded forms carry the everyday warmth
+   of the EngAGE wordmark.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── Design tokens ─────────────────────────────────────────── */
 :root {
-  /* Petal palette — sampled from the logo mark, tuned for contrast.
-     Each petal has: base (identity), ink (text-safe), tint (surface). */
+  /* Botanical palette — carried forward from the roadmap and tuned for
+     contrast. Each color has: base (identity), ink (text-safe), tint (surface). */
   --petal-slate:      oklch(52% 0.075 235);
   --petal-slate-ink:  oklch(40% 0.07 235);
   --petal-slate-deep: oklch(32% 0.055 235);
   --petal-slate-tint: oklch(94.5% 0.02 235);
+  --color-search-surface: oklch(94% 0.025 202);
 
   --petal-sage:       oklch(65% 0.09 128);
   --petal-sage-ink:   oklch(40% 0.08 130);
@@ -105,12 +106,14 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --dur-fast: 150ms;
   --dur-base: 200ms;
+  --dur-welcome: 600ms;
 
-  /* Z scale: dropdown → panel → chat → modal → popover-in-modal → skip link */
+  /* Z scale: dropdown → panel → chat → modal backdrop → modal → popover → skip link */
   --z-dropdown: 200;
   --z-panel-backdrop: 290;
   --z-panel: 300;
   --z-chat: 350;
+  --z-modal-backdrop: 390;
   --z-modal: 400;
   --z-popover: 450;
   --z-skip: 600;
@@ -126,6 +129,9 @@ html {
   /* persistent visible scrollbar — David Phillips feedback: auto-hide annoying for seniors with multiple windows */
   scrollbar-width: thin;
   scrollbar-color: var(--color-border-strong) transparent;
+  /* Belt-and-suspenders against any stray wide element pushing the page
+     sideways on mobile — pages must scroll vertically only (V4 mobile P0). */
+  overflow-x: hidden;
 }
 html::-webkit-scrollbar { width: 10px; }
 html::-webkit-scrollbar-track { background: transparent; }
@@ -138,6 +144,7 @@ body {
   line-height: var(--line-height);
   color: var(--color-text);
   background: var(--color-bg);
+  overflow-x: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -228,21 +235,25 @@ a:hover { color: var(--petal-slate-deep); }
   outline-offset: 3px;
 }
 .site-logo {
-  height: 72px;
+  height: 86px;
   width: auto;
+  max-width: min(430px, 52vw);
   display: block;
 }
 .site-header h1 {
   color: var(--color-ink);
   font-size: var(--font-size-xl);
   letter-spacing: -0.01em;
+  /* A bit of room below the top edge — V4 P2, 2026-07-24. */
+  margin-top: 4px;
+  line-height: 1.25;
 }
 .site-header p {
   font-size: var(--font-size-sm);
-  color: var(--color-ink-soft);
+  color: var(--color-text);
   margin-top: 2px;
 }
-.site-header-text { flex: 1 1 20em; min-width: 0; }
+.site-header-text { flex: 1 1 10em; min-width: 0; }
 
 /* ─── Accessibility panel ────────────────────────────────────── */
 .a11y-btn-wrap {
@@ -264,18 +275,57 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .a11y-toggle-btn:hover { background: var(--petal-slate-tint); }
 
+/* Fixed to the viewport, not absolute-anchored to the toggle button.
+   The old `position: absolute; right: 0` was relative to .a11y-btn-wrap —
+   fine normally, but .site-header-inner wraps at Maximum text size, and the
+   button can land back at the far left of a new row. The panel then still
+   computed right:0 from THAT position, pushing most of itself off-screen to
+   the left (measured at x: -270px, hiding the Text size and Font columns
+   entirely with no way to reach them). Anchoring to the viewport instead
+   makes it immune to wherever the trigger button ends up (V4 P1, "Large and
+   Maximum settings must not break the layout", 2026-07-24). */
 .a11y-panel {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
+  position: fixed;
+  top: 96px;
+  right: var(--space-md);
+  width: min(560px, calc(100vw - 2 * var(--space-md)));
+  max-height: calc(100vh - 112px);
+  overflow-y: auto;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-overlay);
   padding: var(--space-md);
   z-index: var(--z-panel);
-  min-width: 560px;
 }
+.a11y-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+.a11y-panel-header h2 {
+  color: var(--color-ink);
+  font-size: var(--font-size-xl);
+  line-height: 1.25;
+}
+.a11y-panel-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  flex-shrink: 0;
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  cursor: pointer;
+}
+.a11y-panel-close:hover { background: var(--petal-slate-tint); }
 .a11y-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -290,17 +340,17 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .a11y-reset-btn {
   background: transparent;
-  border: 2px solid var(--color-ink-soft);
-  color: var(--color-ink-soft);
+  border: 2px solid var(--petal-slate-ink);
+  color: var(--petal-slate-ink);
   border-radius: var(--radius-md);
   padding: var(--space-xs) var(--space-md);
   font-size: var(--font-size-sm);
   font-weight: 700;
   cursor: pointer;
-  min-height: 40px;
+  min-height: var(--touch-target);
 }
 .a11y-reset-btn:hover {
-  background: var(--color-ink-soft);
+  background: var(--petal-slate-ink);
   color: var(--color-text-inverse);
 }
 
@@ -315,7 +365,7 @@ a:hover { color: var(--petal-slate-deep); }
 .a11y-card-title {
   font-size: var(--font-size-sm);
   font-weight: 700;
-  color: var(--color-ink-soft);
+  color: var(--color-text);
 }
 .a11y-options {
   display: flex;
@@ -332,7 +382,7 @@ a:hover { color: var(--petal-slate-deep); }
   cursor: pointer;
   color: var(--color-text);
   font-size: var(--font-size-base);
-  min-height: 40px;
+  min-height: var(--touch-target);
 }
 .a11y-option-btn:hover,
 .a11y-contrast-btn:hover { border-color: var(--petal-slate); }
@@ -356,7 +406,7 @@ a:hover { color: var(--petal-slate-deep); }
   cursor: pointer;
   color: var(--color-text);
   line-height: 1.3;
-  min-height: 40px;
+  min-height: var(--touch-target);
 }
 .a11y-size-btn:hover { border-color: var(--petal-slate); }
 .a11y-size-btn.a11y-active { border-color: var(--petal-slate-ink); color: var(--petal-slate-ink); font-weight: 700; }
@@ -365,6 +415,11 @@ a:hover { color: var(--petal-slate-deep); }
 .a11y-contrast-normal { background: #ffffff; color: #000000; }
 .a11y-contrast-high   { background: #000000; color: #ffffff; font-weight: 700; }
 .a11y-contrast-high:hover { border-color: #ffffff !important; }
+.a11y-contrast-high.a11y-active,
+[data-contrast="high"] .a11y-contrast-high.a11y-active {
+  border-color: #ffffff;
+  color: #ffffff;
+}
 
 /* ─── High contrast overrides ────────────────────────────────── */
 [data-contrast="high"] {
@@ -400,6 +455,16 @@ a:hover { color: var(--petal-slate-deep); }
 [data-contrast="high"] .badge-service { background: #e8d8ff; color: #30006a; }
 [data-contrast="high"] .badge-population { background: #ffd6e6; color: #7a003f; }
 [data-contrast="high"] .search-section { background: #00007a; background-image: none; }
+[data-contrast="high"] .search-hint,
+[data-contrast="high"] .search-hint--detected,
+[data-contrast="high"] .search-hint--ai,
+[data-contrast="high"] .search-hint--error { color: #ffffff; }
+[data-contrast="high"] .hero-guidance {
+  background: #ffffff;
+  border-color: #000000;
+}
+[data-contrast="high"] .hero-guidance-text { color: #000000; }
+[data-contrast="high"] .a11y-contrast-high.a11y-active .a11y-check { color: #ffffff; }
 [data-contrast="high"] .filter-chip  { background: #000055; border-color: #b35000; }
 [data-contrast="high"] .site-header::after,
 [data-contrast="high"] .site-footer::before { background: #000000; }
@@ -408,22 +473,22 @@ a:hover { color: var(--petal-slate-deep); }
 [data-spacing="relaxed"] { --line-height: 2; letter-spacing: 0.02em; }
 [data-spacing="wide"]    { --line-height: 2.3; letter-spacing: 0.05em; word-spacing: 0.1em; }
 
-/* ─── Landing mode toggle (UAT testing only — Session 3 A/B decision) ── */
+/* ─── Search / browse choice ─────────────────────────────────── */
 .landing-mode-toggle {
   display: flex;
-  border: 1px solid var(--color-border-strong);
+  border: 2px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   overflow: hidden;
   flex-shrink: 0;
 }
 .landing-mode-btn {
-  padding: 0 var(--space-sm);
+  padding: 0 var(--space-md);
   height: var(--touch-target);
-  font-size: 0.75rem;
+  font-size: var(--font-size-base);
   font-weight: 700;
   border: none;
   background: var(--color-surface);
-  color: var(--color-ink-soft);
+  color: var(--color-text);
   cursor: pointer;
   white-space: nowrap;
   transition: background var(--dur-fast) var(--ease-out);
@@ -438,13 +503,74 @@ a:hover { color: var(--petal-slate-deep); }
   padding: var(--space-xl) 0;
   text-align: center;
 }
+.wizard-welcome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm) var(--space-lg);
+  max-width: 48rem;
+  margin: 0 auto var(--space-xl);
+}
+.wizard-welcome-mark {
+  width: min(270px, 42vw);
+  height: auto;
+  flex: 0 1 270px;
+  overflow: visible;
+}
+.wizard-welcome-stroke {
+  stroke: var(--color-ink-soft);
+  stroke-width: 10;
+}
+.wizard-welcome-leaf {
+  fill: var(--petal-sage);
+  stroke: var(--color-ink-soft);
+  stroke-width: 10;
+}
+.wizard-welcome-trace {
+  fill: none;
+  stroke: var(--petal-ember);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  animation: wizard-growth-trace var(--dur-welcome) var(--ease-out) both;
+}
+.wizard-welcome-dot {
+  fill: var(--petal-plum);
+}
+@keyframes wizard-growth-trace {
+  0%   { stroke-dashoffset: 1; opacity: 0; }
+  15%  { opacity: 0.8; }
+  75%  { stroke-dashoffset: 0; opacity: 0.65; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+.wizard-welcome-copy {
+  flex: 1 1 20rem;
+  max-width: 34rem;
+  text-align: left;
+}
+.wizard-welcome-title {
+  color: var(--color-ink);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: var(--space-xs);
+  text-wrap: balance;
+}
+.wizard-welcome-eng { color: var(--petal-slate-ink); }
+.wizard-welcome-age { color: var(--petal-ember-ink); }
+.wizard-welcome-text {
+  color: var(--color-text);
+  max-width: 44ch;
+  text-wrap: pretty;
+}
 .wizard-landing-title {
   font-size: var(--font-size-2xl);
   color: var(--color-ink);
   margin-bottom: var(--space-xs);
 }
 .wizard-landing-subtitle {
-  color: var(--color-ink-soft);
+  color: var(--color-text);
   margin-bottom: var(--space-xl);
   max-width: 62ch;
   margin-left: auto;
@@ -452,55 +578,86 @@ a:hover { color: var(--petal-slate-deep); }
   text-wrap: pretty;
 }
 .wizard-landing-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-lg);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-sm);
   max-width: 1080px;
   margin: 0 auto;
 }
-.wizard-landing-grid > * {
-  flex: 1 1 176px;
-  max-width: 240px;
-  min-width: 160px;
-}
-/* Each category card carries its petal: tinted icon, inked label,
-   petal-colored border on hover. Petal shape = three round corners. */
+/* The five roadmap petals become sturdy category buttons. Their restrained,
+   compact shape keeps the guided landing page useful at large text sizes. */
 .wizard-landing-card {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-lg) var(--space-md);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  justify-content: flex-start;
+  gap: var(--space-sm);
+  min-height: 72px;
+  padding: var(--space-sm);
+  background: var(--wizard-card-bg, var(--petal-slate-tint));
+  border: 2px solid var(--wizard-card-color, var(--petal-slate-ink));
+  border-radius: var(--radius-md);
   cursor: pointer;
-  box-shadow: var(--shadow-card);
-  transition: box-shadow var(--dur-base) var(--ease-out),
-              border-color var(--dur-base) var(--ease-out),
-              transform var(--dur-base) var(--ease-out);
+  text-align: left;
+  transition: background var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
 }
 .wizard-landing-card:hover {
-  box-shadow: var(--shadow-card-hover);
-  border-color: var(--wizard-card-color, var(--petal-slate));
-  transform: translateY(-3px);
+  background: var(--color-surface);
+  transform: translateY(-2px);
 }
-.wizard-landing-card:active { transform: translateY(-1px); }
+.wizard-landing-card:active { transform: translateY(0); }
 .wizard-landing-icon {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
   border-radius: 50% 50% 50% 10px;  /* petal, pointing home */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
-  background: var(--wizard-card-bg, var(--petal-slate-tint));
+  font-size: 24px;
+  background: var(--color-surface);
 }
 .wizard-landing-label {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-base);
   font-weight: 700;
+  line-height: 1.3;
   color: var(--wizard-card-color, var(--petal-slate-ink));
+}
+.wizard-landing-helper {
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  margin: var(--space-lg) auto 0;
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wizard-welcome-trace { display: none; }
+}
+@media (max-width: 700px) {
+  .wizard-welcome {
+    flex-direction: column;
+    margin-bottom: var(--space-lg);
+  }
+  .wizard-welcome-mark {
+    width: min(280px, 78vw);
+    flex-basis: auto;
+  }
+  .wizard-welcome-copy {
+    flex: 0 1 auto;
+    text-align: center;
+  }
+  .wizard-welcome-text { margin-inline: auto; }
+}
+@media (max-width: 980px) {
+  .wizard-landing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wizard-landing-grid > :last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .wizard-landing { padding: var(--space-lg) 0; }
+  .wizard-landing-subtitle { margin-bottom: var(--space-lg); }
+  .wizard-landing-grid { grid-template-columns: 1fr; }
+  .wizard-landing-grid > :last-child { grid-column: auto; }
 }
 /* Petal assignment: five groups, five petals */
 .wizard-landing-card--home      { --wizard-card-bg: var(--petal-slate-tint); --wizard-card-color: var(--petal-slate-ink); }
@@ -509,13 +666,26 @@ a:hover { color: var(--petal-slate-deep); }
 .wizard-landing-card--practical { --wizard-card-bg: var(--petal-amber-tint); --wizard-card-color: var(--petal-amber-ink); }
 .wizard-landing-card--safety    { --wizard-card-bg: var(--petal-ember-tint); --wizard-card-color: var(--petal-ember-ink); }
 
+[data-contrast="high"] .wizard-welcome-stroke,
+[data-contrast="high"] .wizard-welcome-leaf { stroke: var(--color-ink); }
+[data-contrast="high"] .wizard-welcome-leaf { fill: var(--color-surface); }
+[data-contrast="high"] .wizard-welcome-trace { display: none; }
+[data-contrast="high"] .wizard-welcome-dot { fill: var(--color-primary); }
+[data-contrast="high"] .wizard-welcome-eng,
+[data-contrast="high"] .wizard-welcome-age { color: var(--color-ink); }
+
 /* ─── Help button ────────────────────────────────────────────── */
+/* Outline treatment, not a solid fill — a solid orange button here competed
+   too hard against the rest of the header row (V4 P2, "reduce the visual
+   dominance of the orange call to action", 2026-07-24). Same shape/weight as
+   the Display Settings button beside it, just in the ember color family so
+   it's still identifiable as its own action. */
 .help-btn {
   height: var(--touch-target);
   padding: 0 var(--space-md);
-  background: var(--petal-ember);
-  color: var(--color-text-inverse);
-  border: none;
+  background: var(--color-surface);
+  color: var(--petal-ember-deep);
+  border: 2px solid var(--petal-ember);
   border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
   font-weight: 700;
@@ -524,7 +694,62 @@ a:hover { color: var(--petal-slate-deep); }
   flex-shrink: 0;
   transition: background var(--dur-fast) var(--ease-out);
 }
-.help-btn:hover { background: var(--petal-ember-deep); }
+.help-btn:hover { background: var(--petal-ember-tint); }
+
+/* ─── Mobile hamburger menu (hidden on desktop; shown ≤640px below) ──── */
+.mobile-menu-wrap {
+  display: none;
+  position: relative;
+  flex-shrink: 0;
+}
+.mobile-menu-btn {
+  height: var(--touch-target);
+  padding: 0 var(--space-md);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mobile-menu-btn:hover { background: var(--color-surface-sunken); }
+.mobile-menu-backdrop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background: oklch(20% 0.02 240 / 0.4);
+  z-index: var(--z-panel-backdrop);
+}
+.mobile-menu-panel {
+  position: fixed;
+  top: 88px;
+  left: 16px;
+  right: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-overlay);
+  padding: var(--space-sm);
+  z-index: var(--z-panel);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.mobile-menu-item {
+  text-align: left;
+  background: var(--color-surface);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  min-height: var(--touch-target);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.mobile-menu-item:hover { background: var(--color-surface-sunken); }
 
 /* ─── Help modal ─────────────────────────────────────────────── */
 .help-panel {
@@ -596,7 +821,7 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .font-size-label {
   font-size: var(--font-size-sm);
-  color: var(--color-ink-soft);
+  color: var(--color-text);
   white-space: nowrap;
 }
 .font-size-btn {
@@ -621,18 +846,59 @@ a:hover { color: var(--petal-slate-deep); }
 
 /* ─── Search bar ─────────────────────────────────────────────── */
 .search-section {
-  background: var(--petal-slate-deep);
+  background: var(--color-search-surface);
   /* Faint four-petal rosettes from the logo — one cropped off each edge.
      The left one is smaller, lower, and turned differently so the pair
      reads as a pattern, not a mirrored stamp. */
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23ffffff' opacity='0.05' transform='rotate(20 100 100)'%3E%3Cellipse cx='100' cy='52' rx='30' ry='46'/%3E%3Cellipse cx='100' cy='148' rx='30' ry='46'/%3E%3Cellipse cx='52' cy='100' rx='46' ry='30'/%3E%3Cellipse cx='148' cy='100' rx='46' ry='30'/%3E%3C/g%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23ffffff' opacity='0.05' transform='rotate(45 100 100)'%3E%3Cellipse cx='100' cy='52' rx='30' ry='46'/%3E%3Cellipse cx='100' cy='148' rx='30' ry='46'/%3E%3Cellipse cx='52' cy='100' rx='46' ry='30'/%3E%3Cellipse cx='148' cy='100' rx='46' ry='30'/%3E%3C/g%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23315f7f' opacity='0.07' transform='rotate(20 100 100)'%3E%3Cellipse cx='100' cy='52' rx='30' ry='46'/%3E%3Cellipse cx='100' cy='148' rx='30' ry='46'/%3E%3Cellipse cx='52' cy='100' rx='46' ry='30'/%3E%3Cellipse cx='148' cy='100' rx='46' ry='30'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23315f7f' opacity='0.07' transform='rotate(45 100 100)'%3E%3Cellipse cx='100' cy='52' rx='30' ry='46'/%3E%3Cellipse cx='100' cy='148' rx='30' ry='46'/%3E%3Cellipse cx='52' cy='100' rx='46' ry='30'/%3E%3Cellipse cx='148' cy='100' rx='46' ry='30'/%3E%3C/g%3E%3C/svg%3E");
   background-repeat: no-repeat, no-repeat;
   background-position: left -60px center, right -50px center;
   background-size: 220px, 280px;
   padding: var(--space-lg) 0;
 }
+.search-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+.search-row > .search-bar-outer {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* Hidden on desktop — filters are already visible in the sidebar there.
+   Shown ≤768px (below) next to the search bar, grouped with search per
+   the V4 mobile P0 ask, and opens the filter panel as a drawer. */
+.mobile-filter-btn {
+  display: none;
+  height: 52px;
+  padding: 0 var(--space-md);
+  align-items: center;
+  flex-shrink: 0;
+  background: var(--color-surface);
+  color: var(--petal-slate-deep);
+  border: 2px solid var(--petal-slate-ink);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.mobile-filter-btn:hover { background: oklch(92% 0.015 235); }
+/* Base (not media-gated) rule, matching .mobile-menu-backdrop: the drawer
+   itself only opens from a mobile-only trigger, but if the state were ever
+   true above the 768px breakpoint (e.g. rotating a tablet mid-session),
+   this must not fall back to unstyled static layout inside .main-layout's
+   grid — an earlier version of this rule lived only inside the ≤768px
+   media query and would have done exactly that. */
+.mobile-filter-backdrop {
+  position: fixed;
+  inset: 0;
+  background: oklch(20% 0.02 240 / 0.4);
+  z-index: var(--z-panel-backdrop);
+}
+
 .search-bar-outer {
   display: flex;
   flex-direction: column;
@@ -645,21 +911,21 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .search-hint {
   font-size: var(--font-size-sm);
-  color: oklch(90% 0.01 235);
+  color: var(--color-text);
 }
 .search-hint--detected {
-  color: #ffffff;
+  color: var(--petal-slate-deep);
   font-weight: 500;
 }
 .search-hint--ai {
-  color: #ffffff;
+  color: var(--petal-slate-deep);
   font-weight: 500;
 }
 .ai-hint-badge {
   display: inline-block;
   background: var(--petal-amber);
   color: oklch(25% 0.05 75);
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -675,41 +941,61 @@ a:hover { color: var(--petal-slate-deep); }
   gap: var(--space-sm);
   margin-top: var(--space-xs);
   padding: var(--space-sm) var(--space-md);
-  background: oklch(100% 0 0 / 0.10);
-  border: 1px solid oklch(100% 0 0 / 0.28);
+  background: oklch(100% 0 0 / 0.82);
+  border: 2px solid var(--petal-slate);
   border-radius: var(--radius-md);
 }
 .hero-guidance-text {
   flex: 1;
   font-size: var(--font-size-sm);
-  color: #ffffff;
+  color: var(--color-text);
   line-height: 1.45;
 }
 .hero-guidance-close {
   flex-shrink: 0;
   background: none;
   border: none;
-  color: #ffffff;
+  color: var(--petal-slate-deep);
   font-size: var(--font-size-base);
   cursor: pointer;
-  width: 28px;
-  height: 28px;
+  width: var(--touch-target);
+  height: var(--touch-target);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
 }
-.hero-guidance-close:hover { background: oklch(100% 0 0 / 0.2); }
+.hero-guidance-close:hover { background: var(--petal-slate-tint); }
+.hero-guidance-more-btn {
+  display: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: var(--space-xs);
+  color: var(--petal-slate-deep);
+  font-size: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+@media (max-width: 640px) {
+  .hero-guidance-text:not(.hero-guidance-text--expanded) .hero-guidance-more {
+    display: none;
+  }
+  .hero-guidance-text:not(.hero-guidance-text--expanded) .hero-guidance-more-btn {
+    display: inline;
+  }
+}
 .hint-clear-btn {
   background: none;
   border: none;
-  color: oklch(92% 0.01 235);
+  color: var(--petal-slate-deep);
   font-size: var(--font-size-sm);
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
 }
-.hint-clear-btn:hover { color: #ffffff; }
+.hint-clear-btn:hover { color: var(--color-text); }
 .search-input-wrap {
   flex: 1;
   position: relative;
@@ -721,13 +1007,14 @@ a:hover { color: var(--petal-slate-deep); }
   font-size: var(--font-size-lg);
   padding: 0 40px 0 var(--space-md);
   height: 52px;
-  border: 2px solid transparent;
+  border: 2px solid var(--petal-slate-ink);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text);
 }
 .search-input:focus {
-  border-color: var(--petal-amber);
+  border-color: var(--petal-ember-deep);
+  box-shadow: 0 0 0 2px var(--petal-ember-tint);
   outline: none;
 }
 .search-input::placeholder { color: var(--color-ink-soft); }
@@ -742,8 +1029,8 @@ a:hover { color: var(--petal-slate-deep); }
   cursor: pointer;
   color: var(--color-ink-soft);
   font-size: var(--font-size-base);
-  width: 32px;
-  height: 32px;
+  width: var(--touch-target);
+  height: var(--touch-target);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -765,7 +1052,7 @@ a:hover { color: var(--petal-slate-deep); }
   flex-shrink: 0;
   background: var(--color-surface);
   color: var(--petal-slate-deep);
-  border: 2px solid transparent;
+  border: 2px solid var(--petal-slate-ink);
   border-radius: var(--radius-md);
   font-size: var(--font-size-base);
   font-weight: 700;
@@ -793,8 +1080,8 @@ a:hover { color: var(--petal-slate-deep); }
   .voice-btn--listening .voice-btn-icon { animation: none; }
 }
 .search-hint--error {
-  color: #ffffff;
-  font-weight: 500;
+  color: var(--petal-ember-deep);
+  font-weight: 700;
 }
 
 .search-btn {
@@ -825,6 +1112,39 @@ a:hover { color: var(--petal-slate-deep); }
   .main-layout {
     grid-template-columns: 1fr;
   }
+  .mobile-filter-btn {
+    display: inline-flex;
+  }
+  /* The filter panel becomes an off-canvas drawer instead of an always-open
+     block above the results (V4 mobile P0, 2026-07-24): closed by default,
+     opened from the "Filters" button next to search, dismissed via the ✕,
+     the backdrop, or "Show N programs". */
+  .filter-aside {
+    position: fixed;
+    inset: 0;
+    /* Above --z-chat (350), same tier as the other full-screen mobile
+       overlays (detail/help modals) — otherwise the chat bubble floats on
+       top of the drawer's "Show N programs" button. */
+    z-index: var(--z-modal);
+    transform: translateX(-100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform var(--dur-base) var(--ease-out),
+                visibility 0s linear var(--dur-base);
+    overflow-y: auto;
+    padding: var(--space-md);
+  }
+  .filter-aside--open {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+  .filter-aside .filter-panel {
+    position: static;
+    min-height: 100%;
+    box-shadow: none;
+  }
 }
 
 /* ─── Filter panel ───────────────────────────────────────────── */
@@ -839,7 +1159,8 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .filter-panel-header {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-xs);
   margin-bottom: var(--space-sm);
   padding-bottom: var(--space-sm);
@@ -849,6 +1170,47 @@ a:hover { color: var(--petal-slate-deep); }
   margin-bottom: 0;
   border-bottom: none;
   padding-bottom: 0;
+}
+/* Only rendered (and only ever shown) inside the mobile drawer. */
+.filter-panel-mobile-close {
+  display: none;
+  background: var(--color-surface-sunken);
+  border: none;
+  border-radius: var(--radius-md);
+  width: var(--touch-target);
+  height: var(--touch-target);
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.filter-panel-mobile-apply {
+  display: none;
+  width: 100%;
+  margin-top: var(--space-md);
+  height: var(--touch-target);
+  background: var(--petal-slate-ink);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  cursor: pointer;
+  position: sticky;
+  bottom: 0;
+}
+.filter-panel-mobile-apply:hover { background: var(--petal-slate-deep); }
+
+/* Kept after the base rules above so it wins the cascade at equal
+   specificity regardless of source order elsewhere in the file. */
+@media (max-width: 768px) {
+  .filter-panel-mobile-close {
+    display: inline-flex;
+  }
+  .filter-panel-mobile-apply {
+    display: block;
+  }
 }
 .filter-group-label {
   display: block;
@@ -873,7 +1235,7 @@ a:hover { color: var(--petal-slate-deep); }
   background: var(--color-surface);
   color: var(--color-text);
   cursor: pointer;
-  min-height: 40px;
+  min-height: var(--touch-target);
   font-weight: 500;
   text-align: left;
   line-height: 1.25;
@@ -927,10 +1289,15 @@ a:hover { color: var(--petal-slate-deep); }
   margin-bottom: var(--space-xs);
   color: var(--color-text);
 }
+/* min-height, not height — a fixed height clipped/misaligned longer service
+   labels ("Home support & maintenance") once they wrapped to two lines: the
+   box stayed 44px tall regardless, and the caret (vertically centered
+   against that fixed box) ended up floating above the actual two-line text
+   instead of centered against it. Letting the box grow fixes both. */
 .filter-select {
   width: 100%;
-  height: var(--touch-target);
-  padding: 0 var(--space-sm);
+  min-height: var(--touch-target);
+  padding: var(--space-xs) var(--space-sm);
   font-size: var(--font-size-base);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -985,7 +1352,7 @@ a:hover { color: var(--petal-slate-deep); }
   font-size: var(--font-size-sm);
   color: var(--color-text);
   cursor: pointer;
-  min-height: 36px;
+  min-height: var(--touch-target);
 }
 .service-select-option:hover { background: var(--petal-slate-tint); }
 .service-select-option--active {
@@ -1027,7 +1394,7 @@ a:hover { color: var(--petal-slate-deep); }
 .filter-tips-heading {
   font-size: var(--font-size-sm);
   font-weight: 700;
-  color: var(--color-ink-soft);
+  color: var(--color-text);
   cursor: pointer;
   user-select: none;
 }
@@ -1043,7 +1410,7 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .filter-tips-list li {
   font-size: var(--font-size-sm);
-  color: var(--color-ink-soft);
+  color: var(--color-text);
   line-height: 1.5;
   padding-left: var(--space-sm);
   position: relative;
@@ -1066,14 +1433,14 @@ a:hover { color: var(--petal-slate-deep); }
 .filter-chips-label {
   font-size: var(--font-size-sm);
   font-weight: 700;
-  color: var(--color-ink-soft);
+  color: var(--color-text);
   white-space: nowrap;
 }
 .filter-chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  height: 34px;
+  min-height: var(--touch-target);
   padding: 0 var(--space-md);
   background: var(--petal-slate-deep);
   color: var(--color-text-inverse);
@@ -1108,10 +1475,22 @@ a:hover { color: var(--petal-slate-deep); }
 
 .results-summary {
   font-size: var(--font-size-sm);
-  color: var(--color-ink-soft);
+  color: var(--color-text);
   margin: 0;
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-sm);
 }
 .results-summary strong { color: var(--color-text); }
+.results-summary--flash {
+  animation: results-summary-flash 900ms var(--ease-out);
+}
+@keyframes results-summary-flash {
+  0%   { background: var(--petal-slate-tint); }
+  100% { background: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .results-summary--flash { animation: none; }
+}
 
 .sort-control {
   display: flex;
@@ -1121,18 +1500,27 @@ a:hover { color: var(--petal-slate-deep); }
 .sort-label {
   font-size: var(--font-size-sm);
   font-weight: 700;
-  color: var(--color-ink-soft);
+  color: var(--color-text);
   white-space: nowrap;
 }
 .sort-select {
-  height: 38px;
-  padding: 0 var(--space-sm);
+  height: var(--touch-target);
+  padding: 0 28px 0 var(--space-sm);
   font-size: var(--font-size-sm);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background-color: var(--color-surface);
   color: var(--color-text);
   cursor: pointer;
+  /* Safari (desktop and iOS) otherwise renders its own native control that
+     ignores the border-radius/border above — reset to the system default
+     and draw our own dropdown arrow (V4 mobile P0, 2026-07-24). */
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%23444444' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 14px;
 }
 .sort-select:focus {
   border-color: var(--color-border-focus);
@@ -1146,45 +1534,11 @@ a:hover { color: var(--petal-slate-deep); }
   gap: var(--space-sm) var(--space-md);
 }
 
-.layout-toggle {
-  display: flex;
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-.layout-toggle-btn {
-  background: var(--color-surface);
-  color: var(--color-ink-soft);
-  border: none;
-  padding: 0 var(--space-sm);
-  height: 38px;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background var(--dur-fast), color var(--dur-fast);
-  white-space: nowrap;
-}
-.layout-toggle-btn:hover {
-  background: var(--color-surface-sunken);
-  color: var(--color-text);
-}
-.layout-toggle-btn--active {
-  background: var(--petal-slate-ink);
-  color: var(--color-text-inverse);
-}
-.layout-toggle-btn--active:hover {
-  background: var(--petal-slate-deep);
-  color: var(--color-text-inverse);
-}
-
 .results-list {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-md);
-}
-.results-list--1col {
   grid-template-columns: 1fr;
+  gap: var(--space-md);
 }
 .results-list > li { height: 100%; }
 .results-list > li > article {
@@ -1207,12 +1561,6 @@ a:hover { color: var(--petal-slate-deep); }
   border-color: var(--color-border-focus);
 }
 
-@media (max-width: 900px) {
-  .results-list {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ─── Program card ───────────────────────────────────────────── */
 .program-card {
   background: transparent;
@@ -1225,7 +1573,10 @@ a:hover { color: var(--petal-slate-deep); }
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 100%;
+  transition: background var(--dur-fast) var(--ease-out);
 }
+.program-card:hover { background: var(--petal-slate-tint); }
 .program-card:focus-visible {
   outline: 3px solid var(--color-border-focus);
   outline-offset: -3px;
@@ -1244,21 +1595,15 @@ a:hover { color: var(--petal-slate-deep); }
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+/* Full-contrast text, semi-bold — not the muted --color-ink-soft grey it used
+   to be. Still one step under .card-name's bold brand color, but no longer
+   reads as de-emphasized body text (V4 P2, "make the organization name more
+   prominent and avoid grey body text", 2026-07-24). */
 .card-org {
   font-size: var(--font-size-sm);
-  font-weight: 400;
-  color: var(--color-ink-soft);
-  line-height: 1.35;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.card-description {
-  margin-top: var(--space-sm);
-  font-size: var(--font-size-sm);
+  font-weight: 600;
   color: var(--color-text);
-  line-height: 1.45;
+  line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -1273,34 +1618,7 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .card-service-more {
   font-size: var(--font-size-sm);
-  color: var(--color-ink-soft);
-}
-
-.card-footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--space-xs) var(--space-md);
-  margin-top: auto;
-  padding-top: var(--space-sm);
-  align-items: baseline;
-}
-.card-location {
-  font-size: var(--font-size-sm);
-  color: var(--color-ink-soft);
-  line-height: 1.4;
-}
-.card-details-cue {
-  margin-left: auto;
-  font-size: var(--font-size-sm);
-  font-weight: 700;
   color: var(--petal-slate-ink);
-  white-space: nowrap;
-}
-.program-card:hover .card-details-cue,
-.program-card:focus-visible .card-details-cue {
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 /* ─── Badges ─────────────────────────────────────────────────── */
@@ -1387,7 +1705,7 @@ a:hover { color: var(--petal-slate-deep); }
   flex-shrink: 0;
 }
 .detail-action-btn {
-  height: 38px;
+  height: var(--touch-target);
   padding: 0 var(--space-sm);
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -1455,7 +1773,7 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .detail-close-btn:hover { background: var(--color-surface-sunken); }
 
-.detail-org { font-size: var(--font-size-sm); color: var(--color-ink-soft); }
+.detail-org { font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text); }
 .detail-name {
   font-size: var(--font-size-xl);
   font-weight: 700;
@@ -1473,7 +1791,7 @@ a:hover { color: var(--petal-slate-deep); }
 .detail-label {
   font-size: var(--font-size-sm);
   font-weight: 700;
-  color: var(--color-ink-soft);
+  color: var(--petal-slate-ink);
 }
 .detail-value { font-size: var(--font-size-base); max-width: 72ch; text-wrap: pretty; }
 
@@ -1510,41 +1828,53 @@ a:hover { color: var(--petal-slate-deep); }
               border-color var(--dur-fast) var(--ease-out);
 }
 .contact-btn-phone    { background: var(--petal-slate-deep); color: var(--color-text-inverse); font-size: var(--font-size-lg); }
-.contact-btn-email    { background: var(--petal-slate-ink);  color: var(--color-text-inverse); }
 .contact-btn-register { background: var(--petal-ember);      color: var(--color-text-inverse); }
 .contact-btn-web      { background: transparent; border: 2px solid var(--petal-slate-ink); color: var(--petal-slate-ink); }
-.contact-btn-web-org  { background: transparent; border: 2px solid var(--color-border-strong); color: var(--color-ink-soft); }
+.contact-btn-web-org  { background: transparent; border: 2px solid var(--color-border-strong); color: var(--color-text); }
 .contact-btn-form     { background: transparent; border: 2px solid var(--petal-slate-ink); color: var(--petal-slate-ink); }
 
+.contact-email-plain {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-sm);
+  min-height: 48px;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--petal-slate-tint);
+  color: var(--color-text);
+  border: 2px solid var(--petal-slate-ink);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  line-height: 1.45;
+}
+.contact-email-label { font-weight: 700; }
+.contact-email-value {
+  user-select: text;
+  overflow-wrap: anywhere;
+}
+
 .contact-btn-phone:hover    { background: var(--color-filter-active-dark); color: var(--color-text-inverse); }
-.contact-btn-email:hover    { background: var(--petal-slate-deep);          color: var(--color-text-inverse); }
 .contact-btn-register:hover { background: var(--petal-ember-deep);          color: var(--color-text-inverse); }
 .contact-btn-web:hover      { background: var(--petal-slate-ink);           color: var(--color-text-inverse); border-color: var(--petal-slate-ink); }
 .contact-btn-web-org:hover  { background: var(--color-ink-soft);            color: var(--color-text-inverse); border-color: var(--color-ink-soft); }
 .contact-btn-form:hover     { background: var(--petal-slate-ink);           color: var(--color-text-inverse); }
 
-/* Plain copyable email — REQ-034. Clicking/selecting this text must not
-   trigger a mailto: popup the way the button above does. */
-.contact-email-plain {
-  font-size: var(--font-size-sm);
-  color: var(--color-ink-soft);
-}
-.contact-email-plain-value {
-  user-select: all;
-  color: var(--color-text);
-  font-weight: 600;
-}
 
 /* ─── Pagination ─────────────────────────────────────────────── */
 .pagination {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-sm) var(--space-md);
+  gap: var(--space-sm);
   margin-top: var(--space-xl);
   padding-top: var(--space-lg);
   border-top: 1px solid var(--color-border);
+}
+.pagination-buttons {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--space-md);
 }
 .page-btn {
   height: var(--touch-target);
@@ -1614,8 +1944,9 @@ a:hover { color: var(--petal-slate-deep); }
   padding: var(--space-sm) var(--space-md);
 }
 .footer-logo {
-  height: 48px;
+  height: 72px;
   width: auto;
+  max-width: 100%;
   display: block;
 }
 .footer-tagline {
@@ -1691,7 +2022,10 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .footer-funding-logo {
   display: block;
-  height: 32px;
+  /* Larger than the org's own .footer-logo (48px) — V4 P2, "make the Centre
+     on Aging logo larger in the footer", 2026-07-24. Was 32px, smaller than
+     its sibling, which read as backwards from what was asked. */
+  height: 56px;
   width: auto;
   max-width: 100%;
 }
@@ -1794,7 +2128,16 @@ a:hover { color: var(--petal-slate-deep); }
     height: auto !important;
   }
 
-  /* Phone/email already print their visible number/address as text (REQ-040).
+  .contact-email-plain {
+    background: white !important;
+    color: #1a1a1a !important;
+    border: 1pt solid #999 !important;
+    font-size: 10pt !important;
+    min-height: auto !important;
+    padding: 4pt 8pt !important;
+  }
+
+  /* Phone and email already print their visible number/address as text (REQ-040).
      Web/registration buttons only show a generic label on screen, so reveal
      the underlying URL here. */
   .contact-btn-web[href]::after,
@@ -1847,7 +2190,7 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .empty-hint {
   font-size: var(--font-size-base);
-  color: var(--color-ink-soft);
+  color: var(--color-text);
   max-width: 52ch;
   margin: 0 auto;
   text-wrap: pretty;
@@ -1911,18 +2254,20 @@ a:hover { color: var(--petal-slate-deep); }
   color: var(--petal-ember-deep);
 }
 .chat-fab-hint-sub {
-  font-size: 11px;
+  font-size: 0.8rem;
   font-weight: 500;
-  color: var(--color-ink-soft);
+  color: var(--color-text);
 }
 .chat-fab-hint-close {
   background: transparent;
   border: none;
   border-left: 1px solid var(--color-border);
-  padding: 0 10px;
+  width: var(--touch-target);
+  min-height: var(--touch-target);
+  padding: 0;
   cursor: pointer;
-  color: var(--color-ink-soft);
-  font-size: 12px;
+  color: var(--color-text);
+  font-size: var(--font-size-base);
   line-height: 1;
 }
 .chat-fab-hint-close:hover { color: var(--color-text); background: var(--color-surface-sunken); }
@@ -1964,7 +2309,7 @@ a:hover { color: var(--petal-slate-deep); }
   display: inline-block;
   background: var(--petal-amber);
   color: oklch(25% 0.05 75);
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -1978,8 +2323,8 @@ a:hover { color: var(--petal-slate-deep); }
   color: var(--color-text-inverse);
   font-size: var(--font-size-base);
   cursor: pointer;
-  width: 28px;
-  height: 28px;
+  width: var(--touch-target);
+  height: var(--touch-target);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2024,7 +2369,7 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .chat-sample-list li {
   padding: 4px var(--space-md);
-  color: var(--color-ink-soft);
+  color: var(--color-text);
 }
 .chat-view-all-btn {
   margin: 4px var(--space-md) 0;
@@ -2069,7 +2414,7 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .chat-input-row input {
   flex: 1;
-  height: 40px;
+  height: var(--touch-target);
   padding: 0 var(--space-sm);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -2080,8 +2425,8 @@ a:hover { color: var(--petal-slate-deep); }
   outline: none;
 }
 .chat-input-row button {
-  width: 40px;
-  height: 40px;
+  width: var(--touch-target);
+  height: var(--touch-target);
   border: none;
   background: var(--petal-slate-deep);
   color: var(--color-text-inverse);
@@ -2093,10 +2438,20 @@ a:hover { color: var(--petal-slate-deep); }
 .chat-input-row button:hover { background: var(--color-filter-active-dark); }
 
 @media (max-width: 480px) {
+  .search-row { flex-wrap: wrap; }
+  .search-row > .search-bar-outer { flex-basis: 100%; }
+  .mobile-filter-btn {
+    width: 100%;
+    justify-content: center;
+  }
   .chat-panel { width: calc(100vw - 2 * var(--space-lg)); }
-  /* Keep the hint compact next to the bubble on small screens. */
-  .chat-fab-hint-sub { display: none; }
-  .chat-fab-hint-label { padding: 6px var(--space-sm); }
+  .chat-widget {
+    right: var(--space-md);
+    bottom: var(--space-md);
+  }
+  /* The persistent helper label obscured the first category and filter
+     controls on narrow screens; the labelled 60px assistant button remains. */
+  .chat-fab-hint { display: none; }
 }
 
 /* Dims the page behind the display-settings panel on mobile, where the panel
@@ -2116,6 +2471,21 @@ a:hover { color: var(--petal-slate-deep); }
    Kept at the end of the file so it wins the cascade over the equal-specificity
    base rules for .a11y-panel/.a11y-grid defined earlier. */
 @media (max-width: 640px) {
+  .detail-top-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .detail-actions { width: 100%; }
+  .detail-actions .detail-action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  .detail-actions .share-wrap {
+    flex: 1;
+  }
+  .detail-actions .share-wrap .detail-action-btn {
+    width: 100%;
+  }
   .site-header-inner {
     flex-wrap: wrap;
   }
@@ -2124,26 +2494,32 @@ a:hover { color: var(--petal-slate-deep); }
     order: 1;
   }
   .site-logo {
-    height: 48px;
+    height: 58px;
+    max-width: min(330px, calc(100vw - 150px));
   }
-  .landing-mode-toggle,
-  .help-btn,
-  .a11y-btn-wrap {
+  .landing-mode-toggle {
     order: 2;
   }
-  .a11y-panel {
-    min-width: unset;
-    width: calc(100vw - 32px);
-    max-width: 360px;
-    max-height: calc(100vh - 120px);
-    overflow-y: auto;
-    right: auto;
-    left: 0;
+  /* "How to use this" and Display Settings collapse into the hamburger menu
+     on mobile so they don't crowd the header row above the search bar. */
+  .help-btn,
+  .a11y-toggle-btn {
+    display: none;
+  }
+  .mobile-menu-wrap {
+    display: block;
+    order: 2;
   }
   .a11y-grid {
     grid-template-columns: 1fr;
   }
   .a11y-backdrop {
     display: block;
+    z-index: var(--z-modal-backdrop);
+  }
+  .a11y-panel {
+    top: var(--space-md);
+    max-height: calc(100vh - 2 * var(--space-md));
+    z-index: var(--z-modal);
   }
 }

@@ -37,11 +37,11 @@ export function filterPrograms(programs, filters) {
   const aiParsed = queryNorm && !isPostalQuery ? interpretQuery(queryNorm) : null
   const aiQuadrant = aiParsed?.quadrant ?? null
 
-  // Location supports multiple simultaneous selections (e.g. NW + NE) — REQ-020.
-  // Dropdown/postal/AI-detected quadrants are folded into the same selection set.
-  const activeQuadrants = new Set(quadrant || [])
-  if (detectedQuadrant) activeQuadrants.add(detectedQuadrant)
-  if (aiQuadrant) activeQuadrants.add(aiQuadrant)
+  // Location supports multiple simultaneous UI selections (e.g. NW + NE) —
+  // REQ-020. A location expressed in the query is a separate constraint so it
+  // remains AND-combined with the selected filters like every other dimension.
+  const selectedQuadrants = new Set(quadrant || [])
+  const queryQuadrant = detectedQuadrant || aiQuadrant
 
   // When the mock AI recognized something (a location phrase, category, or
   // "free"), search against its cleaned keyword list instead of the raw
@@ -49,9 +49,9 @@ export function filterPrograms(programs, filters) {
   const textForTokens = aiParsed?.hasInterpretation ? aiParsed.cleanedKeywords : queryNorm
   const queryTokens = textForTokens && !isPostalQuery ? textForTokens.split(/\s+/).filter(Boolean) : []
 
-  return programs.filter((p) => {
+  const runFilter = (includeQueryTokens) => programs.filter((p) => {
     // Text search across all relevant fields (skipped when query is a postal code)
-    if (queryTokens.length > 0) {
+    if (includeQueryTokens && queryTokens.length > 0) {
       const searchable = [
         p.organization,
         p.programName,
@@ -84,13 +84,23 @@ export function filterPrograms(programs, filters) {
       if (!queryTokens.every(tokenMatches)) return false
     }
 
-    // Quadrant filter — one or more checkbox selections, postal code, or a
-    // plain-language location phrase like "north east" typed in the search box.
-    // A program matches if it carries any selected quadrant, or is tagged City-wide.
-    if (activeQuadrants.size > 0 && !activeQuadrants.has('City-wide')) {
-      const hasQuadrant =
-        p.quadrant.some((q) => activeQuadrants.has(q)) || p.quadrant.includes('City-wide')
-      if (!hasQuadrant) return false
+    // Multiple selected locations are OR-combined within the Location filter.
+    // City-wide programs remain eligible for every specific location.
+    if (selectedQuadrants.size > 0 && !selectedQuadrants.has('City-wide')) {
+      const matchesSelected =
+        p.quadrant.some((q) => selectedQuadrants.has(q)) || p.quadrant.includes('City-wide')
+      if (!matchesSelected) return false
+    }
+
+    // Postal-code and natural-language locations constrain the UI selection
+    // rather than expanding it. "Anywhere" / City-wide adds no restriction.
+    if (
+      queryQuadrant
+      && queryQuadrant !== 'City-wide'
+      && !p.quadrant.includes(queryQuadrant)
+      && !p.quadrant.includes('City-wide')
+    ) {
+      return false
     }
 
     // Service area filter — supports both sub-category and parent group selection
@@ -104,10 +114,23 @@ export function filterPrograms(programs, filters) {
       }
     }
 
+    // Natural-language category intent uses the same structured field as the
+    // Service Type control. The parser removes recognized category words from
+    // the remaining text tokens, so this check is what makes phrases such as
+    // "fitness programs in northeast Calgary" actually filter to fitness.
+    if (aiParsed?.serviceAreaValue && !p.serviceArea.includes(aiParsed.serviceAreaValue)) {
+      return false
+    }
+
     // Cost filter
     if (cost) {
       if (!p.cost.includes(cost)) return false
     }
+
+    // Apply "free" recognized in a natural-language query. Keep this separate
+    // from the explicit Cost control so a contradictory query/filter pair
+    // correctly produces no matches instead of silently overriding either one.
+    if (aiParsed?.costFree && !p.cost.includes('Free')) return false
 
     // Format filter
     if (format) {
@@ -116,6 +139,18 @@ export function filterPrograms(programs, filters) {
 
     return true
   })
+
+  const matches = runFilter(true)
+
+  // Keep both AI entry points consistent: if the parser found meaningful
+  // structured intent but an extra word is too specific for this dataset,
+  // fall back to the recognized category/location/cost rather than showing an
+  // empty result. The chatbot already uses this structured-intent fallback.
+  if (matches.length === 0 && aiParsed?.hasInterpretation && queryTokens.length > 0) {
+    return runFilter(false)
+  }
+
+  return matches
 }
 
 /**

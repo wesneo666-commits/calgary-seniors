@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import ProgramCard from './ProgramCard.jsx'
 import FilterChips from './FilterChips.jsx'
 import Pagination from './Pagination.jsx'
@@ -65,8 +66,6 @@ export default function ResultsList({
   onPage,
   sort,
   onSort,
-  layout,
-  onLayout,
 }) {
   const isFiltered = Object.values(filters).some(isFilterActive)
   const isEmpty = totalResults === 0
@@ -75,12 +74,28 @@ export default function ResultsList({
   const rangeStart = totalResults === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
   const rangeEnd = Math.min(page * PAGE_SIZE, totalResults)
 
+  // Visible (not just screen-reader) confirmation that results actually
+  // changed after a filter/search edit — a brief highlight, not just the
+  // aria-live announcement below (V4 mobile P0, 2026-07-24).
+  const [flash, setFlash] = useState(false)
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+    setFlash(true)
+    const t = setTimeout(() => setFlash(false), 900)
+    return () => clearTimeout(t)
+  }, [totalResults])
+
   return (
     <div className="results-area">
       <FilterChips filters={filters} onRemove={onRemove} />
 
       <div className="results-toolbar">
-        <p className="results-summary" aria-live="polite" aria-atomic="true">
+        <p
+          className={`results-summary${flash ? ' results-summary--flash' : ''}`}
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {isFiltered
             ? totalPages > 1
               ? <>Showing <strong>{rangeStart}–{rangeEnd}</strong> of <strong>{totalResults}</strong> matching programs</>
@@ -93,24 +108,6 @@ export default function ResultsList({
 
         {!isEmpty && (
           <div className="toolbar-right">
-            <div className="layout-toggle" role="group" aria-label="Layout">
-              <button
-                className={`layout-toggle-btn${layout === '1col' ? ' layout-toggle-btn--active' : ''}`}
-                onClick={() => onLayout('1col')}
-                aria-pressed={layout === '1col'}
-                title="Single column"
-              >
-                ☰ 1 col
-              </button>
-              <button
-                className={`layout-toggle-btn${layout === '2col' ? ' layout-toggle-btn--active' : ''}`}
-                onClick={() => onLayout('2col')}
-                aria-pressed={layout === '2col'}
-                title="Two columns"
-              >
-                ⊞ 2 col
-              </button>
-            </div>
             <div className="sort-control">
               <label htmlFor="sort-select" className="sort-label">Sort by</label>
               <select
@@ -141,7 +138,7 @@ export default function ResultsList({
         </div>
       ) : (
         <>
-          <ul className={`results-list${layout === '1col' ? ' results-list--1col' : ''}`} role="list">
+          <ul className="results-list" role="list">
             {results.map((program) => (
               <li key={program.id} role="listitem">
                 <ProgramCard program={program} onSelect={onSelect} />

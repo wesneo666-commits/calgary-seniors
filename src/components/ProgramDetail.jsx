@@ -95,10 +95,41 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
     window.print()
   }
 
+  // Older/non-secure-context Safari doesn't expose navigator.clipboard at
+  // all — calling .writeText on it throws before the promise chain even
+  // starts, so the button silently does nothing. Fall back to the
+  // execCommand approach there (V4 mobile P0: "make Share actions usable
+  // in mobile Safari", 2026-07-24).
+  function copyText(text) {
+    if (navigator.clipboard?.writeText) {
+      return navigator.clipboard.writeText(text)
+    }
+    return new Promise((resolve, reject) => {
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+      try {
+        document.execCommand('copy') ? resolve() : reject()
+      } catch (err) {
+        reject(err)
+      } finally {
+        document.body.removeChild(textarea)
+      }
+    })
+  }
+
   function handleCopyUrl() {
-    navigator.clipboard.writeText(shareUrlFor(program)).catch(() => {})
-    setCopied(true)
-    setTimeout(() => setShareOpen(false), 700)
+    copyText(shareUrlFor(program)).then(
+      () => {
+        setCopied(true)
+        setTimeout(() => setShareOpen(false), 700)
+      },
+      () => setCopied(false)
+    )
   }
 
   const friendlyServiceAreas = program.serviceArea.map((value) => ({
@@ -116,7 +147,7 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
     || program.orgWebsite
     || extractRegistrationUrl(program.howToAccess)
   )
-  const mailtoBody = encodeURIComponent(`Take a look at this program on the Calgary Seniors Resource Directory:\n${shareUrlFor(program)}`)
+  const mailtoBody = encodeURIComponent(`Take a look at this program on EngAGE: Calgary Directory for Aging Well:\n${shareUrlFor(program)}`)
 
   return (
     <div
@@ -130,7 +161,7 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
       <div className="detail-panel" ref={panelRef}>
 
         <div className="print-only-header">
-          <span>Calgary Seniors Resource Directory</span>
+          <span>EngAGE: Calgary Directory for Aging Well</span>
           <span>Printed {new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
         </div>
 

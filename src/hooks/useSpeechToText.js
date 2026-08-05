@@ -13,7 +13,7 @@ export const speechSupported = Boolean(SpeechRecognitionImpl)
 const ERROR_MESSAGES = {
   'not-allowed':         'Voice search needs permission to use your microphone. Check the microphone setting in your browser, or type your search instead.',
   'service-not-allowed': 'Voice search needs permission to use your microphone. Check the microphone setting in your browser, or type your search instead.',
-  'no-speech':           "We didn't hear anything. Press the Voice button and try speaking again.",
+  'no-speech':           "We didn't hear anything. Press the Voice search button and try speaking again.",
   'audio-capture':       "We couldn't find a microphone on this device. You can type your search instead.",
   'network':             'Voice search needs an internet connection. Please try again, or type your search instead.',
   'aborted':             null, // user stopped it on purpose — not an error worth showing

@@ -54,7 +54,7 @@ export default function AboutModal({ onClose }) {
           <div className="help-icon">📋</div>
           <div>
             <h3>What is this?</h3>
-            <p>The <strong>Calgary Seniors Resource Directory</strong> is a free, easy-to-use online directory of programs and services for adults aged 55+ living in Calgary. It brings together reliable, up-to-date information in one place to help older adults, caregivers, and service providers find the supports they need.</p>
+            <p><strong>EngAGE: Calgary Directory for Aging Well</strong> is a free, easy-to-use online directory of programs and services for adults aged 55+ living in Calgary. It brings together reliable, up-to-date information in one place to help older adults, caregivers, and service providers find the supports they need.</p>
           </div>
         </div>
 

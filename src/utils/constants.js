@@ -76,8 +76,8 @@ export const SERVICE_AREA_GROUPS = [
 export const SERVICE_AREAS = SERVICE_AREA_GROUPS.flatMap((g) => g.items)
 
 // Parent category icons — used by the landing-page icon navigation only
-// (removed from program cards per REQ-051). Each group carries one petal of
-// the Calgary Seniors logo; the slug selects its petal colors in CSS.
+// (removed from program cards per REQ-051). Each group carries one color from
+// the roadmap's botanical palette; the slug selects that color family in CSS.
 export const GROUP_ICONS = {
   'Getting help at home': { emoji: '🏠', slug: 'home' },
   'Health & wellness':    { emoji: '🩺', slug: 'health' },
@@ -104,13 +104,15 @@ export function serviceAreaLabel(value) {
   return SERVICE_AREAS.find((s) => s.value === value)?.label ?? value
 }
 
+// 'City-wide' is not a selectable option here — a program tagged City-wide
+// already matches every quadrant filter (see search.js), and leaving the
+// selection empty already reads as "All of Calgary" (V4 Round 10, 2026-07-24).
 export const QUADRANTS = [
   { value: 'NW', label: 'Northwest' },
   { value: 'NE', label: 'Northeast' },
   { value: 'SW', label: 'Southwest' },
   { value: 'SE', label: 'Southeast' },
   { value: 'Central', label: 'Central Calgary' },
-  { value: 'City-wide', label: 'City-wide' },
 ]
 
 // Full quadrant name for program-card/detail badges — abbreviations like "SW"

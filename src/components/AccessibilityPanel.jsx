@@ -3,24 +3,68 @@ import { TEXT_SIZES, FONTS, SPACINGS } from '../hooks/useAccessibility.js'
 
 export default function AccessibilityPanel({ prefs, set, reset, onClose }) {
   const panelRef = useRef(null)
+  const closeButtonRef = useRef(null)
 
   useEffect(() => {
+    const previouslyFocused = document.activeElement
+
     function handleClick(e) {
       if (panelRef.current && !panelRef.current.contains(e.target)) onClose()
     }
     function handleKey(e) {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+
+      if (e.key !== 'Tab' || !panelRef.current) return
+
+      const focusable = [...panelRef.current.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )]
+      if (focusable.length === 0) return
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
     }
+
+    closeButtonRef.current?.focus()
     document.addEventListener('mousedown', handleClick)
     window.addEventListener('keydown', handleKey)
     return () => {
       document.removeEventListener('mousedown', handleClick)
       window.removeEventListener('keydown', handleKey)
+      previouslyFocused?.focus?.()
     }
   }, [onClose])
 
   return (
-    <div className="a11y-panel" ref={panelRef} role="region" aria-label="Display settings">
+    <div
+      className="a11y-panel"
+      ref={panelRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="display-settings-title"
+    >
+      <div className="a11y-panel-header">
+        <h2 id="display-settings-title">Display Settings</h2>
+        <button
+          ref={closeButtonRef}
+          type="button"
+          className="a11y-panel-close"
+          onClick={onClose}
+          aria-label="Close Display Settings"
+        >
+          <span aria-hidden="true">X</span>
+        </button>
+      </div>
       <div className="a11y-grid">
 
         {/* Text size */}

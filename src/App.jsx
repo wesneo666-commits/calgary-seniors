@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import programs from './data/programs.json'
 import SearchBar from './components/SearchBar.jsx'
 import FilterPanel from './components/FilterPanel.jsx'
@@ -28,22 +28,60 @@ export function isFilterActive(value) {
 
 export const PAGE_SIZE = 20
 
+// Same focus-trap pattern used by HelpModal/AboutModal/ProgramDetail — kept
+// here too rather than pulled into a shared util, consistent with how those
+// components each define their own copy.
+const FOCUSABLE = 'a[href], button:not([disabled]), input, select, [tabindex]:not([tabindex="-1"])'
+
 function getSharedProgramId() {
   return new URLSearchParams(window.location.search).get('program')
+}
+
+// Escape-to-close plus the same Tab focus-trap used by the other overlays in
+// this app (HelpModal/AboutModal/ProgramDetail) — without it, a keyboard user
+// tabbing through (especially the filter drawer's many checkbox buttons) can
+// tab straight out into the page underneath.
+function useOverlayKeys(open, onClose, panelRef) {
+  useEffect(() => {
+    if (!open) return
+    function handleKey(e) {
+      if (e.key === 'Escape') { onClose(); return }
+      if (e.key === 'Tab' && panelRef.current) {
+        const focusable = [...panelRef.current.querySelectorAll(FOCUSABLE)]
+        if (focusable.length === 0) return
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (e.shiftKey) {
+          if (document.activeElement === first) { e.preventDefault(); last.focus() }
+        } else {
+          if (document.activeElement === last) { e.preventDefault(); first.focus() }
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [open, onClose, panelRef])
+
+  useEffect(() => {
+    if (open) panelRef.current?.querySelector(FOCUSABLE)?.focus()
+  }, [open, panelRef])
 }
 
 export default function App() {
   const { prefs, set, reset: resetA11y } = useAccessibility()
   const [showA11y, setShowA11y] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [selectedProgram, setSelectedProgram] = useState(null)
   const [page, setPage] = useState(1)
   const [sort, setSort] = useState('name-az')
-  const [layout, setLayout] = useState('2col')
-  const [landingMode, setLandingMode] = useState('direct') // 'direct' | 'wizard' — A/B toggle for UAT (Session 3, 2026-06-25)
+  const [landingMode, setLandingMode] = useState('wizard') // 'direct' | 'wizard' — landing page is the default entry view (V4 Round 10, 2026-07-24)
   const [sharedProgramId, setSharedProgramId] = useState(getSharedProgramId)
+  const mobileMenuRef = useRef(null)
+  const filterDrawerRef = useRef(null)
 
   // A copied/shared program link (?program=<id>) loads straight into a
   // single-card view instead of the full app backdrop — REQ-042.
@@ -66,6 +104,11 @@ export default function App() {
       return { ...prev, [key]: '' }
     })
   }, [])
+
+  // Stable identities so useOverlayKeys' effect isn't torn down and rebuilt
+  // on every render (an inline arrow here would change every time).
+  const closeMobileMenu = useCallback(() => setShowMobileMenu(false), [])
+  const closeMobileFilters = useCallback(() => setShowMobileFilters(false), [])
 
   const clearFilters = useCallback(() => {
     setFilters(EMPTY_FILTERS)
@@ -97,6 +140,9 @@ export default function App() {
     else if (!filters.query && sort === 'relevance') setSort('name-az')
   }, [filters.query])
 
+  useOverlayKeys(showMobileMenu, closeMobileMenu, mobileMenuRef)
+  useOverlayKeys(showMobileFilters, closeMobileFilters, filterDrawerRef)
+
   const totalPages = Math.ceil(allResults.length / PAGE_SIZE)
   const pageResults = allResults.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
@@ -108,7 +154,7 @@ export default function App() {
       <ProgramDetail
         program={sharedProgram}
         onClose={exitSharedView}
-        backLabel="← Back to Calgary Seniors Resource Directory"
+        backLabel="← Back to EngAGE"
       />
     )
   }
@@ -125,26 +171,26 @@ export default function App() {
             <button
               className="site-logo-btn"
               onClick={clearFilters}
-              aria-label="Calgary Seniors Resource Society — reset to home"
+              aria-label="EngAGE — reset to home"
             >
               <img
-                src="/logo.webp"
+                src="/engage-logo.svg"
                 alt=""
                 className="site-logo"
               />
             </button>
             <div className="site-header-text">
-              <h1>Calgary Seniors Resource Directory</h1>
-              <p>Find Programs and Services in Calgary, Alberta!</p>
+              <h1 className="sr-only">EngAGE: Calgary Directory for Aging Well</h1>
+              <p>Calgary Directory for Aging Well</p>
             </div>
-            <div className="landing-mode-toggle" role="group" aria-label="Landing page style (UAT testing)">
+            <div className="landing-mode-toggle" role="group" aria-label="Choose how to find a program">
               <button
                 type="button"
                 className={`landing-mode-btn${landingMode === 'direct' ? ' landing-mode-btn--active' : ''}`}
                 onClick={() => setLandingMode('direct')}
                 aria-pressed={landingMode === 'direct'}
               >
-                Direct search
+                Direct Search
               </button>
               <button
                 type="button"
@@ -163,9 +209,9 @@ export default function App() {
                 className="a11y-toggle-btn"
                 onClick={() => setShowA11y((v) => !v)}
                 aria-expanded={showA11y}
-                aria-label="Website display settings"
+                aria-label="Display settings"
               >
-                Website Display Settings ▾
+                ⚙ Display Settings ▾
               </button>
               {showA11y && (
                 <>
@@ -179,16 +225,68 @@ export default function App() {
                 </>
               )}
             </div>
+
+            {/* Mobile-only: collapses "How to use this" and Display Settings behind
+                a hamburger menu so the header row doesn't crowd the search area
+                (V4 mobile P0, 2026-07-24). Desktop keeps the two buttons above. */}
+            <div className="mobile-menu-wrap">
+              <button
+                type="button"
+                className="mobile-menu-btn"
+                onClick={() => setShowMobileMenu((v) => !v)}
+                aria-expanded={showMobileMenu}
+                aria-haspopup="menu"
+                aria-label="More options"
+              >
+                <span aria-hidden="true">☰</span> Menu
+              </button>
+              {showMobileMenu && (
+                <>
+                  <div className="mobile-menu-backdrop" aria-hidden="true" onClick={() => setShowMobileMenu(false)} />
+                  <div className="mobile-menu-panel" role="menu" aria-label="More options" ref={mobileMenuRef}>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="mobile-menu-item"
+                      onClick={() => { setShowHelp(true); setShowMobileMenu(false) }}
+                    >
+                      ❓ How to use this
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="mobile-menu-item"
+                      onClick={() => { setShowA11y(true); setShowMobileMenu(false) }}
+                    >
+                      ⚙ Display Settings
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
       <div className="search-section" role="search">
         <div className="container">
-          <SearchBar
-            value={filters.query}
-            onChange={(v) => setFilter('query', v)}
-          />
+          <div className="search-row">
+            <SearchBar
+              value={filters.query}
+              onChange={(v) => setFilter('query', v)}
+            />
+            {!showWizard && (
+              <button
+                type="button"
+                className="mobile-filter-btn"
+                onClick={() => setShowMobileFilters(true)}
+                aria-haspopup="dialog"
+                aria-expanded={showMobileFilters}
+              >
+                🗂 Filters{hasActiveFilters ? ` (${Object.values(filters).filter(isFilterActive).length})` : ''}
+              </button>
+            )}
+          </div>
           <HeroGuidance />
         </div>
       </div>
@@ -198,12 +296,23 @@ export default function App() {
           <WizardLanding onPickGroup={(group) => setFilter('serviceArea', `_group_${group}`)} />
         ) : (
           <div className="main-layout">
-            <aside aria-label="Filters">
+            {showMobileFilters && (
+              <div className="mobile-filter-backdrop" aria-hidden="true" onClick={() => setShowMobileFilters(false)} />
+            )}
+            <aside
+              aria-label="Filters"
+              role={showMobileFilters ? 'dialog' : undefined}
+              aria-modal={showMobileFilters ? 'true' : undefined}
+              className={`filter-aside${showMobileFilters ? ' filter-aside--open' : ''}`}
+              ref={filterDrawerRef}
+            >
               <FilterPanel
                 filters={filters}
                 onFilterChange={setFilter}
                 onClear={clearFilters}
                 hasActive={hasActiveFilters}
+                onCloseMobile={() => setShowMobileFilters(false)}
+                resultCount={allResults.length}
               />
             </aside>
 
@@ -223,8 +332,6 @@ export default function App() {
                 }}
                 sort={sort}
                 onSort={(s) => { setSort(s); setPage(1) }}
-                layout={layout}
-                onLayout={setLayout}
               />
             </section>
           </div>

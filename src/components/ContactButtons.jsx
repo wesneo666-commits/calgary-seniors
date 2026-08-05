@@ -22,13 +22,14 @@ export default function ContactButtons({ program }) {
         </a>
       ))}
       {email && (
-        <a
-          href={`mailto:${email}`}
-          className="contact-btn contact-btn-email"
+        <div
+          className="contact-email-plain"
           aria-label={`Email ${program.organization}: ${email}`}
         >
-          <span aria-hidden="true">✉️</span> Email: {email}
-        </a>
+          <span aria-hidden="true">✉️</span>
+          <span className="contact-email-label">Email:</span>
+          <span className="contact-email-value">{email}</span>
+        </div>
       )}
       {contactFormUrl && (
         <a
@@ -73,11 +74,6 @@ export default function ContactButtons({ program }) {
         >
           <span aria-hidden="true">🏢</span> Organization website
         </a>
-      )}
-      {email && (
-        <p className="contact-email-plain">
-          Email (copyable): <span className="contact-email-plain-value">{email}</span>
-        </p>
       )}
     </div>
   )

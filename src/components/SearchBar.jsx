@@ -77,7 +77,7 @@ export default function SearchBar({ value, onChange }) {
             aria-label={listening ? 'Stop listening' : 'Search by voice'}
           >
             <MicIcon />
-            {listening ? 'Listening…' : 'Voice'}
+            {listening ? 'Stop listening' : 'Voice search'}
           </button>
         )}
       </div>
@@ -91,7 +91,7 @@ export default function SearchBar({ value, onChange }) {
         </p>
       ) : listening ? (
         <p className="search-hint search-hint--detected" role="status">
-          Speak now — for example, "fitness classes in the northwest"
+          Listening… Speak now, then press <strong>Stop listening</strong> when finished.
         </p>
       ) : detectedQuadrant ? (
         <p className="search-hint search-hint--detected" role="status">
