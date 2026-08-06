@@ -1,6 +1,6 @@
 import programs from '../data/programs.json'
 
-export default function Footer({ onAbout }) {
+export default function Footer({ onAbout, onSubmitProgram, submissionTriggerRef }) {
   return (
     <footer className="site-footer" role="contentinfo">
       <div className="container">
@@ -28,9 +28,9 @@ export default function Footer({ onAbout }) {
                 </a>
               </li>
               <li>
-                <a href={`mailto:?subject=${encodeURIComponent('Request to be added — EngAGE')}`}>
-                  Request to be added
-                </a>
+                <button ref={submissionTriggerRef} className="footer-link-btn" onClick={onSubmitProgram}>
+                  Submit a program or organization
+                </button>
               </li>
             </ul>
           </div>

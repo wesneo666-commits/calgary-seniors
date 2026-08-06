@@ -6,6 +6,7 @@ import ResultsList from './components/ResultsList.jsx'
 import ProgramDetail from './components/ProgramDetail.jsx'
 import HelpModal from './components/HelpModal.jsx'
 import AboutModal from './components/AboutModal.jsx'
+import SubmissionModal from './components/SubmissionModal.jsx'
 import AccessibilityPanel from './components/AccessibilityPanel.jsx'
 import HeroGuidance from './components/HeroGuidance.jsx'
 import WizardLanding from './components/WizardLanding.jsx'
@@ -74,6 +75,7 @@ export default function App() {
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
+  const [showSubmission, setShowSubmission] = useState(false)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [selectedProgram, setSelectedProgram] = useState(null)
   const [page, setPage] = useState(1)
@@ -82,6 +84,12 @@ export default function App() {
   const [sharedProgramId, setSharedProgramId] = useState(getSharedProgramId)
   const mobileMenuRef = useRef(null)
   const filterDrawerRef = useRef(null)
+  const submissionTriggerRef = useRef(null)
+
+  const closeSubmission = useCallback(() => {
+    setShowSubmission(false)
+    window.requestAnimationFrame(() => submissionTriggerRef.current?.focus())
+  }, [])
 
   // A copied/shared program link (?program=<id>) loads straight into a
   // single-card view instead of the full app backdrop — REQ-042.
@@ -338,7 +346,11 @@ export default function App() {
         )}
       </main>
 
-      <Footer onAbout={() => setShowAbout(true)} />
+      <Footer
+        onAbout={() => setShowAbout(true)}
+        onSubmitProgram={() => setShowSubmission(true)}
+        submissionTriggerRef={submissionTriggerRef}
+      />
 
       {selectedProgram && (
         <ProgramDetail
@@ -349,6 +361,7 @@ export default function App() {
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
       {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
+      {showSubmission && <SubmissionModal onClose={closeSubmission} />}
 
       <ChatWidget onApplyFilters={applyChatFilters} />
     </>
