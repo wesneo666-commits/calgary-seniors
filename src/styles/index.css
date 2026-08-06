@@ -258,6 +258,7 @@ a:hover { color: var(--petal-slate-deep); }
 /* ─── Accessibility panel ────────────────────────────────────── */
 .a11y-btn-wrap {
   position: relative;
+  margin-left: auto;
   flex-shrink: 0;
 }
 .a11y-toggle-btn {
@@ -452,7 +453,16 @@ a:hover { color: var(--petal-slate-deep); }
 [data-contrast="high"] .badge-unknown { background: #e0e0e0; color: #000000; }
 [data-contrast="high"] .badge-format  { background: #e0e0e0; color: #000000; }
 [data-contrast="high"] .badge-quad    { background: #d0e8ff; color: #00007a; }
-[data-contrast="high"] .badge-service { background: #e8d8ff; color: #30006a; }
+[data-contrast="high"] .badge-service {
+  background: #e8d8ff;
+  color: #30006a;
+  border: 2px solid #30006a;
+}
+[data-contrast="high"] .badge-service--home      { background: #d0e8ff; color: #00007a; border-color: #00007a; }
+[data-contrast="high"] .badge-service--health    { background: #c8ffc8; color: #003000; border-color: #003000; }
+[data-contrast="high"] .badge-service--social    { background: #e8d8ff; color: #30006a; border-color: #30006a; }
+[data-contrast="high"] .badge-service--practical { background: #fff0b0; color: #3d2000; border-color: #3d2000; }
+[data-contrast="high"] .badge-service--safety    { background: #ffd6e6; color: #7a003f; border-color: #7a003f; }
 [data-contrast="high"] .badge-population { background: #ffd6e6; color: #7a003f; }
 [data-contrast="high"] .search-section { background: #00007a; background-image: none; }
 [data-contrast="high"] .search-hint,
@@ -2726,6 +2736,12 @@ a:hover { color: var(--petal-slate-deep); }
    Kept at the end of the file so it wins the cascade over the equal-specificity
    base rules for .a11y-panel/.a11y-grid defined earlier. */
 @media (max-width: 640px) {
+  .voice-btn {
+    width: 52px;
+    padding: 0;
+    justify-content: center;
+  }
+  .voice-btn-label { display: none; }
   .detail-top-bar {
     align-items: stretch;
     flex-direction: column;

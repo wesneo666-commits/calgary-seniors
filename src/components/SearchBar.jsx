@@ -77,7 +77,7 @@ export default function SearchBar({ value, onChange }) {
             aria-label={listening ? 'Stop listening' : 'Search by voice'}
           >
             <MicIcon />
-            {listening ? 'Stop listening' : 'Voice search'}
+            <span className="voice-btn-label">{listening ? 'Stop listening' : 'Voice search'}</span>
           </button>
         )}
       </div>

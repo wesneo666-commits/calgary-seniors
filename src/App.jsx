@@ -29,6 +29,11 @@ export function isFilterActive(value) {
 
 export const PAGE_SIZE = 20
 
+// Phase 1 tests focus on search, filters, and display settings. Keep the
+// product landing page code available for Phase 2, but start test participants
+// directly in the searchable directory without a competing mode switch.
+const PHASE_ONE_TEST_MODE = true
+
 // Same focus-trap pattern used by HelpModal/AboutModal/ProgramDetail — kept
 // here too rather than pulled into a shared util, consistent with how those
 // components each define their own copy.
@@ -80,7 +85,7 @@ export default function App() {
   const [selectedProgram, setSelectedProgram] = useState(null)
   const [page, setPage] = useState(1)
   const [sort, setSort] = useState('name-az')
-  const [landingMode, setLandingMode] = useState('wizard') // 'direct' | 'wizard' — landing page is the default entry view (V4 Round 10, 2026-07-24)
+  const [landingMode, setLandingMode] = useState(PHASE_ONE_TEST_MODE ? 'direct' : 'wizard')
   const [sharedProgramId, setSharedProgramId] = useState(getSharedProgramId)
   const mobileMenuRef = useRef(null)
   const filterDrawerRef = useRef(null)
@@ -155,7 +160,7 @@ export default function App() {
   const pageResults = allResults.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const hasActiveFilters = Object.values(filters).some(isFilterActive)
-  const showWizard = landingMode === 'wizard' && !hasActiveFilters
+  const showWizard = !PHASE_ONE_TEST_MODE && landingMode === 'wizard' && !hasActiveFilters
 
   if (sharedProgram) {
     return (
@@ -191,24 +196,26 @@ export default function App() {
               <h1 className="sr-only">EngAGE: Calgary Directory for Aging Well</h1>
               <p>Calgary Directory for Aging Well</p>
             </div>
-            <div className="landing-mode-toggle" role="group" aria-label="Choose how to find a program">
-              <button
-                type="button"
-                className={`landing-mode-btn${landingMode === 'direct' ? ' landing-mode-btn--active' : ''}`}
-                onClick={() => setLandingMode('direct')}
-                aria-pressed={landingMode === 'direct'}
-              >
-                Direct Search
-              </button>
-              <button
-                type="button"
-                className={`landing-mode-btn${landingMode === 'wizard' ? ' landing-mode-btn--active' : ''}`}
-                onClick={() => setLandingMode('wizard')}
-                aria-pressed={landingMode === 'wizard'}
-              >
-                Directory
-              </button>
-            </div>
+            {!PHASE_ONE_TEST_MODE && (
+              <div className="landing-mode-toggle" role="group" aria-label="Choose how to find a program">
+                <button
+                  type="button"
+                  className={`landing-mode-btn${landingMode === 'direct' ? ' landing-mode-btn--active' : ''}`}
+                  onClick={() => setLandingMode('direct')}
+                  aria-pressed={landingMode === 'direct'}
+                >
+                  Direct Search
+                </button>
+                <button
+                  type="button"
+                  className={`landing-mode-btn${landingMode === 'wizard' ? ' landing-mode-btn--active' : ''}`}
+                  onClick={() => setLandingMode('wizard')}
+                  aria-pressed={landingMode === 'wizard'}
+                >
+                  Directory
+                </button>
+              </div>
+            )}
             <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="How to use this directory">
               How to use this
             </button>

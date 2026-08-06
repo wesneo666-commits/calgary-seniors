@@ -14,6 +14,15 @@ function prefixMatch(a, b) {
 }
 
 /**
+ * Normalizes well-known spelling variants before the query reaches the
+ * structured parser or the text matcher. Keep this narrow and explicit so
+ * users get a reliable result without broad, surprising substitutions.
+ */
+export function normalizeSearchQuery(query) {
+  return query.trim().toLowerCase().replace(/\bageing\b/g, 'aging')
+}
+
+/**
  * Returns programs matching the given filters.
  * All filters are AND-combined; empty/null values skip that filter.
  * Multi-word queries use AND logic per token so "fitness northwest" finds
@@ -28,7 +37,7 @@ function prefixMatch(a, b) {
 export function filterPrograms(programs, filters) {
   const { query, quadrant, serviceArea, cost, format } = filters
 
-  const queryNorm = query ? query.trim().toLowerCase() : ''
+  const queryNorm = query ? normalizeSearchQuery(query) : ''
 
   // Detect postal code early so we can skip text search for it
   const detectedQuadrant = queryNorm ? postalToQuadrant(queryNorm) : null

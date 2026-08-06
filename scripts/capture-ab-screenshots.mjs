@@ -197,7 +197,10 @@ async function openPage(profile) {
 }
 
 async function enterDirectSearch(page) {
-  await page.getByRole('button', { name: 'Direct Search', exact: true }).click()
+  const directSearchButton = page.getByRole('button', { name: 'Direct Search', exact: true })
+  if (await directSearchButton.count()) {
+    await directSearchButton.click()
+  }
   await page.locator('.results-list').waitFor()
 }
 
