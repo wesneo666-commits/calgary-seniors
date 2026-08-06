@@ -91,9 +91,12 @@ export default function ChatWidget({ onApplyFilters }) {
   // Remembers the last unanswered location follow-up, so a typed location
   // (not just a chip click) can be combined with the pending search.
   const [pending, setPending] = useState(null)
-  // The "Ask our AI assistant" label beside the bubble, hidden once opened
-  // or dismissed so it doesn't nag.
+  // The label starts visible. Opening chat hides it, while the × is a true
+  // opt-out; those are deliberately separate actions.
+  const [showHint, setShowHint] = useState(true)
   const [hintDismissed, setHintDismissed] = useState(false)
+  const [hasOpenedChat, setHasOpenedChat] = useState(false)
+  const [reminderShown, setReminderShown] = useState(false)
   const listRef = useRef(null)
   const panelRef = useRef(null)
 
@@ -117,6 +120,31 @@ export default function ChatWidget({ onApplyFilters }) {
       window.removeEventListener('keydown', handleKey)
     }
   }, [open])
+
+  // After someone has tried the assistant, offer one small reminder after
+  // they close it. Do not resurface it if they explicitly dismissed the hint,
+  // while the panel is open, or more than once in the same visit.
+  useEffect(() => {
+    if (open || hintDismissed || !hasOpenedChat || reminderShown || showHint) return undefined
+
+    const timer = window.setTimeout(() => {
+      setShowHint(true)
+      setReminderShown(true)
+    }, 15000)
+
+    return () => window.clearTimeout(timer)
+  }, [hasOpenedChat, hintDismissed, open, reminderShown, showHint])
+
+  function openChat() {
+    setOpen(true)
+    setHasOpenedChat(true)
+    setShowHint(false)
+  }
+
+  function dismissHint() {
+    setHintDismissed(true)
+    setShowHint(false)
+  }
 
   function addExchange(userText, botMsg, nextPending = null) {
     const userMsg = { id: nextMessageId++, from: 'user', text: userText }
@@ -262,12 +290,12 @@ export default function ChatWidget({ onApplyFilters }) {
         </div>
       )}
 
-      {!open && !hintDismissed && (
+      {!open && showHint && !hintDismissed && (
         <div className="chat-fab-hint">
           <button
             type="button"
             className="chat-fab-hint-label"
-            onClick={() => { setOpen(true); setHintDismissed(true) }}
+            onClick={openChat}
           >
             <span className="chat-fab-hint-title">👋 Ask our AI assistant</span>
             <span className="chat-fab-hint-sub">Chat to find a program</span>
@@ -275,7 +303,7 @@ export default function ChatWidget({ onApplyFilters }) {
           <button
             type="button"
             className="chat-fab-hint-close"
-            onClick={() => setHintDismissed(true)}
+            onClick={dismissHint}
             aria-label="Dismiss assistant hint"
           >
             ✕
@@ -286,7 +314,7 @@ export default function ChatWidget({ onApplyFilters }) {
       <button
         type="button"
         className="chat-fab"
-        onClick={() => { setOpen((o) => !o); setHintDismissed(true) }}
+        onClick={() => (open ? setOpen(false) : openChat())}
         aria-expanded={open}
         aria-label={open ? 'Close chat assistant' : 'Open AI chat assistant'}
       >
