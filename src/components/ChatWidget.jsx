@@ -9,7 +9,7 @@ let nextMessageId = 1
 const GREETING = {
   id: 0,
   from: 'bot',
-  text: 'Hi! I\'m a mock AI assistant for testing this prototype. What can I help you with?',
+  text: 'Hi! What can I help you with today?',
 }
 
 // When a search matches more than this many programs and no location was given,
@@ -233,9 +233,9 @@ export default function ChatWidget({ onApplyFilters }) {
   return (
     <div className="chat-widget">
       {open && (
-        <div className="chat-panel" role="dialog" aria-label="Mock AI assistant" ref={panelRef}>
+        <div className="chat-panel" role="dialog" aria-label="Chatbot" ref={panelRef}>
           <div className="chat-panel-header">
-            <span>Ask about programs <span className="chat-mock-badge">Mock AI</span></span>
+            <span>Ask about programs</span>
             <button type="button" className="chat-close-btn" onClick={() => setOpen(false)} aria-label="Close chat">✕</button>
           </div>
 
@@ -297,7 +297,7 @@ export default function ChatWidget({ onApplyFilters }) {
             className="chat-fab-hint-label"
             onClick={openChat}
           >
-            <span className="chat-fab-hint-title">👋 Ask our AI assistant</span>
+            <span className="chat-fab-hint-title">👋 Ask our chatbot</span>
             <span className="chat-fab-hint-sub">Chat to find a program</span>
           </button>
           <button
@@ -316,7 +316,7 @@ export default function ChatWidget({ onApplyFilters }) {
         className="chat-fab"
         onClick={() => (open ? setOpen(false) : openChat())}
         aria-expanded={open}
-        aria-label={open ? 'Close chat assistant' : 'Open AI chat assistant'}
+        aria-label={open ? 'Close chatbot' : 'Open chatbot'}
       >
         💬
       </button>

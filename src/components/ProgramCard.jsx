@@ -21,6 +21,10 @@ export default function ProgramCard({ program, onSelect }) {
           <div className="card-org">{program.organization}</div>
         )}
 
+        {program.description && (
+          <p className="card-description">{program.description}</p>
+        )}
+
         {serviceTags.length > 0 && (
           <div className="card-service-tags">
             {serviceTags.map(({ label, slug }) => (

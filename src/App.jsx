@@ -8,7 +8,6 @@ import HelpModal from './components/HelpModal.jsx'
 import AboutModal from './components/AboutModal.jsx'
 import SubmissionModal from './components/SubmissionModal.jsx'
 import AccessibilityPanel from './components/AccessibilityPanel.jsx'
-import HeroGuidance from './components/HeroGuidance.jsx'
 import WizardLanding from './components/WizardLanding.jsx'
 import ChatWidget from './components/ChatWidget.jsx'
 import { filterPrograms, sortResults } from './utils/search.js'
@@ -302,7 +301,6 @@ export default function App() {
               </button>
             )}
           </div>
-          <HeroGuidance />
         </div>
       </div>
 

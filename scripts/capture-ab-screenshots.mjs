@@ -1,7 +1,6 @@
 import { mkdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { chromium } from 'playwright'
-import programs from '../src/data/programs.json' with { type: 'json' }
 import { QUADRANTS, SERVICE_AREA_GROUPS } from '../src/utils/constants.js'
 
 const baseUrl = process.env.AB_BASE_URL || 'http://127.0.0.1:5173'
@@ -11,6 +10,7 @@ const outputFolders = {
   'program-detail': '02-program-card-view',
   'service-type-filter': '03-service-type-filter',
   'location-filter': '04-location-filter',
+  'results-layout': '05-search-results-layout',
 }
 
 function artifactPath(slug, filename) {
@@ -38,24 +38,25 @@ const comparisons = [
   {
     slug: 'service-type-filter',
     title: 'Service type filter',
-    aLabel: 'Checkboxes with higher-order categories only',
+    aLabel: 'Higher-order category buttons',
     bLabel: 'Drop-down menu with all service types',
   },
   {
     slug: 'location-filter',
     title: 'Location filter',
-    aLabel: 'Location checkboxes',
-    bLabel: 'Location drop-down menu',
+    aLabel: 'Location buttons',
+    bLabel: 'Location drop-down with full quadrant names',
+  },
+  {
+    slug: 'results-layout',
+    title: 'Search results layout',
+    aLabel: 'One-column results',
+    bLabel: 'Two-column results',
   },
 ]
 
-const contextComparisons = comparisons.filter(({ slug }) => slug !== 'program-detail')
-
-const descriptionByProgram = Object.fromEntries(
-  programs.map((program) => [
-    `${program.programName}\n${program.organization}`,
-    program.description,
-  ])
+const contextComparisons = comparisons.filter(
+  ({ slug }) => !['program-detail', 'results-layout'].includes(slug)
 )
 
 const captureStyles = `
@@ -87,17 +88,6 @@ const captureStyles = `
   #ab-stage .results-list > li > article {
     background: var(--color-surface);
   }
-  .ab-card-description {
-    margin-top: var(--space-sm);
-    color: var(--color-text);
-    font-size: var(--font-size-sm);
-    line-height: 1.45;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-    text-align: left;
-  }
   #ab-stage.ab-detail-stage .detail-panel {
     width: 100%;
     max-height: none;
@@ -113,32 +103,6 @@ const captureStyles = `
     margin-top: 4px;
     max-height: 352px;
     box-shadow: none;
-  }
-  .ab-checkbox-list {
-    display: grid;
-    gap: var(--space-xs);
-  }
-  .ab-checkbox-choice {
-    display: flex !important;
-    align-items: center;
-    gap: var(--space-sm);
-    min-height: var(--touch-target);
-    margin: 0 !important;
-    padding: var(--space-xs) var(--space-sm);
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--color-surface);
-    color: var(--color-text);
-    font-size: var(--font-size-sm) !important;
-    font-weight: 500 !important;
-    line-height: 1.25;
-  }
-  .ab-checkbox-choice input {
-    width: 22px;
-    height: 22px;
-    margin: 0;
-    flex: 0 0 22px;
-    accent-color: var(--petal-slate-ink);
   }
   .ab-scroll-cue {
     margin: var(--space-xs) 0 0;
@@ -230,26 +194,14 @@ async function captureCardPreview(profile, withDescription) {
     await page.getByRole('searchbox').fill('transportation')
     await page.locator('.program-card').first().waitFor()
 
-    await page.evaluate(({ descriptions, caption, width, withDescription }) => {
+    await page.evaluate(({ caption, width, withDescription }) => {
       const list = document.querySelector('.results-list').cloneNode(true)
       ;[...list.children].slice(3).forEach((item) => item.remove())
 
-      if (withDescription) {
-        list.querySelectorAll('.program-card').forEach((card) => {
-          const name = card.querySelector('.card-name')?.textContent.trim() || ''
-          const organization = card.querySelector('.card-org')?.textContent.trim() || name
-          const description = descriptions[`${name}\n${organization}`]
-          if (!description) return
-          const preview = document.createElement('p')
-          preview.className = 'ab-card-description'
-          preview.textContent = description
-          card.querySelector('.card-service-tags')?.before(preview)
-        })
-      }
+      if (!withDescription) list.querySelectorAll('.card-description').forEach((node) => node.remove())
 
       window.__showAbStage(list, caption, 'card', width)
     }, {
-      descriptions: descriptionByProgram,
       caption: withDescription ? 'B · With description preview' : 'A · Without description preview',
       width: profile.widths.card,
       withDescription,
@@ -317,15 +269,12 @@ async function captureServiceFilter(profile, dropdown) {
         label.className = 'filter-group-label'
         label.textContent = 'Select service type'
         const options = document.createElement('div')
-        options.className = 'ab-checkbox-list'
+        options.className = 'checkbox-options'
         groups.forEach((text) => {
-          const option = document.createElement('label')
-          option.className = 'ab-checkbox-choice'
-          const checkbox = document.createElement('input')
-          checkbox.type = 'checkbox'
-          const optionText = document.createElement('span')
-          optionText.textContent = text
-          option.append(checkbox, optionText)
+          const option = document.createElement('button')
+          option.type = 'button'
+          option.className = 'checkbox-option'
+          option.textContent = text
           options.append(option)
         })
         group.append(label, options)
@@ -340,7 +289,7 @@ async function captureServiceFilter(profile, dropdown) {
     }, {
       caption: dropdown
         ? 'B · Drop-down menu with all service types'
-        : 'A · Checkboxes with higher-order categories only',
+        : 'A · Higher-order category buttons',
       dropdown,
       groups: SERVICE_AREA_GROUPS.map((group) => group.group),
       width: profile.widths.filter,
@@ -365,15 +314,12 @@ async function captureLocationFilter(profile, dropdown) {
         label.className = 'filter-group-label'
         label.textContent = 'Location'
         const choices = document.createElement('div')
-        choices.className = 'ab-checkbox-list'
+        choices.className = 'checkbox-options'
         options.forEach((location) => {
-          const option = document.createElement('label')
-          option.className = 'ab-checkbox-choice'
-          const checkbox = document.createElement('input')
-          checkbox.type = 'checkbox'
-          const optionText = document.createElement('span')
-          optionText.textContent = location.label
-          option.append(checkbox, optionText)
+          const option = document.createElement('button')
+          option.type = 'button'
+          option.className = 'checkbox-option'
+          option.textContent = location.label
           choices.append(option)
         })
         group.append(label, choices)
@@ -398,7 +344,7 @@ async function captureLocationFilter(profile, dropdown) {
           const button = document.createElement('button')
           button.type = 'button'
           button.className = `service-select-option${index === 0 ? ' service-select-option--active' : ''}`
-          button.textContent = option.value ?? option.label
+          button.textContent = option.label
           item.append(button)
           list.append(item)
         })
@@ -407,13 +353,41 @@ async function captureLocationFilter(profile, dropdown) {
       }
       window.__showAbStage(group, caption, 'filter', width)
     }, {
-      caption: dropdown ? 'B · Location drop-down menu' : 'A · Location checkboxes',
+      caption: dropdown ? 'B · Location drop-down with full quadrant names' : 'A · Location buttons',
       dropdown,
       options: QUADRANTS,
       width: profile.widths.filter,
     })
 
     await saveStage(page, 'location-filter', `${profile.name}-location-filter-${dropdown ? 'b' : 'a'}.png`)
+  } finally {
+    await context.close()
+  }
+}
+
+async function captureResultsLayout(profile, twoColumns) {
+  const { context, page } = await openPage(profile)
+  try {
+    await enterDirectSearch(page)
+    await page.getByRole('searchbox').fill('transportation')
+    await page.locator('.program-card').first().waitFor()
+
+    if (twoColumns) {
+      await page.addStyleTag({
+        content: '.results-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }',
+      })
+    }
+
+    const scrollTop = await page.evaluate(() => Math.max(
+      0,
+      (document.querySelector('#main-content')?.offsetTop ?? 0) - 12
+    ))
+    await saveContext(
+      page,
+      'results-layout',
+      `${profile.name}-results-layout-${twoColumns ? 'b' : 'a'}.png`,
+      scrollTop
+    )
   } finally {
     await context.close()
   }
@@ -426,19 +400,8 @@ async function captureContextCardPreview(profile, withDescription) {
     await page.getByRole('searchbox').fill('transportation')
     await page.locator('.program-card').first().waitFor()
 
-    if (withDescription) {
-      await page.evaluate((descriptions) => {
-        document.querySelectorAll('.program-card').forEach((card) => {
-          const name = card.querySelector('.card-name')?.textContent.trim() || ''
-          const organization = card.querySelector('.card-org')?.textContent.trim() || name
-          const description = descriptions[`${name}\n${organization}`]
-          if (!description) return
-          const preview = document.createElement('p')
-          preview.className = 'ab-card-description'
-          preview.textContent = description
-          card.querySelector('.card-service-tags')?.before(preview)
-        })
-      }, descriptionByProgram)
+    if (!withDescription) {
+      await page.evaluate(() => document.querySelectorAll('.card-description').forEach((node) => node.remove()))
     }
 
     const scrollTop = profile.name === 'mobile'
@@ -485,15 +448,12 @@ async function captureContextServiceFilter(profile, dropdown) {
         if (!group || !existing) return
 
         const choices = document.createElement('div')
-        choices.className = 'ab-checkbox-list'
+        choices.className = 'checkbox-options'
         groups.forEach((text) => {
-          const option = document.createElement('label')
-          option.className = 'ab-checkbox-choice'
-          const checkbox = document.createElement('input')
-          checkbox.type = 'checkbox'
-          const optionText = document.createElement('span')
-          optionText.textContent = text
-          option.append(checkbox, optionText)
+          const option = document.createElement('button')
+          option.type = 'button'
+          option.className = 'checkbox-option'
+          option.textContent = text
           choices.append(option)
         })
         existing.replaceWith(choices)
@@ -528,15 +488,12 @@ async function captureContextLocationFilter(profile, dropdown) {
 
       if (!dropdown) {
         const choices = document.createElement('div')
-        choices.className = 'ab-checkbox-list'
+        choices.className = 'checkbox-options'
         options.forEach((location) => {
-          const option = document.createElement('label')
-          option.className = 'ab-checkbox-choice'
-          const checkbox = document.createElement('input')
-          checkbox.type = 'checkbox'
-          const optionText = document.createElement('span')
-          optionText.textContent = location.label
-          option.append(checkbox, optionText)
+          const option = document.createElement('button')
+          option.type = 'button'
+          option.className = 'checkbox-option'
+          option.textContent = location.label
           choices.append(option)
         })
         group.querySelector('.checkbox-options')?.replaceWith(choices)
@@ -557,7 +514,7 @@ async function captureContextLocationFilter(profile, dropdown) {
         const button = document.createElement('button')
         button.type = 'button'
         button.className = `service-select-option${index === 0 ? ' service-select-option--active' : ''}`
-        button.textContent = location.value ?? location.label
+        button.textContent = location.label
         item.append(button)
         list.append(item)
       })
@@ -680,6 +637,8 @@ try {
     await captureServiceFilter(profile, true)
     await captureLocationFilter(profile, false)
     await captureLocationFilter(profile, true)
+    await captureResultsLayout(profile, false)
+    await captureResultsLayout(profile, true)
 
     for (const comparison of comparisons) {
       await composePair(profile, comparison)

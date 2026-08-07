@@ -1580,10 +1580,10 @@ a:hover { color: var(--petal-slate-deep); }
   cursor: pointer;
   text-align: left;
   width: 100%;
-  flex: 1;
+  flex: none;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  height: 22em;
   transition: background var(--dur-fast) var(--ease-out);
 }
 .program-card:hover { background: var(--petal-slate-tint); }
@@ -1619,11 +1619,22 @@ a:hover { color: var(--petal-slate-deep); }
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.card-description {
+  margin: var(--space-sm) 0 0;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
 .card-service-tags {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xs);
-  margin-top: var(--space-sm);
+  margin-top: auto;
   align-items: center;
 }
 .card-service-more {
@@ -2489,7 +2500,7 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .chat-fab:hover { background: var(--petal-ember-deep); transform: scale(1.05); }
 
-/* Floating label so people know the bubble is an AI assistant. Clickable
+/* Floating label so people know the bubble is a chatbot. Clickable
    (a larger, clearer target than the emoji alone), with a dismiss button. */
 .chat-fab-hint {
   display: flex;
@@ -2569,18 +2580,6 @@ a:hover { color: var(--petal-slate-deep); }
   color: var(--color-text-inverse);
   font-weight: 700;
   font-size: var(--font-size-sm);
-}
-.chat-mock-badge {
-  display: inline-block;
-  background: var(--petal-amber);
-  color: oklch(25% 0.05 75);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  padding: 2px 6px;
-  border-radius: var(--radius-pill);
-  margin-left: 6px;
 }
 .chat-close-btn {
   background: none;
