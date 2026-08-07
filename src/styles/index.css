@@ -1589,7 +1589,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   flex: none;
   display: flex;
   flex-direction: column;
-  height: 22em;
+  height: 16em;
   transition: background var(--dur-fast) var(--ease-out);
 }
 .program-card:hover { background: var(--petal-slate-tint); }
