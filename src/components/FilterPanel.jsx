@@ -41,7 +41,7 @@ function MultiCheckboxGroup({ label, options, values, onChange, allLabel }) {
   }
 
   return (
-    <div className={`filter-group${hasSelection ? ' filter-group--active' : ''}`}>
+    <div className={`filter-group filter-group--location${hasSelection ? ' filter-group--active' : ''}`}>
       <span className="filter-group-label">{label}{hasSelection ? ' ✓' : ''}</span>
       <div className="checkbox-options">
         <button

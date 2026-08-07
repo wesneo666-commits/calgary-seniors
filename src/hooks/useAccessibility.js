@@ -43,6 +43,7 @@ export function useAccessibility() {
   useEffect(() => {
     const html = document.documentElement
     html.style.fontSize = TEXT_SIZES[prefs.sizeIndex].px + 'px'
+    html.dataset.textSize = String(prefs.sizeIndex)
     html.dataset.contrast = prefs.contrast
     html.dataset.spacing  = prefs.spacing
 
