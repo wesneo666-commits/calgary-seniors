@@ -2558,6 +2558,10 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   0%, 100% { transform: translateX(0); }
   50% { transform: translateX(-5px); }
 }
+@keyframes chat-hint-bob-mobile {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
 @media (prefers-reduced-motion: reduce) {
   .chat-fab-hint { animation: none; }
 }
@@ -2715,13 +2719,34 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
     justify-content: center;
   }
   .chat-panel { width: calc(100vw - 2 * var(--space-lg)); }
+  /* Stack the helper label above the button instead of beside it. Sitting
+     alongside, the two-line pill stretched across the screen and obscured the
+     first category and filter controls; stacked and trimmed to one line it
+     stays in the bottom-right corner, so people on phones still learn the
+     bubble is a chatbot (the label is what usability testing relies on). */
   .chat-widget {
     right: var(--space-md);
     bottom: var(--space-md);
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-xs);
   }
-  /* The persistent helper label obscured the first category and filter
-     controls on narrow screens; the labelled 60px assistant button remains. */
-  .chat-fab-hint { display: none; }
+  .chat-fab-hint { max-width: calc(100vw - 2 * var(--space-md)); }
+  .chat-fab-hint-label {
+    justify-content: center;
+    padding: 0 var(--space-sm) 0 var(--space-md);
+    /* At the largest text sizes the label would otherwise refuse to shrink and
+       squeeze the ✕ out of the pill, leaving no way to dismiss the hint. */
+    min-width: 0;
+    white-space: normal;
+  }
+  .chat-fab-hint-sub { display: none; }
+  .chat-fab-hint-close {
+    flex: 0 0 var(--touch-target);
+    font-size: var(--font-size-sm);
+  }
+  /* Horizontal bob would push the pill past the screen edge here. */
+  .chat-fab-hint { animation-name: chat-hint-bob-mobile; }
 }
 
 /* Dims the page behind the display-settings panel on mobile, where the panel
