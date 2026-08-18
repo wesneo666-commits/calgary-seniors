@@ -75,7 +75,6 @@ function useOverlayKeys(open, onClose, panelRef) {
 export default function App() {
   const { prefs, set, reset: resetA11y } = useAccessibility()
   const [showA11y, setShowA11y] = useState(false)
-  const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
@@ -86,7 +85,6 @@ export default function App() {
   const [sort, setSort] = useState('name-az')
   const [landingMode, setLandingMode] = useState(PHASE_ONE_TEST_MODE ? 'direct' : 'wizard')
   const [sharedProgramId, setSharedProgramId] = useState(getSharedProgramId)
-  const mobileMenuRef = useRef(null)
   const filterDrawerRef = useRef(null)
   const submissionTriggerRef = useRef(null)
 
@@ -119,7 +117,6 @@ export default function App() {
 
   // Stable identities so useOverlayKeys' effect isn't torn down and rebuilt
   // on every render (an inline arrow here would change every time).
-  const closeMobileMenu = useCallback(() => setShowMobileMenu(false), [])
   const closeMobileFilters = useCallback(() => setShowMobileFilters(false), [])
 
   const clearFilters = useCallback(() => {
@@ -152,7 +149,6 @@ export default function App() {
     else if (!filters.query && sort === 'relevance') setSort('name-az')
   }, [filters.query])
 
-  useOverlayKeys(showMobileMenu, closeMobileMenu, mobileMenuRef)
   useOverlayKeys(showMobileFilters, closeMobileFilters, filterDrawerRef)
 
   const totalPages = Math.ceil(allResults.length / PAGE_SIZE)
@@ -185,11 +181,17 @@ export default function App() {
               onClick={clearFilters}
               aria-label="EngAGE — reset to home"
             >
-              <img
-                src="/engage-logo.svg"
-                alt=""
-                className="site-logo"
-              />
+              {/* Narrow screens get a stacked cut of the same artwork — wordmark
+                  centred, skyline-and-leaves underneath — so the wordmark can
+                  run full width instead of sharing the row with the motif. */}
+              <picture className="site-logo-picture">
+                <source media="(max-width: 640px)" srcSet="/engage-logo-stacked.svg" />
+                <img
+                  src="/engage-logo.svg"
+                  alt=""
+                  className="site-logo"
+                />
+              </picture>
             </button>
             <div className="site-header-text">
               <h1 className="sr-only">EngAGE: Calgary Directory for Aging Well</h1>
@@ -215,68 +217,34 @@ export default function App() {
                 </button>
               </div>
             )}
-            <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="How to use this directory">
-              How to use this
-            </button>
-            <div className="a11y-btn-wrap">
-              <button
-                className="a11y-toggle-btn"
-                onClick={() => setShowA11y((v) => !v)}
-                aria-expanded={showA11y}
-                aria-label="Display settings"
-              >
-                ⚙ Display Settings ▾
+            {/* display:contents on desktop, so this wrapper changes nothing there;
+                on mobile it becomes the right-aligned action row under the
+                centred logo (replacing the old hamburger menu). */}
+            <div className="site-header-actions">
+              <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="How to use this directory">
+                How to use this
               </button>
-              {showA11y && (
-                <>
-                  <div className="a11y-backdrop" aria-hidden="true" />
-                  <AccessibilityPanel
-                    prefs={prefs}
-                    set={set}
-                    reset={resetA11y}
-                    onClose={() => setShowA11y(false)}
-                  />
-                </>
-              )}
-            </div>
-
-            {/* Mobile-only: collapses "How to use this" and Display Settings behind
-                a hamburger menu so the header row doesn't crowd the search area
-                (V4 mobile P0, 2026-07-24). Desktop keeps the two buttons above. */}
-            <div className="mobile-menu-wrap">
-              <button
-                type="button"
-                className="mobile-menu-btn"
-                onClick={() => setShowMobileMenu((v) => !v)}
-                aria-expanded={showMobileMenu}
-                aria-haspopup="menu"
-                aria-label="More options"
-              >
-                <span aria-hidden="true">☰</span> Menu
-              </button>
-              {showMobileMenu && (
-                <>
-                  <div className="mobile-menu-backdrop" aria-hidden="true" onClick={() => setShowMobileMenu(false)} />
-                  <div className="mobile-menu-panel" role="menu" aria-label="More options" ref={mobileMenuRef}>
-                    <button
-                      type="button"
-                      role="menuitem"
-                      className="mobile-menu-item"
-                      onClick={() => { setShowHelp(true); setShowMobileMenu(false) }}
-                    >
-                      ❓ How to use this
-                    </button>
-                    <button
-                      type="button"
-                      role="menuitem"
-                      className="mobile-menu-item"
-                      onClick={() => { setShowA11y(true); setShowMobileMenu(false) }}
-                    >
-                      ⚙ Display Settings
-                    </button>
-                  </div>
-                </>
-              )}
+              <div className="a11y-btn-wrap">
+                <button
+                  className="a11y-toggle-btn"
+                  onClick={() => setShowA11y((v) => !v)}
+                  aria-expanded={showA11y}
+                  aria-label="Display settings"
+                >
+                  ⚙ Display Settings ▾
+                </button>
+                {showA11y && (
+                  <>
+                    <div className="a11y-backdrop" aria-hidden="true" />
+                    <AccessibilityPanel
+                      prefs={prefs}
+                      set={set}
+                      reset={resetA11y}
+                      onClose={() => setShowA11y(false)}
+                    />
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>

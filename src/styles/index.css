@@ -254,6 +254,12 @@ a:hover { color: var(--petal-slate-deep); }
   margin-top: 2px;
 }
 .site-header-text { flex: 1 1 10em; min-width: 0; }
+/* Groups "How to use this" + Display Settings. Transparent on desktop, so the
+   two buttons stay direct flex children of .site-header-inner exactly as
+   before; the mobile query below turns it into a real row. */
+.site-header-actions { display: contents; }
+/* Transparent wrapper — the <img> stays the flex child it was before. */
+.site-logo-picture { display: contents; }
 
 /* ─── Accessibility panel ────────────────────────────────────── */
 .a11y-btn-wrap {
@@ -706,61 +712,6 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .help-btn:hover { background: var(--petal-ember-tint); }
 
-/* ─── Mobile hamburger menu (hidden on desktop; shown ≤640px below) ──── */
-.mobile-menu-wrap {
-  display: none;
-  position: relative;
-  flex-shrink: 0;
-}
-.mobile-menu-btn {
-  height: var(--touch-target);
-  padding: 0 var(--space-md);
-  background: var(--color-surface);
-  color: var(--color-ink);
-  border: 2px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.mobile-menu-btn:hover { background: var(--color-surface-sunken); }
-.mobile-menu-backdrop {
-  display: block;
-  position: fixed;
-  inset: 0;
-  background: oklch(20% 0.02 240 / 0.4);
-  z-index: var(--z-panel-backdrop);
-}
-.mobile-menu-panel {
-  position: fixed;
-  top: 88px;
-  left: 16px;
-  right: 16px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-overlay);
-  padding: var(--space-sm);
-  z-index: var(--z-panel);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-.mobile-menu-item {
-  text-align: left;
-  background: var(--color-surface);
-  border: none;
-  border-radius: var(--radius-md);
-  padding: var(--space-sm) var(--space-md);
-  min-height: var(--touch-target);
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  color: var(--color-text);
-  cursor: pointer;
-}
-.mobile-menu-item:hover { background: var(--color-surface-sunken); }
-
 /* ─── Help modal ─────────────────────────────────────────────── */
 .help-panel {
   background: var(--color-surface);
@@ -896,7 +847,7 @@ a:hover { color: var(--petal-slate-deep); }
   cursor: pointer;
 }
 .mobile-filter-btn:hover { background: oklch(92% 0.015 235); }
-/* Base (not media-gated) rule, matching .mobile-menu-backdrop: the drawer
+/* Base (not media-gated) rule, deliberately outside a media query: the drawer
    itself only opens from a mobile-only trigger, but if the state were ever
    true above the 768px breakpoint (e.g. rotating a tablet mid-session),
    this must not fall back to unstyled static layout inside .main-layout's
@@ -2787,30 +2738,54 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   .detail-actions .share-wrap .detail-action-btn {
     width: 100%;
   }
+  /* Centred brand stack — the logo on its own row, the controls beneath it.
+     Left-aligning the small logo left the row visually lopsided, with dead
+     space to its right. */
   .site-header-inner {
     flex-wrap: wrap;
+    justify-content: center;
   }
-  .site-header-text {
+  .site-logo-btn {
     flex-basis: 100%;
-    order: 1;
+    display: flex;
+    justify-content: center;
   }
+  /* Sized by width, not height: the stacked artwork this picks up is a
+     different ratio, and width is what the wordmark's legibility follows —
+     300px puts its "Calgary Directory for Aging Well" line at ~17px, the
+     same as body text. */
   .site-logo {
-    height: 58px;
-    max-width: min(330px, calc(100vw - 150px));
+    height: auto;
+    width: min(300px, calc(100vw - 2 * var(--space-md)));
+    max-width: none;
   }
+  /* The tagline underneath repeated the line already set inside the logo,
+     which reads as a duplicate once the logo is centred and large enough to
+     be legible. The h1 stays (screen-reader only). */
+  .site-header-text { display: contents; }
+  .site-header-text p { display: none; }
   .landing-mode-toggle {
     order: 2;
   }
-  /* "How to use this" and Display Settings collapse into the hamburger menu
-     on mobile so they don't crowd the header row above the search bar. */
-  .help-btn,
-  .a11y-toggle-btn {
-    display: none;
-  }
-  .mobile-menu-wrap {
-    display: block;
+  /* Only two items lived behind the hamburger, so show them directly instead:
+     a right-aligned row under the brand (replaces the ☰ Menu button). */
+  .site-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    flex-basis: 100%;
     order: 2;
   }
+  /* Both grow to fill the row, so when the pair no longer fits side by side
+     they stack as two full-width buttons rather than a ragged right edge. */
+  .site-header-actions > * { flex: 1 1 auto; }
+  .a11y-btn-wrap { margin-left: 0; }
+  .help-btn,
+  .a11y-toggle-btn {
+    padding: 0 var(--space-sm);
+  }
+  .a11y-btn-wrap .a11y-toggle-btn { width: 100%; }
   .a11y-grid {
     grid-template-columns: 1fr;
   }
