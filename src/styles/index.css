@@ -1540,7 +1540,14 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   flex: none;
   display: flex;
   flex-direction: column;
-  height: 16em;
+  /* Buttons don't inherit font-size, so set it: em/rem inside the card then
+     mean what they say. */
+  font-size: var(--font-size-base);
+  /* A floor, not a ceiling. Cards used to be locked to a fixed height, which
+     sheared the name and organization mid-line whenever the content needed
+     more room — a long program name, or any text size above the default.
+     Cards still share a compact resting height and grow only when they must. */
+  min-height: 11rem;
   transition: background var(--dur-fast) var(--ease-out);
 }
 .program-card:hover { background: var(--petal-slate-tint); }
@@ -1557,6 +1564,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   color: var(--petal-slate-ink);
   margin-bottom: 2px;
   line-height: 1.3;
+  flex: none;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -1571,6 +1579,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   font-weight: 600;
   color: var(--color-text);
   line-height: 1.35;
+  flex: none;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -1582,6 +1591,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   font-size: var(--font-size-sm);
   font-weight: 400;
   line-height: 1.45;
+  flex: none;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -1591,7 +1601,10 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xs);
+  /* auto pushes the tags to the bottom when the card has slack; the padding
+     keeps a gap off the description when it doesn't */
   margin-top: auto;
+  padding-top: var(--space-sm);
   align-items: center;
 }
 .card-service-more {
