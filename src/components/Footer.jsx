@@ -39,7 +39,7 @@ export default function Footer({ onAbout, onSubmitProgram, submissionTriggerRef 
         <div className="footer-funding">
           <div className="footer-funding-text">
             <p className="footer-funding-label">Funding acknowledgment</p>
-            <p>The development of this directory was funded by the <strong>University of Calgary Centre on Aging</strong>, the <strong>Brenda Strafford Foundation Chair in Geriatric Medicine</strong>, and the <strong>Canadian Institutes of Health Research Betty Havens Prize for Knowledge Mobilization in Aging</strong>.</p>
+            <p>The development of this directory was funded by the <strong>University of Calgary Centre on Aging</strong>, the <strong>UCalgary BSF Chair in Geriatric Medicine</strong>, and the <strong>Canadian Institutes of Health Research Betty Havens Prize for Knowledge Mobilization in Aging</strong>.</p>
           </div>
           <div className="footer-funding-logo-wrap">
             <img src="/coa-logo.png" alt="University of Calgary Centre on Aging" className="footer-funding-logo" />
