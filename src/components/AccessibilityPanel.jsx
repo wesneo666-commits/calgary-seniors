@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { TEXT_SIZES, FONTS, SPACINGS } from '../hooks/useAccessibility.js'
+import { TEXT_SIZES } from '../hooks/useAccessibility.js'
 
 export default function AccessibilityPanel({ prefs, set, reset, onClose }) {
   const panelRef = useRef(null)
@@ -54,13 +54,13 @@ export default function AccessibilityPanel({ prefs, set, reset, onClose }) {
       aria-labelledby="display-settings-title"
     >
       <div className="a11y-panel-header">
-        <h2 id="display-settings-title">Display Settings</h2>
+        <h2 id="display-settings-title">Text &amp; Display</h2>
         <button
           ref={closeButtonRef}
           type="button"
           className="a11y-panel-close"
           onClick={onClose}
-          aria-label="Close Display Settings"
+          aria-label="Close Text and Display settings"
         >
           <span aria-hidden="true">X</span>
         </button>
@@ -104,43 +104,6 @@ export default function AccessibilityPanel({ prefs, set, reset, onClose }) {
             >
               {prefs.contrast === 'high' && <span className="a11y-check">✓ </span>}High contrast
             </button>
-          </div>
-        </div>
-
-        {/* Font */}
-        <div className="a11y-card">
-          <p className="a11y-card-title">Font</p>
-          <div className="a11y-options">
-            {FONTS.map((f) => (
-              <button
-                key={f.key}
-                className={`a11y-option-btn${prefs.fontKey === f.key ? ' a11y-active' : ''}`}
-                style={{ fontFamily: f.family }}
-                onClick={() => set('fontKey', f.key)}
-                aria-pressed={prefs.fontKey === f.key}
-              >
-                {prefs.fontKey === f.key && <span className="a11y-check">✓ </span>}
-                {f.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Text spacing */}
-        <div className="a11y-card">
-          <p className="a11y-card-title">Text spacing</p>
-          <div className="a11y-options">
-            {SPACINGS.map((s) => (
-              <button
-                key={s.key}
-                className={`a11y-option-btn${prefs.spacing === s.key ? ' a11y-active' : ''}`}
-                onClick={() => set('spacing', s.key)}
-                aria-pressed={prefs.spacing === s.key}
-              >
-                {prefs.spacing === s.key && <span className="a11y-check">✓ </span>}
-                {s.label}
-              </button>
-            ))}
           </div>
         </div>
 

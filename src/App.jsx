@@ -5,11 +5,10 @@ import FilterPanel from './components/FilterPanel.jsx'
 import ResultsList from './components/ResultsList.jsx'
 import ProgramDetail from './components/ProgramDetail.jsx'
 import HelpModal from './components/HelpModal.jsx'
-import AboutModal from './components/AboutModal.jsx'
+import AboutPage from './components/AboutPage.jsx'
 import SubmissionModal from './components/SubmissionModal.jsx'
 import AccessibilityPanel from './components/AccessibilityPanel.jsx'
 import WizardLanding from './components/WizardLanding.jsx'
-import ChatWidget from './components/ChatWidget.jsx'
 import { filterPrograms, sortResults } from './utils/search.js'
 import Footer from './components/Footer.jsx'
 import { useAccessibility } from './hooks/useAccessibility.js'
@@ -26,7 +25,8 @@ export function isFilterActive(value) {
   return Array.isArray(value) ? value.length > 0 : value !== ''
 }
 
-export const PAGE_SIZE = 20
+export const PAGE_SIZE_OPTIONS = [10, 20, 30, 50]
+const DEFAULT_PAGE_SIZE = 20
 
 // Phase 1 tests focus on search, filters, and display settings. Keep the
 // product landing page code available for Phase 2, but start test participants
@@ -40,6 +40,32 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input, select, [tabindex]:no
 
 function getSharedProgramId() {
   return new URLSearchParams(window.location.search).get('program')
+}
+
+// ?view=about shows the About page (V5 A-01).
+function getView() {
+  return new URLSearchParams(window.location.search).get('view') === 'about' ? 'about' : 'directory'
+}
+
+// Landing A/B layout (V5 L-04): ?layout=b puts filters above search.
+function getLandingLayout() {
+  return new URLSearchParams(window.location.search).get('layout') === 'b' ? 'b' : 'a'
+}
+
+function GearIcon() {
+  // Long-toothed gear so it reads unmistakably as settings (V5 DS-03).
+  return (
+    <svg className="a11y-gear-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden="true">
+      <path d="M10.3 1.5h3.4l.5 3a7.6 7.6 0 0 1 2 1.2l2.9-1.1 1.7 2.9-2.4 1.9a7.7 7.7 0 0 1 0 2.3l2.4 1.9-1.7 2.9-2.9-1.1a7.6 7.6 0 0 1-2 1.2l-.5 3h-3.4l-.5-3a7.6 7.6 0 0 1-2-1.2l-2.9 1.1-1.7-2.9 2.4-1.9a7.7 7.7 0 0 1 0-2.3L2.2 7.5l1.7-2.9 2.9 1.1a7.6 7.6 0 0 1 2-1.2z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  )
+}
+
+// Keep the Phase 1 directory-first test intact while giving reviewers a
+// stable, direct URL for the retained landing experience.
+function isLandingPreview() {
+  return new URLSearchParams(window.location.search).get('view') === 'landing'
 }
 
 // Escape-to-close plus the same Tab focus-trap used by the other overlays in
@@ -77,13 +103,17 @@ export default function App() {
   const [showA11y, setShowA11y] = useState(false)
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
-  const [showAbout, setShowAbout] = useState(false)
+  const [view, setView] = useState(getView)
   const [showSubmission, setShowSubmission] = useState(false)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [selectedProgram, setSelectedProgram] = useState(null)
   const [page, setPage] = useState(1)
-  const [sort, setSort] = useState('name-az')
-  const [landingMode, setLandingMode] = useState(PHASE_ONE_TEST_MODE ? 'direct' : 'wizard')
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+  // Alphabetical by organization by default (V5 D-01).
+  const [sort, setSort] = useState('org-az')
+  const [landingMode, setLandingMode] = useState(
+    isLandingPreview() || !PHASE_ONE_TEST_MODE ? 'wizard' : 'direct'
+  )
   const [sharedProgramId, setSharedProgramId] = useState(getSharedProgramId)
   const filterDrawerRef = useRef(null)
   const submissionTriggerRef = useRef(null)
@@ -96,6 +126,44 @@ export default function App() {
   // A copied/shared program link (?program=<id>) loads straight into a
   // single-card view instead of the full app backdrop — REQ-042.
   const sharedProgram = sharedProgramId ? programs.find((p) => p.id === sharedProgramId) : null
+
+  // Opening a card puts its own link in the address bar (V5 SP-04), so
+  // copying the URL shares that service; Back closes the card.
+  const openProgram = useCallback((program) => {
+    window.history.pushState({ program: program.id }, '', `?program=${encodeURIComponent(program.id)}`)
+    setSelectedProgram(program)
+  }, [])
+
+  const closeProgram = useCallback(() => {
+    if (window.history.state?.program) window.history.back()
+    else setSelectedProgram(null)
+  }, [])
+
+  const openAbout = useCallback((e) => {
+    e?.preventDefault()
+    window.history.pushState({ view: 'about' }, '', '?view=about')
+    setView('about')
+  }, [])
+
+  const closeAbout = useCallback(() => {
+    if (window.history.state?.view === 'about') window.history.back()
+    else {
+      window.history.replaceState({}, '', window.location.pathname)
+      setView('directory')
+    }
+  }, [])
+
+  // Browser Back/Forward: keep the open card and the About page in step
+  // with the address bar.
+  useEffect(() => {
+    function handlePop() {
+      const id = getSharedProgramId()
+      setSelectedProgram(id ? programs.find((p) => p.id === id) ?? null : null)
+      setView(getView())
+    }
+    window.addEventListener('popstate', handlePop)
+    return () => window.removeEventListener('popstate', handlePop)
+  }, [])
 
   const exitSharedView = useCallback(() => {
     window.history.pushState({}, '', window.location.pathname)
@@ -118,44 +186,68 @@ export default function App() {
   // Stable identities so useOverlayKeys' effect isn't torn down and rebuilt
   // on every render (an inline arrow here would change every time).
   const closeMobileFilters = useCallback(() => setShowMobileFilters(false), [])
+  const closeHelp = useCallback(() => setShowHelp(false), [])
 
   const clearFilters = useCallback(() => {
-    setFilters(EMPTY_FILTERS)
-    setSort('relevance')
+    setFilters((prev) => ({ ...EMPTY_FILTERS, query: prev.query }))
   }, [])
 
-  const applyChatFilters = useCallback((chatFilters) => {
-    setFilters({ ...EMPTY_FILTERS, ...chatFilters })
+  const resetHome = useCallback(() => {
+    setFilters(EMPTY_FILTERS)
+    setSort('org-az')
+    setLandingMode(isLandingPreview() || !PHASE_ONE_TEST_MODE ? 'wizard' : 'direct')
+    if (view === 'about') closeAbout()
+  }, [view, closeAbout])
+
+  // Bring the results into view after a search or filter is applied, so the
+  // change is visible — especially on phones (V5 S-05/F-09).
+  const scrollToResults = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      document.getElementById('results-top')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }, [])
+
+  const submitSearch = useCallback((q) => {
+    setFilters((prev) => ({ ...prev, query: q }))
     setLandingMode('direct')
-    document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' })
+    if (q) scrollToResults()
+  }, [scrollToResults])
+
+  const applyLandingFilter = useCallback((key, value) => {
+    setFilters({ ...EMPTY_FILTERS, [key]: value })
+    setLandingMode('direct')
   }, [])
 
   const allResults = useMemo(() => {
     const filtered = filterPrograms(programs, filters)
     const base = sortResults(filtered, filters.query)
     if (sort === 'name-az') return [...base].sort((a, b) => a.programName.localeCompare(b.programName))
-    if (sort === 'org-az')  return [...base].sort((a, b) => a.organization.localeCompare(b.organization))
+    if (sort === 'org-az')  return [...base].sort((a, b) =>
+      a.organization.localeCompare(b.organization) || a.programName.localeCompare(b.programName))
     return base
   }, [filters, sort])
 
-  // Reset to page 1 whenever filters change
+  // Reset to page 1 whenever filters or page size change
   useEffect(() => {
     setPage(1)
-  }, [filters])
+  }, [filters, pageSize])
 
-  // Auto-switch sort: relevance when searching, A-Z when browsing
+  // Auto-switch sort: relevance when searching, organization A-Z when browsing
   useEffect(() => {
-    if (filters.query && sort === 'name-az') setSort('relevance')
-    else if (!filters.query && sort === 'relevance') setSort('name-az')
+    if (filters.query && sort === 'org-az') setSort('relevance')
+    else if (!filters.query && sort === 'relevance') setSort('org-az')
   }, [filters.query])
 
   useOverlayKeys(showMobileFilters, closeMobileFilters, filterDrawerRef)
 
-  const totalPages = Math.ceil(allResults.length / PAGE_SIZE)
-  const pageResults = allResults.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const totalPages = Math.ceil(allResults.length / pageSize)
+  const pageResults = allResults.slice((page - 1) * pageSize, page * pageSize)
 
   const hasActiveFilters = Object.values(filters).some(isFilterActive)
-  const showWizard = !PHASE_ONE_TEST_MODE && landingMode === 'wizard' && !hasActiveFilters
+  // Filters only — the search term has its own Clear in the results header.
+  const activeFilterCount = Object.entries(filters)
+    .filter(([key, value]) => key !== 'query' && isFilterActive(value)).length
+  const showWizard = (isLandingPreview() || !PHASE_ONE_TEST_MODE) && landingMode === 'wizard' && !hasActiveFilters
 
   if (sharedProgram) {
     return (
@@ -178,7 +270,7 @@ export default function App() {
           <div className="site-header-inner">
             <button
               className="site-logo-btn"
-              onClick={clearFilters}
+              onClick={resetHome}
               aria-label="EngAGE — reset to home"
             >
               {/* Narrow screens get a stacked cut of the same artwork — wordmark
@@ -221,7 +313,12 @@ export default function App() {
                 on mobile it becomes the right-aligned action row under the
                 centred logo (replacing the old hamburger menu). */}
             <div className="site-header-actions">
-              <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="How to use this directory">
+              <button
+                className="help-btn"
+                onClick={() => setShowHelp((v) => !v)}
+                aria-expanded={showHelp}
+                aria-label="How to use this directory"
+              >
                 How to use this
               </button>
               <div className="a11y-btn-wrap">
@@ -229,9 +326,9 @@ export default function App() {
                   className="a11y-toggle-btn"
                   onClick={() => setShowA11y((v) => !v)}
                   aria-expanded={showA11y}
-                  aria-label="Display settings"
+                  aria-label="Text and display settings"
                 >
-                  ⚙ Display Settings ▾
+                  <GearIcon /> Text &amp; Display ▾
                 </button>
                 {showA11y && (
                   <>
@@ -250,12 +347,13 @@ export default function App() {
         </div>
       </header>
 
+      {view === 'directory' && !showWizard && (
       <div className="search-section" role="search">
         <div className="container">
           <div className="search-row">
             <SearchBar
               value={filters.query}
-              onChange={(v) => setFilter('query', v)}
+              onSubmit={submitSearch}
             />
             {!showWizard && (
               <button
@@ -265,16 +363,25 @@ export default function App() {
                 aria-haspopup="dialog"
                 aria-expanded={showMobileFilters}
               >
-                🗂 Filters{hasActiveFilters ? ` (${Object.values(filters).filter(isFilterActive).length})` : ''}
+                🗂 Filters{activeFilterCount ? ` (${activeFilterCount})` : ''}
               </button>
             )}
           </div>
         </div>
       </div>
+      )}
 
       <main id="main-content" className="container">
-        {showWizard ? (
-          <WizardLanding onPickGroup={(group) => setFilter('serviceArea', `_group_${group}`)} />
+        {view === 'about' ? (
+          <AboutPage onBack={closeAbout} />
+        ) : showWizard ? (
+          <WizardLanding
+            layout={getLandingLayout()}
+            onSearch={submitSearch}
+            onApplyFilter={applyLandingFilter}
+            onBrowseAll={() => setLandingMode('direct')}
+            onAbout={openAbout}
+          />
         ) : (
           <div className="main-layout">
             {showMobileFilters && (
@@ -291,20 +398,20 @@ export default function App() {
                 filters={filters}
                 onFilterChange={setFilter}
                 onClear={clearFilters}
-                hasActive={hasActiveFilters}
-                onCloseMobile={() => setShowMobileFilters(false)}
+                hasActive={activeFilterCount > 0}
+                onCloseMobile={() => { setShowMobileFilters(false); scrollToResults() }}
                 resultCount={allResults.length}
               />
             </aside>
 
-            <section aria-label="Search results" aria-live="polite">
+            <section aria-label="Search results" id="results-top">
               <ResultsList
                 results={pageResults}
                 totalResults={allResults.length}
                 totalCount={programs.length}
                 filters={filters}
                 onRemove={removeFilter}
-                onSelect={setSelectedProgram}
+                onSelect={openProgram}
                 page={page}
                 totalPages={totalPages}
                 onPage={(p) => {
@@ -313,6 +420,9 @@ export default function App() {
                 }}
                 sort={sort}
                 onSort={(s) => { setSort(s); setPage(1) }}
+                pageSize={pageSize}
+                onPageSize={setPageSize}
+                onClearSearch={() => submitSearch('')}
               />
             </section>
           </div>
@@ -320,7 +430,7 @@ export default function App() {
       </main>
 
       <Footer
-        onAbout={() => setShowAbout(true)}
+        onAbout={openAbout}
         onSubmitProgram={() => setShowSubmission(true)}
         submissionTriggerRef={submissionTriggerRef}
       />
@@ -328,15 +438,14 @@ export default function App() {
       {selectedProgram && (
         <ProgramDetail
           program={selectedProgram}
-          onClose={() => setSelectedProgram(null)}
+          onClose={closeProgram}
         />
       )}
 
-      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
-      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
+      {showHelp && <HelpModal onClose={closeHelp} />}
       {showSubmission && <SubmissionModal onClose={closeSubmission} />}
 
-      <ChatWidget onApplyFilters={applyChatFilters} />
+      {/* Chatbot removed for V5 (C-01); ChatWidget.jsx is kept so it can return. */}
     </>
   )
 }

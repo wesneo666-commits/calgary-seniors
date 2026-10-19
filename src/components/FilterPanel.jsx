@@ -1,5 +1,33 @@
+import { useState } from 'react'
 import { QUADRANTS, COST_TYPES, FORMAT_TYPES } from '../utils/constants.js'
 import ServiceTypeSelect from './ServiceTypeSelect.jsx'
+
+const INTRO_KEY = 'csrg-filter-intro-dismissed'
+
+// Closable one-time explainer at the top of the panel (V5 F-02), dismissed
+// the same way as the old chatbot hint — remembered in localStorage.
+function FilterIntro() {
+  const [dismissed, setDismissed] = useState(() => {
+    try { return localStorage.getItem(INTRO_KEY) === '1' } catch { return false }
+  })
+  if (dismissed) return null
+
+  function dismiss() {
+    try { localStorage.setItem(INTRO_KEY, '1') } catch { /* private mode */ }
+    setDismissed(true)
+  }
+
+  return (
+    <div className="filter-intro" role="note">
+      <p>
+        <strong>Show only relevant results.</strong> Choose a location, type, cost, or format to narrow your search. Use one filter or combine several.
+      </p>
+      <button type="button" className="filter-intro-close" onClick={dismiss} aria-label="Dismiss filter tip">
+        <span aria-hidden="true">✕</span>
+      </button>
+    </div>
+  )
+}
 
 function CheckboxGroup({ label, options, value, onChange, allLabel }) {
   return (
@@ -68,9 +96,14 @@ function MultiCheckboxGroup({ label, options, values, onChange, allLabel }) {
 
 export default function FilterPanel({ filters, onFilterChange, onClear, hasActive, onCloseMobile, resultCount }) {
   return (
-    <div className="filter-panel" role="group" aria-label="Filter programs">
+    <div className="filter-panel" role="group" aria-label="Filter services">
       <div className="filter-panel-header">
-        <h2>Filter Programs</h2>
+        <h2>Filter to Find Services</h2>
+        {hasActive && (
+          <button type="button" className="clear-filters-btn clear-filters-btn--top" onClick={onClear}>
+            Clear filters
+          </button>
+        )}
         {onCloseMobile && (
           <button
             type="button"
@@ -83,12 +116,14 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
         )}
       </div>
 
+      <FilterIntro />
+
       <MultiCheckboxGroup
         label="Location"
         options={QUADRANTS}
         values={filters.quadrant}
         onChange={(v) => onFilterChange('quadrant', v)}
-        allLabel="All of Calgary"
+        allLabel="All"
       />
 
       <div className={`filter-group${filters.serviceArea ? ' filter-group--active' : ''}`}>
@@ -107,7 +142,7 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
         options={COST_TYPES}
         value={filters.cost}
         onChange={(v) => onFilterChange('cost', v)}
-        allLabel="All costs"
+        allLabel="All"
       />
 
       <CheckboxGroup
@@ -115,27 +150,13 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
         options={FORMAT_TYPES}
         value={filters.format}
         onChange={(v) => onFilterChange('format', v)}
-        allLabel="All formats"
+        allLabel="All"
       />
 
-      {hasActive && (
-        <button className="clear-filters-btn" onClick={onClear}>
-          Clear all filters
-        </button>
-      )}
-
-      <details className="filter-tips">
-        <summary className="filter-tips-heading">How filters work</summary>
-        <ul className="filter-tips-list">
-          <li>Tap any option to filter results</li>
-          <li>You can apply more than one filter at a time</li>
-          <li>Active filters appear as tags above your results — click the ✕ on any tag to remove it</li>
-        </ul>
-      </details>
 
       {onCloseMobile && (
         <button type="button" className="filter-panel-mobile-apply" onClick={onCloseMobile}>
-          Show {resultCount} program{resultCount === 1 ? '' : 's'}
+          Show {resultCount} service{resultCount === 1 ? '' : 's'}
         </button>
       )}
     </div>

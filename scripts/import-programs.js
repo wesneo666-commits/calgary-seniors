@@ -68,6 +68,10 @@ function mapRow(row, index) {
     keywords: parseArrayField(row['Additional Keywords']),
     intendedPopulation: parseArrayField(row['Intended Population']),
     source: parseArrayField(row['Source']),
+    // Optional columns requested for V5 (Microsoft Lists). Blank until the
+    // client adds them; cards fall back to the full description / no date.
+    shortDescription: (row['Short Description'] || '').trim(),
+    lastUpdated: (row['Last Updated'] || '').trim(),
   }
 }
 

@@ -151,6 +151,6 @@ export function describeInterpretation(result) {
 
   const costText = result.costFree ? ' that are free' : ''
 
-  const what = parts.length > 0 ? parts.join(' ') : 'programs'
+  const what = parts.length > 0 ? parts.join(' ') : 'services'
   return `${what}${costText}${where}`.trim()
 }

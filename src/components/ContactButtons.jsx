@@ -61,7 +61,7 @@ export default function ContactButtons({ program }) {
           className="contact-btn contact-btn-web"
           aria-label={`Visit program page for ${program.programName} (opens in new tab)`}
         >
-          <span aria-hidden="true">🌐</span> Program page
+          <span aria-hidden="true">🌐</span> Service page
         </a>
       )}
       {orgWebsite && orgWebsite !== programWebsite && (

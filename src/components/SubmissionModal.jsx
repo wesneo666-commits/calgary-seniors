@@ -69,7 +69,7 @@ export default function SubmissionModal({ onClose }) {
         <div className="submission-header">
           <div>
             <p className="submission-eyebrow">For organizations</p>
-            <h2 id="submission-title">Submit a program or organization</h2>
+            <h2 id="submission-title">Submit a service or organization</h2>
           </div>
           <button ref={closeRef} className="detail-close-btn" onClick={onClose} aria-label="Close submission form">
             ✕ Close
@@ -88,7 +88,7 @@ export default function SubmissionModal({ onClose }) {
           </div>
         ) : (
           <>
-            <p className="submission-intro">Tell us about a community program or service that could support older adults in Calgary. Every request is reviewed before anything appears in the directory, and submitting a request does not guarantee that a listing will be added.</p>
+            <p className="submission-intro">Tell us about a community service that could support older adults in Calgary. Every request is reviewed before anything appears in the directory, and submitting a request does not guarantee that a listing will be added.</p>
             <div className="submission-prototype-note submission-prototype-note--before-form">
               <strong>Prototype form:</strong> Information entered here will not be stored or sent.
             </div>
@@ -96,14 +96,14 @@ export default function SubmissionModal({ onClose }) {
 
             <form className="submission-form" onSubmit={handleSubmit}>
               <fieldset className="submission-fieldset">
-                <legend>Organization and program</legend>
+                <legend>Organization and service</legend>
                 <div className="submission-grid">
                   <div className="submission-field">
                     <label htmlFor="submission-organization">Organization name <span aria-hidden="true">*</span></label>
                     <input id="submission-organization" name="organizationName" autoComplete="organization" required />
                   </div>
                   <div className="submission-field">
-                    <label htmlFor="submission-program">Program or service name <span aria-hidden="true">*</span></label>
+                    <label htmlFor="submission-program">Service name <span aria-hidden="true">*</span></label>
                     <input id="submission-program" name="programName" required />
                   </div>
                   <div className="submission-field">
@@ -122,9 +122,9 @@ export default function SubmissionModal({ onClose }) {
                     <input id="submission-locations" name="locationsServed" placeholder="For example: city-wide, Northwest Calgary, or a street address" />
                   </div>
                   <div className="submission-field submission-field--full">
-                    <label htmlFor="submission-description">Brief program description <span aria-hidden="true">*</span></label>
+                    <label htmlFor="submission-description">Brief service description <span aria-hidden="true">*</span></label>
                     <textarea id="submission-description" name="description" rows="4" required aria-describedby="submission-description-help" />
-                    <p id="submission-description-help" className="submission-help-text">Include who the program supports and what help it provides.</p>
+                    <p id="submission-description-help" className="submission-help-text">Include who the service supports and what help it provides.</p>
                   </div>
                 </div>
               </fieldset>
@@ -137,11 +137,11 @@ export default function SubmissionModal({ onClose }) {
                     <input id="submission-contact-name" name="contactName" autoComplete="name" />
                   </div>
                   <div className="submission-field">
-                    <label htmlFor="submission-relationship">Your relationship to the program <span aria-hidden="true">*</span></label>
+                    <label htmlFor="submission-relationship">Your relationship to the service <span aria-hidden="true">*</span></label>
                     <select id="submission-relationship" name="relationship" defaultValue="" required>
                       <option value="" disabled>Select one</option>
                       <option>Staff member or volunteer</option>
-                      <option>Program participant or caregiver</option>
+                      <option>Service participant or caregiver</option>
                       <option>Community service provider</option>
                       <option>Other</option>
                     </select>

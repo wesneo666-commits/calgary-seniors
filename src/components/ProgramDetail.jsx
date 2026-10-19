@@ -43,6 +43,32 @@ function shareUrlFor(program) {
   return `${window.location.origin}${window.location.pathname}?program=${encodeURIComponent(program.id)}`
 }
 
+// Standard share (box with an up arrow) and printer icons (V5 SP-02).
+function ShareIcon() {
+  return (
+    <svg className="detail-action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M8 9H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-2" />
+      <polyline points="8 6 12 2 16 6" />
+      <line x1="12" y1="2" x2="12" y2="15" />
+    </svg>
+  )
+}
+
+function PrintIcon() {
+  return (
+    <svg className="detail-action-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="6 9 6 2 18 2 18 9" />
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+      <rect x="6" y="14" width="12" height="8" />
+    </svg>
+  )
+}
+
+// Text-message and WhatsApp sharing only make sense on a phone (V5 SP-01).
+function isPhone() {
+  return window.matchMedia?.('(max-width: 768px) and (pointer: coarse)').matches ?? false
+}
+
 const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 export default function ProgramDetail({ program, onClose, backLabel = '← Back to results' }) {
@@ -147,7 +173,9 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
     || program.orgWebsite
     || extractRegistrationUrl(program.howToAccess)
   )
-  const mailtoBody = encodeURIComponent(`Take a look at this program on EngAGE: Calgary Directory for Aging Well:\n${shareUrlFor(program)}`)
+  const shareMessage = `Take a look at this service on EngAGE: Calgary Directory for Aging Well:\n${shareUrlFor(program)}`
+  const mailtoBody = encodeURIComponent(shareMessage)
+  const onPhone = isPhone()
 
   return (
     <div
@@ -156,7 +184,7 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
-      aria-label={`Program details: ${program.programName}`}
+      aria-label={`Service details: ${program.programName}`}
     >
       <div className="detail-panel" ref={panelRef}>
 
@@ -171,13 +199,13 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
             ref={closeRef}
             className="detail-close-btn"
             onClick={onClose}
-            aria-label="Close program details"
+            aria-label="Close service details"
           >
             {backLabel}
           </button>
           <div className="detail-actions">
-            <button className="detail-action-btn" onClick={handlePrint} aria-label="Print this resource">
-              🖨 Print
+            <button className="detail-action-btn" onClick={handlePrint} aria-label="Print this service">
+              <PrintIcon /> Print
             </button>
             <div className="share-wrap" ref={shareRef}>
               <button
@@ -185,9 +213,9 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
                 onClick={() => { setShareOpen((o) => !o); setCopied(false) }}
                 aria-haspopup="menu"
                 aria-expanded={shareOpen}
-                aria-label="Share this resource"
+                aria-label="Share this service"
               >
-                🔗 Share
+                <ShareIcon /> Share
               </button>
               {shareOpen && (
                 <div className="share-menu" role="menu" aria-label="Share options">
@@ -202,6 +230,28 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
                   >
                     ✉️ Share by email
                   </a>
+                  {onPhone && (
+                    <>
+                      <a
+                        className="share-menu-item"
+                        role="menuitem"
+                        href={`sms:?&body=${mailtoBody}`}
+                        onClick={() => setShareOpen(false)}
+                      >
+                        💬 Share by text message
+                      </a>
+                      <a
+                        className="share-menu-item"
+                        role="menuitem"
+                        href={`https://wa.me/?text=${mailtoBody}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setShareOpen(false)}
+                      >
+                        🟢 Share on WhatsApp
+                      </a>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -268,7 +318,7 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
         <button
           className="detail-close-btn"
           onClick={onClose}
-          aria-label="Close program details"
+          aria-label="Close service details"
         >
           {backLabel}
         </button>

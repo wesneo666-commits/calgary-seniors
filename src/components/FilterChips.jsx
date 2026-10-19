@@ -2,8 +2,6 @@ import { QUADRANTS, COST_TYPES, FORMAT_TYPES, serviceAreaLabel } from '../utils/
 
 function labelFor(key, value) {
   switch (key) {
-    case 'query':
-      return `"${value}"`
     case 'quadrant':
       return QUADRANTS.find((q) => q.value === value)?.label ?? value
     case 'serviceArea':
@@ -18,7 +16,6 @@ function labelFor(key, value) {
 }
 
 const KEY_PREFIX = {
-  query: 'Search',
   quadrant: 'Location',
   serviceArea: 'Service',
   cost: 'Cost',
@@ -28,7 +25,9 @@ const KEY_PREFIX = {
 export default function FilterChips({ filters, onRemove }) {
   // Location supports multiple simultaneous values (REQ-020), so it expands
   // into one chip per selection instead of one chip for the whole filter.
-  const activeChips = Object.entries(filters).flatMap(([key, value]) => {
+  // The search term is shown in the results header, not as a filter tag —
+  // tags are only for filters (V5 S-06).
+  const activeChips = Object.entries(filters).filter(([key]) => key !== 'query').flatMap(([key, value]) => {
     if (Array.isArray(value)) return value.map((v) => ({ key, value: v }))
     return value !== '' ? [{ key, value }] : []
   })

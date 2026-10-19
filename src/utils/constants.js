@@ -99,7 +99,7 @@ export function serviceGroupSlug(value) {
 
 // Display label for a filters.serviceArea value: '' | '_group_X' | item value
 export function serviceAreaLabel(value) {
-  if (!value) return 'All types'
+  if (!value) return 'All'
   if (value.startsWith('_group_')) return value.slice(7)
   return SERVICE_AREAS.find((s) => s.value === value)?.label ?? value
 }

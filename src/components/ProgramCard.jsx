@@ -16,13 +16,17 @@ export default function ProgramCard({ program, onSelect }) {
         onClick={() => onSelect(program)}
         aria-label={`View details for ${program.programName}${program.organization !== program.programName ? `, offered by ${program.organization}` : ''}`}
       >
-        <div className="card-name">{program.programName}</div>
+        {/* Organization leads (V5 SC-01): it is now the default sort key and
+            what people recognise first. Shown once when the names match. */}
+        <div className="card-org">{program.organization}</div>
         {program.organization !== program.programName && (
-          <div className="card-org">{program.organization}</div>
+          <div className="card-name">{program.programName}</div>
         )}
 
-        {program.description && (
-          <p className="card-description">{program.description}</p>
+        {/* The preview is clamped to two lines in CSS (V5 D-03); a curated
+            short description from the source list wins when one exists. */}
+        {(program.shortDescription || program.description) && (
+          <p className="card-description">{program.shortDescription || program.description}</p>
         )}
 
         {serviceTags.length > 0 && (
@@ -36,6 +40,10 @@ export default function ProgramCard({ program, onSelect }) {
               </span>
             )}
           </div>
+        )}
+
+        {program.lastUpdated && (
+          <p className="card-updated">Last updated: {program.lastUpdated}</p>
         )}
       </button>
     </article>
