@@ -9,3 +9,6 @@ tmp/
 
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
+
+# Upload packages for SmarterASP (rebuilt from dist/)
+deploy/
