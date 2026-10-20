@@ -80,6 +80,13 @@ export default function HelpModal({ onClose }) {
           </a>
         )}
 
+        {/* Kept low-key on purpose: available for people who are stuck,
+            without becoming the first thing everyone reaches for (X-01). */}
+        <p className="help-phone">
+          Still need help using the directory? Call Calgary Seniors at{' '}
+          <a href="tel:+14032666200">403-266-6200</a>.
+        </p>
+
         <button className="help-close-btn" onClick={onClose}>
           Got it – let's go!
         </button>
