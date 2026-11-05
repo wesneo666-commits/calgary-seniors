@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="480" viewBox="0 0 1600 480" role="img" aria-labelledby="title desc">
+  <title id="title">EngAGE: Calgary Directory for Aging Well</title>
+  <desc id="desc">A warm blue and coral wordmark with a hand-drawn Calgary skyline and olive leaves.</desc>
+
+  <g id="wordmark" font-family="Century Gothic, Avenir Next, Trebuchet MS, Arial, sans-serif">
+    <text x="70" y="276" font-size="222" font-weight="700" letter-spacing="-11">
+      <tspan fill="#315F7F">Eng</tspan><tspan fill="#F0643C">AGE</tspan>
+    </text>
+    <text x="78" y="374" fill="#315F7F" font-size="47" font-weight="600" letter-spacing="0.6">Calgary Directory for Aging Well</text>
+  </g>
+
+  <g id="calgary-growth-line" fill="none" stroke="#41464B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M928 296 C1001 338 1104 341 1194 305 C1273 274 1340 242 1450 225"/>
+    <path d="M1065 327 L1065 272 L1101 272 L1101 313 L1131 313 L1131 249 L1168 249 L1168 313 L1206 313 L1206 268 L1241 268 L1241 297"/>
+    <path d="M1149 249 L1149 212 L1164 199 L1179 212 L1179 249"/>
+    <path d="M1164 199 L1164 173 M1155 184 L1164 173 L1173 184"/>
+    <path d="M1382 249 C1427 200 1481 177 1535 184 C1520 239 1464 270 1382 249 Z" fill="#89975D"/>
+    <path d="M1388 250 C1430 231 1469 211 1514 194"/>
+    <path d="M1436 225 L1445 200 M1471 211 L1492 218"/>
+    <path d="M1449 226 C1494 239 1527 273 1537 316 C1481 321 1433 290 1404 256" fill="#89975D"/>
+    <path d="M1412 255 C1451 269 1487 285 1522 307"/>
+    <path d="M1461 278 L1474 301 M1495 294 L1515 287"/>
+  </g>
+
+  <circle cx="1302" cy="274" r="9" fill="#9561A8"/>
+</svg>

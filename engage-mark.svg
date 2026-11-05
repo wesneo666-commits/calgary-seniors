@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">EngAGE</title>
+  <rect width="128" height="128" rx="24" fill="#FFFDF7"/>
+  <path d="M29 31 H75 M29 31 V96 M29 63 H67 M29 96 H75" fill="none" stroke="#315F7F" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M73 91 C86 87 97 77 105 62" fill="none" stroke="#41464B" stroke-width="6" stroke-linecap="round"/>
+  <path d="M94 73 C95 55 105 44 119 42 C119 57 110 69 94 73 Z" fill="#89975D" stroke="#41464B" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="82" cy="86" r="7" fill="#F0643C"/>
+</svg>
