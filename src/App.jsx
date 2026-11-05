@@ -9,6 +9,7 @@ import AboutPage from './components/AboutPage.jsx'
 import SubmissionModal from './components/SubmissionModal.jsx'
 import AccessibilityPanel from './components/AccessibilityPanel.jsx'
 import WizardLanding from './components/WizardLanding.jsx'
+import GuidedTour from './components/GuidedTour.jsx'
 import { filterPrograms, sortResults } from './utils/search.js'
 import Footer from './components/Footer.jsx'
 import { useAccessibility } from './hooks/useAccessibility.js'
@@ -52,11 +53,20 @@ function getLandingLayout() {
   return new URLSearchParams(window.location.search).get('layout') === 'b' ? 'b' : 'a'
 }
 
+// Guided tour demo (2026-10-20 review, B-04): only on ?tour links for now,
+// so the UAT prototype is unchanged until the team approves it. It starts on
+// every load there so reviewers always see it; once approved, switch it to
+// first visit only using TOUR_SEEN_KEY.
+const TOUR_DEMO = new URLSearchParams(window.location.search).has('tour')
+const TOUR_SEEN_KEY = 'csrg-tour-seen'
+
 function GearIcon() {
-  // Long-toothed gear so it reads unmistakably as settings (V5 DS-03).
+  // Long-toothed gear so it reads unmistakably as settings (V5 DS-03). Eight
+  // evenly spaced teeth around the centre; the old hand-drawn path was
+  // shorter at the bottom, so it looked cut off (2026-10-20 review, Q-04).
   return (
     <svg className="a11y-gear-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden="true">
-      <path d="M10.3 1.5h3.4l.5 3a7.6 7.6 0 0 1 2 1.2l2.9-1.1 1.7 2.9-2.4 1.9a7.7 7.7 0 0 1 0 2.3l2.4 1.9-1.7 2.9-2.9-1.1a7.6 7.6 0 0 1-2 1.2l-.5 3h-3.4l-.5-3a7.6 7.6 0 0 1-2-1.2l-2.9 1.1-1.7-2.9 2.4-1.9a7.7 7.7 0 0 1 0-2.3L2.2 7.5l1.7-2.9 2.9 1.1a7.6 7.6 0 0 1 2-1.2z" />
+      <path d="M9.75 4.64L10.37 1.73L13.63 1.73L14.25 4.64L15.61 5.2L18.11 3.59L20.41 5.89L18.8 8.39L19.36 9.75L22.27 10.37L22.27 13.63L19.36 14.25L18.8 15.61L20.41 18.11L18.11 20.41L15.61 18.8L14.25 19.36L13.63 22.27L10.37 22.27L9.75 19.36L8.39 18.8L5.89 20.41L3.59 18.11L5.2 15.61L4.64 14.25L1.73 13.63L1.73 10.37L4.64 9.75L5.2 8.39L3.59 5.89L5.89 3.59L8.39 5.2Z" />
       <circle cx="12" cy="12" r="3" />
     </svg>
   )
@@ -105,6 +115,7 @@ export default function App() {
   const [showHelp, setShowHelp] = useState(false)
   const [view, setView] = useState(getView)
   const [showSubmission, setShowSubmission] = useState(false)
+  const [showTour, setShowTour] = useState(TOUR_DEMO)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [selectedProgram, setSelectedProgram] = useState(null)
   const [page, setPage] = useState(1)
@@ -187,6 +198,18 @@ export default function App() {
   // on every render (an inline arrow here would change every time).
   const closeMobileFilters = useCallback(() => setShowMobileFilters(false), [])
   const closeHelp = useCallback(() => setShowHelp(false), [])
+
+  const closeTour = useCallback(() => {
+    try { localStorage.setItem(TOUR_SEEN_KEY, '1') } catch { /* private mode */ }
+    setShowTour(false)
+  }, [])
+
+  const startTour = useCallback(() => {
+    setShowHelp(false)
+    setShowA11y(false)
+    window.scrollTo(0, 0)
+    setShowTour(true)
+  }, [])
 
   const clearFilters = useCallback(() => {
     setFilters((prev) => ({ ...EMPTY_FILTERS, query: prev.query }))
@@ -313,6 +336,18 @@ export default function App() {
                 on mobile it becomes the right-aligned action row under the
                 centred logo (replacing the old hamburger menu). */}
             <div className="site-header-actions">
+              {/* Visible About link alongside the other header controls; the
+                  footer one was easy to miss (2026-10-20 review, Q-05). */}
+              <a
+                href="?view=about"
+                className="about-btn"
+                onClick={openAbout}
+                aria-current={view === 'about' ? 'page' : undefined}
+              >
+                {/* Non-breaking space: the button is a flex box, which drops
+                    a plain space before the span. */}
+                About<span className="about-btn-long">&nbsp;EngAGE</span>
+              </a>
               <button
                 className="help-btn"
                 onClick={() => setShowHelp((v) => !v)}
@@ -363,7 +398,11 @@ export default function App() {
                 aria-haspopup="dialog"
                 aria-expanded={showMobileFilters}
               >
-                🗂 Filters{activeFilterCount ? ` (${activeFilterCount})` : ''}
+                {/* On phones the full-width button says what filters are for,
+                    since the panel is hidden behind it (2026-10-20 review, Q-07). */}
+                🗂 <span className="mobile-filter-label-long">Narrow your search with filters</span>
+                <span className="mobile-filter-label-short">Filters</span>
+                {activeFilterCount ? ` (${activeFilterCount})` : ''}
               </button>
             )}
           </div>
@@ -442,7 +481,12 @@ export default function App() {
         />
       )}
 
-      {showHelp && <HelpModal onClose={closeHelp} />}
+      {showHelp && <HelpModal onClose={closeHelp} onStartTour={TOUR_DEMO ? startTour : undefined} />}
+      {/* The tour points at directory controls, so it waits until the
+          directory is what's on screen. */}
+      {showTour && view === 'directory' && !showWizard && !selectedProgram && (
+        <GuidedTour onClose={closeTour} />
+      )}
       {showSubmission && <SubmissionModal onClose={closeSubmission} />}
 
       {/* Chatbot removed for V5 (C-01); ChatWidget.jsx is kept so it can return. */}

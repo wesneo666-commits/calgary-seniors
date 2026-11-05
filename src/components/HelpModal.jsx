@@ -8,7 +8,7 @@ const DEMO_VIDEO_URL = ''
 // people can keep the instructions open and practise on the page beside
 // them. Escape or the close buttons dismiss it; focus returns to whatever
 // opened it.
-export default function HelpModal({ onClose }) {
+export default function HelpModal({ onClose, onStartTour }) {
   const closeRef = useRef(null)
 
   useEffect(() => {
@@ -73,6 +73,12 @@ export default function HelpModal({ onClose }) {
             <p>Within any service listing, use the <strong>Print</strong> button to print a copy or the <strong>Share</strong> button to copy a link to the service.</p>
           </div>
         </div>
+
+        {onStartTour && (
+          <button type="button" className="help-tour-btn" onClick={onStartTour}>
+            Take the guided tour
+          </button>
+        )}
 
         {DEMO_VIDEO_URL && (
           <a className="help-video-btn" href={DEMO_VIDEO_URL} target="_blank" rel="noopener noreferrer">

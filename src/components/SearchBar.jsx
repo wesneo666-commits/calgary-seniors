@@ -186,6 +186,11 @@ export default function SearchBar({ value, onSubmit }) {
             </ul>
           )}
         </div>
+        {/* Search sits right beside the box, voice after it (2026-10-20 review, Q-01). */}
+        <button type="submit" className="search-btn">
+          <SearchIcon className="search-btn-icon" />
+          <span>Search</span>
+        </button>
         {supported && (
           <button
             type="button"
@@ -198,10 +203,6 @@ export default function SearchBar({ value, onSubmit }) {
             <span className="voice-btn-label">{listening ? 'Stop listening' : 'Voice search'}</span>
           </button>
         )}
-        <button type="submit" className="search-btn">
-          <SearchIcon className="search-btn-icon" />
-          <span>Search</span>
-        </button>
       </form>
       {/* Announces listening state to screen readers without moving focus */}
       <span className="sr-only" role="status">
@@ -225,8 +226,15 @@ export default function SearchBar({ value, onSubmit }) {
           {' — '}<button className="hint-clear-btn" onClick={clearAll} type="button">clear</button>
         </p>
       ) : (
+        // Phones get a one-line version: the full tip took up most of the
+        // screen under the search bar (2026-10-20 review, Q-06).
         <p className="search-hint">
-          <strong>Tip:</strong> Describe what you are looking for in your own words, such as "fitness classes in the northwest" or "help with transportation to appointments." You can also enter a postal code such as <strong>T2N</strong> to find services in your area.
+          <span className="search-hint-long">
+            <strong>Tip:</strong> Describe what you are looking for in your own words, such as "fitness classes in the northwest" or "help with transportation to appointments." You can also enter a postal code such as <strong>T2N</strong> to find services in your area.
+          </span>
+          <span className="search-hint-short">
+            <strong>Tip:</strong> Use your own words, or a postal code like <strong>T2N</strong>.
+          </span>
         </p>
       )}
     </div>

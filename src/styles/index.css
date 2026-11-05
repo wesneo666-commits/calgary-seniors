@@ -711,6 +711,27 @@ a:hover { color: var(--petal-slate-deep); }
   transition: background var(--dur-fast) var(--ease-out);
 }
 .help-btn:hover { background: var(--petal-ember-tint); }
+/* About (Q-05): same size as the other header buttons, quieter slate outline
+   so "How to use this" stays the one that stands out. */
+.about-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--touch-target);
+  padding: 0 var(--space-md);
+  background: var(--color-surface);
+  color: var(--petal-slate-ink);
+  border: 2px solid var(--petal-slate-ink);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.about-btn:hover,
+.about-btn[aria-current="page"] { background: var(--petal-slate-tint); }
 
 /* ─── Help modal ─────────────────────────────────────────────── */
 .help-panel {
@@ -1764,10 +1785,19 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 }
 .detail-close-btn:hover { background: var(--color-surface-sunken); }
 
-.detail-org { font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text); }
-.detail-name {
+/* Same order as the result cards (V5 SC-01): organization leads, service
+   name under it. It was the other way round here, so the organization was
+   easy to miss (2026-10-20 review, Q-03). */
+.detail-org {
   font-size: var(--font-size-xl);
   font-weight: 700;
+  color: var(--petal-slate-deep);
+  line-height: 1.25;
+  margin-bottom: var(--space-xs);
+}
+.detail-name {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
   color: var(--color-ink);
   line-height: 1.3;
 }
@@ -1901,7 +1931,8 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   background: oklch(28% 0.012 240);
   color: var(--color-text-inverse);
   margin-top: var(--space-xl);
-  padding: var(--space-xl) 0 var(--space-lg);
+  /* Tightened for the 2026-10-20 review (Q-02: "big black blob"). */
+  padding: var(--space-lg) 0 var(--space-md);
   position: relative;
 }
 /* Closing bookend of the header's petal strip */
@@ -1917,8 +1948,8 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .footer-columns {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-lg) var(--space-xl);
-  padding-bottom: var(--space-lg);
+  gap: var(--space-md) var(--space-xl);
+  padding-bottom: var(--space-md);
 }
 .footer-brand {
   flex: 1 1 12em;
@@ -1935,7 +1966,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   padding: var(--space-sm) var(--space-md);
 }
 .footer-logo {
-  height: 72px;
+  height: 52px;
   width: auto;
   max-width: 100%;
   display: block;
@@ -1947,7 +1978,6 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 }
 .footer-col {
   flex: 1 1 16em;
-  max-width: 46ch;
 }
 .footer-heading {
   font-size: var(--font-size-base);
@@ -1962,14 +1992,15 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 }
 .footer-col p + p { margin-top: var(--space-xs); }
 .footer-col strong { color: #ffffff; }
-/* Org-facing links — REQ-043 (suggest a correction) and REQ-044 (request to be added) */
+/* Org-facing links — REQ-043 (suggest a correction) and REQ-044 (request to be added).
+   Side by side, wrapping on narrow screens (Q-02). */
 .footer-links {
   list-style: none;
-  margin-top: var(--space-sm);
+  margin-top: var(--space-xs);
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-xs);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-lg);
 }
 .footer-links a,
 .footer-link-btn {
@@ -2242,8 +2273,8 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-md) var(--space-xl);
-  padding: var(--space-lg) 0;
+  gap: var(--space-sm) var(--space-xl);
+  padding: var(--space-md) 0;
   border-top: 1px solid oklch(100% 0 0 / 0.18);
 }
 .footer-funding-text { flex: 1 1 24em; }
@@ -2357,8 +2388,8 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
     font-weight: 600;
   }
 
-  .detail-name  { font-size: 18pt !important; }
-  .detail-org   { font-size: 10pt !important; }
+  .detail-org   { font-size: 18pt !important; }
+  .detail-name  { font-size: 14pt !important; }
   .detail-label { font-size: 9pt !important; font-weight: 700 !important; }
   .detail-value { font-size: 11pt !important; }
 
@@ -2795,9 +2826,12 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   .site-header-actions > * { flex: 1 1 auto; }
   .a11y-btn-wrap { margin-left: 0; }
   .help-btn,
+  .about-btn,
   .a11y-toggle-btn {
     padding: 0 var(--space-sm);
   }
+  /* Just "About" on phones so the three buttons share one row. */
+  .about-btn-long { display: none; }
   .a11y-btn-wrap .a11y-toggle-btn { width: 100%; }
   .a11y-grid {
     grid-template-columns: 1fr;
@@ -2887,6 +2921,18 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   .voice-btn { display: none; }
   .search-btn { padding: 0 var(--space-md); }
   .search-suggest-kind { display: none; }
+}
+/* Long/short copy for phones (2026-10-20 review, Q-06/Q-07). */
+.search-hint-short,
+.mobile-filter-label-long { display: none; }
+@media (max-width: 640px) {
+  .search-hint-long { display: none; }
+  .search-hint-short { display: inline; }
+}
+@media (max-width: 480px) {
+  .mobile-filter-label-short { display: none; }
+  .mobile-filter-label-long { display: inline; white-space: normal; }
+  .mobile-filter-btn { height: auto; min-height: 52px; }
 }
 @media (max-width: 400px) {
   .search-btn span { display: none; }
@@ -3285,3 +3331,248 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   font-weight: 700;
   white-space: nowrap;
 }
+
+/* ─── Guided tour (2026-10-20 review, B-04) ──────────────────── */
+/* The spotlight's huge outer shadow dims the page; the box itself is the
+   lit-up control. Between steps the spotlight and pointer glide over
+   (--tour-glide, kept in step with GLIDE_MS in GuidedTour.jsx), the pointer
+   taps, then the card pops out from the control. */
+.tour-root {
+  --tour-glide: 550ms;
+  --tour-spring: cubic-bezier(0.34, 1.35, 0.64, 1);
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+}
+.tour-blocker { position: fixed; inset: 0; }
+.tour-spotlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 0 0 4px var(--petal-ember),
+    0 0 0 200vmax oklch(20% 0.02 240 / 0.6);
+  pointer-events: none;
+}
+.tour-spotlight--glide {
+  transition:
+    transform var(--tour-glide) var(--ease-out),
+    width var(--tour-glide) var(--ease-out),
+    height var(--tour-glide) var(--ease-out);
+}
+.tour-spotlight--empty {
+  box-shadow: 0 0 0 200vmax oklch(20% 0.02 240 / 0.6);
+}
+/* Once the card is up, a soft ring keeps pulsing out from the control. */
+.tour-spotlight--live::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 3px solid var(--petal-ember);
+  animation: tour-pulse 1.6s var(--ease-out) infinite;
+}
+@keyframes tour-pulse {
+  from { transform: scale(1); opacity: 0.9; }
+  to   { transform: scale(1.08); opacity: 0; }
+}
+
+/* The pointer's tip sits at the outer element's origin. */
+.tour-pointer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  color: var(--color-ink);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.tour-pointer--visible { opacity: 1; }
+.tour-pointer--glide {
+  transition:
+    transform var(--tour-glide) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out);
+}
+.tour-pointer-inner {
+  position: absolute;
+  top: -3px;
+  left: -5px;
+  display: block;
+  transform-origin: 5px 3px;
+  filter: drop-shadow(0 3px 4px oklch(20% 0.02 240 / 0.35));
+}
+.tour-pointer-inner svg { display: block; }
+.tour-pointer-inner--tap { animation: tour-tap 420ms var(--ease-out); }
+@keyframes tour-tap {
+  0%, 100% { transform: scale(1); }
+  45%      { transform: scale(0.82) translate(1px, 1px); }
+}
+.tour-ripple {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  background: var(--petal-ember);
+  opacity: 0;
+}
+.tour-pointer-inner--tap .tour-ripple { animation: tour-ripple 700ms 140ms var(--ease-out); }
+@keyframes tour-ripple {
+  from { transform: scale(0.2); opacity: 0.55; }
+  to   { transform: scale(1.8); opacity: 0; }
+}
+
+.tour-card {
+  position: fixed;
+  width: min(24rem, calc(100vw - 24px));
+  padding: var(--space-md) var(--space-md) var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-lg);
+  border-top: 4px solid var(--petal-ember);
+  box-shadow: var(--shadow-overlay);
+  visibility: hidden;
+  opacity: 0;
+}
+/* Pops out from the side the control is on, with a little overshoot. */
+.tour-card--shown {
+  visibility: visible;
+  opacity: 1;
+  animation: tour-card-in 380ms var(--tour-spring) both;
+}
+.tour-card              { --tour-from: translate(0, 0) scale(0.9); }
+.tour-card--bottom      { --tour-from: translate(0, -14px) scale(0.94); transform-origin: var(--tour-arrow) top; }
+.tour-card--top         { --tour-from: translate(0, 14px) scale(0.94); transform-origin: var(--tour-arrow) bottom; }
+.tour-card--right       { --tour-from: translate(-14px, 0) scale(0.94); transform-origin: left var(--tour-arrow); }
+.tour-card--left        { --tour-from: translate(14px, 0) scale(0.94); transform-origin: right var(--tour-arrow); }
+@keyframes tour-card-in {
+  from { opacity: 0; transform: var(--tour-from); }
+  to   { opacity: 1; transform: none; }
+}
+/* The card's contents follow it in, one after another. */
+.tour-card--shown .tour-card-head,
+.tour-card--shown .tour-title,
+.tour-card--shown .tour-body,
+.tour-card--shown .tour-dots,
+.tour-card--shown .tour-actions {
+  animation: tour-rise 360ms var(--ease-out) both;
+}
+.tour-card--shown .tour-title   { animation-delay: 60ms; }
+.tour-card--shown .tour-body    { animation-delay: 120ms; }
+.tour-card--shown .tour-dots    { animation-delay: 170ms; }
+.tour-card--shown .tour-actions { animation-delay: 200ms; }
+@keyframes tour-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.tour-arrow {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: var(--color-surface);
+  transform: rotate(45deg);
+}
+.tour-card--bottom .tour-arrow { top: -10px; left: clamp(16px, calc(var(--tour-arrow) - 8px), calc(100% - 32px)); background: var(--petal-ember); }
+.tour-card--top .tour-arrow    { bottom: -8px; left: clamp(16px, calc(var(--tour-arrow) - 8px), calc(100% - 32px)); }
+.tour-card--right .tour-arrow  { left: -8px; top: clamp(16px, calc(var(--tour-arrow) - 8px), calc(100% - 32px)); }
+.tour-card--left .tour-arrow   { right: -8px; top: clamp(16px, calc(var(--tour-arrow) - 8px), calc(100% - 32px)); }
+.tour-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+.tour-progress {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--petal-ember-ink);
+}
+.tour-close {
+  margin-left: auto;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  margin-right: calc(-1 * var(--space-xs));
+  border: none;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+}
+.tour-close:hover { background: var(--color-surface-sunken); }
+.tour-title {
+  font-size: var(--font-size-xl);
+  line-height: 1.25;
+  margin: 0 0 var(--space-sm);
+}
+.tour-body {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height);
+}
+/* Progress dots: done ones fill in, the current one stretches into a pill. */
+.tour-dots {
+  display: flex;
+  gap: 6px;
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tour-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
+  transition: width var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
+}
+.tour-dot--done { background: var(--petal-ember); }
+.tour-dot--current { width: 28px; background: var(--petal-ember); }
+.tour-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+.tour-btn {
+  min-height: var(--touch-target);
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid var(--petal-slate-deep);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.tour-btn--secondary { background: var(--color-surface); color: var(--petal-slate-deep); }
+.tour-btn--secondary:hover { background: var(--petal-slate-tint); }
+.tour-btn--primary { flex: 1 1 8em; background: var(--petal-slate-deep); color: var(--color-text-inverse); }
+.tour-btn--primary:hover { background: var(--color-filter-active-dark); }
+@media (prefers-reduced-motion: reduce) {
+  .tour-pointer { display: none; }
+  .tour-spotlight--live::after { animation: none; opacity: 0; }
+  .tour-card--shown,
+  .tour-card--shown * { animation: none !important; }
+  .tour-dot { transition: none; }
+}
+@media print {
+  .tour-root { display: none; }
+}
+
+/* "Take the guided tour" in the How to Use panel (tour demo links only). */
+.help-tour-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target);
+  border: 2px solid var(--petal-slate-deep);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--petal-slate-deep);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  cursor: pointer;
+}
+.help-tour-btn:hover { background: var(--petal-slate-tint); }

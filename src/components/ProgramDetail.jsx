@@ -258,9 +258,17 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
           </div>
         </div>
 
+        {/* Organization leads, as on the result cards; shown once when the
+            names match. The service name stays the heading either way. */}
         <div>
-          <div className="detail-org">{program.organization}</div>
-          <h2 className="detail-name">{program.programName}</h2>
+          {program.organization !== program.programName ? (
+            <>
+              <div className="detail-org">{program.organization}</div>
+              <h2 className="detail-name">{program.programName}</h2>
+            </>
+          ) : (
+            <h2 className="detail-org">{program.programName}</h2>
+          )}
         </div>
 
         {/* Header: service area type tags (most scannable identity info) */}
