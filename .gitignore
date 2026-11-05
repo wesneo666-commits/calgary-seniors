@@ -12,3 +12,8 @@ tmp/
 
 # Upload packages for SmarterASP (rebuilt from dist/)
 deploy/
+
+# Internal project notes: kept on this machine, out of the public repo
+docs/feedback/
+PRODUCT.md
+DESIGN.md
