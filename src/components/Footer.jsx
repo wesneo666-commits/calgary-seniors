@@ -5,7 +5,7 @@ export default function Footer({ onAbout, onSubmitProgram, submissionTriggerRef 
         <div className="footer-columns">
           <div className="footer-brand">
             <div className="footer-logo-wrap">
-              <img src="/engage-logo.svg" alt="EngAGE: Calgary Directory for Aging Well" className="footer-logo" />
+              <img src={`${import.meta.env.BASE_URL}engage-logo.svg`} alt="EngAGE: Calgary Directory for Aging Well" className="footer-logo" />
             </div>
             <p className="footer-tagline">Calgary Directory for Aging Well</p>
           </div>
@@ -39,7 +39,7 @@ export default function Footer({ onAbout, onSubmitProgram, submissionTriggerRef 
             <p>The development of this directory was funded by the <strong>University of Calgary Centre on Aging</strong>, the <strong>University of Calgary Brenda Strafford Foundation Chair in Geriatric Medicine</strong>, and the <strong>Canadian Institutes of Health Research Betty Havens Prize for Knowledge Mobilization in Aging</strong>.</p>
           </div>
           <div className="footer-funding-logo-wrap">
-            <img src="/coa-logo.png" alt="University of Calgary Centre on Aging" className="footer-funding-logo" />
+            <img src={`${import.meta.env.BASE_URL}coa-logo.png`} alt="University of Calgary Centre on Aging" className="footer-funding-logo" />
           </div>
         </div>
 

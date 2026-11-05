@@ -300,9 +300,9 @@ export default function App() {
                   centred, skyline-and-leaves underneath — so the wordmark can
                   run full width instead of sharing the row with the motif. */}
               <picture className="site-logo-picture">
-                <source media="(max-width: 640px)" srcSet="/engage-logo-stacked.svg" />
+                <source media="(max-width: 640px)" srcSet={`${import.meta.env.BASE_URL}engage-logo-stacked.svg`} />
                 <img
-                  src="/engage-logo.svg"
+                  src={`${import.meta.env.BASE_URL}engage-logo.svg`}
                   alt=""
                   className="site-logo"
                 />
