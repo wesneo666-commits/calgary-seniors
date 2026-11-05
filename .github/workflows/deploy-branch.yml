@@ -1,0 +1,72 @@
+# Builds the site on every push to master and puts only the finished files
+# (index.html, web.config, assets/, logos) on the `deploy` branch, which
+# SmarterASP's Git deployment pulls into the site root. Each build is added as
+# a normal commit, so the branch history never needs a force-pull.
+#
+# app_offline.htm takes an IIS site offline, so it must never be deployed:
+# it is removed from the build and the run fails if one is still present.
+name: Build deploy branch
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-branch
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+      - run: npm run build
+
+      - name: Keep app_offline out of the build
+        run: |
+          find dist -iname 'app_offline*' -print -delete
+          if find dist -iname 'app_offline*' | grep -q .; then
+            echo "::error::app_offline file found in dist/"; exit 1
+          fi
+          test -f dist/index.html && test -f dist/web.config
+
+      - name: Publish to the deploy branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          REPO="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code --heads "$REPO" deploy > /dev/null; then
+            git clone -q --depth 1 --branch deploy "$REPO" out
+          else
+            git init -q -b deploy out
+            git -C out remote add origin "$REPO"
+          fi
+          find out -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -R dist/. out/
+          cd out
+          if find . -path ./.git -prune -o -iname 'app_offline*' -print | grep -q .; then
+            echo "::error::app_offline file in deploy branch"; exit 1
+          fi
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Build unchanged; nothing to publish."
+            exit 0
+          fi
+          git commit -q -m "Build of ${GITHUB_SHA::7}"
+          git push -q origin deploy

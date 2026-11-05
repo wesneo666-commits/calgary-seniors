@@ -17,3 +17,6 @@ deploy/
 docs/feedback/
 PRODUCT.md
 DESIGN.md
+
+# IIS maintenance flag: never commit or deploy
+app_offline.htm
