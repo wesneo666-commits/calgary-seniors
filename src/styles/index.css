@@ -33,6 +33,11 @@
   --petal-ember-deep: oklch(48% 0.13 40);
   --petal-ember-tint: oklch(94.5% 0.03 40);
 
+  /* Sixth service category (Find Housing & Transportation), Nov 2026 */
+  --petal-teal:       oklch(60% 0.085 180);
+  --petal-teal-ink:   oklch(40% 0.07 182);
+  --petal-teal-tint:  oklch(94.5% 0.03 180);
+
   /* Neutrals — charcoal ink from the wordmark, cool paper ground */
   --color-ink:        oklch(25% 0.01 240);
   --color-ink-soft:   oklch(40% 0.015 240);
@@ -469,6 +474,7 @@ a:hover { color: var(--petal-slate-deep); }
 [data-contrast="high"] .badge-service--social    { background: #e8d8ff; color: #30006a; border-color: #30006a; }
 [data-contrast="high"] .badge-service--practical { background: #fff0b0; color: #3d2000; border-color: #3d2000; }
 [data-contrast="high"] .badge-service--safety    { background: #ffd6e6; color: #7a003f; border-color: #7a003f; }
+[data-contrast="high"] .badge-service--housing   { background: #c8f5ee; color: #00403a; border-color: #00403a; }
 [data-contrast="high"] .badge-population { background: #ffd6e6; color: #7a003f; }
 [data-contrast="high"] .search-section { background: #00007a; background-image: none; }
 [data-contrast="high"] .search-hint,
@@ -681,6 +687,7 @@ a:hover { color: var(--petal-slate-deep); }
 .wizard-landing-card--social    { --wizard-card-bg: var(--petal-plum-tint);  --wizard-card-color: var(--petal-plum-ink); }
 .wizard-landing-card--practical { --wizard-card-bg: var(--petal-amber-tint); --wizard-card-color: var(--petal-amber-ink); }
 .wizard-landing-card--safety    { --wizard-card-bg: var(--petal-ember-tint); --wizard-card-color: var(--petal-ember-ink); }
+.wizard-landing-card--housing   { --wizard-card-bg: var(--petal-teal-tint);  --wizard-card-color: var(--petal-teal-ink); }
 
 [data-contrast="high"] .wizard-welcome-stroke,
 [data-contrast="high"] .wizard-welcome-leaf { stroke: var(--color-ink); }
@@ -1658,6 +1665,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .badge-service--social    { background: var(--petal-plum-tint);  color: var(--petal-plum-ink); }
 .badge-service--practical { background: var(--petal-amber-tint); color: var(--petal-amber-ink); }
 .badge-service--safety    { background: var(--petal-ember-tint); color: var(--petal-ember-ink); }
+.badge-service--housing   { background: var(--petal-teal-tint);  color: var(--petal-teal-ink); }
 
 /* ─── Detail panel ───────────────────────────────────────────── */
 .detail-overlay {
@@ -3053,11 +3061,13 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .service-select-section--social    { --section-base: var(--petal-plum);  --section-tint: var(--petal-plum-tint);  --section-ink: var(--petal-plum-ink);  --dot: var(--petal-plum); }
 .service-select-section--practical { --section-base: var(--petal-amber); --section-tint: var(--petal-amber-tint); --section-ink: var(--petal-amber-ink); --dot: var(--petal-amber); }
 .service-select-section--safety    { --section-base: var(--petal-ember); --section-tint: var(--petal-ember-tint); --section-ink: var(--petal-ember-ink); --dot: var(--petal-ember); }
+.service-select-section--housing   { --section-base: var(--petal-teal);  --section-tint: var(--petal-teal-tint);  --section-ink: var(--petal-teal-ink);  --dot: var(--petal-teal); }
 .service-select-dot--home      { --dot: var(--petal-slate); }
 .service-select-dot--health    { --dot: var(--petal-sage); }
 .service-select-dot--social    { --dot: var(--petal-plum); }
 .service-select-dot--practical { --dot: var(--petal-amber); }
 .service-select-dot--safety    { --dot: var(--petal-ember); }
+.service-select-dot--housing   { --dot: var(--petal-teal); }
 [data-contrast="high"] .service-select-section .service-select-group { background: transparent; color: var(--color-ink); }
 
 /* ─── Service cards (SC-01, SC-02, D-03) ─────────────────────── */
@@ -3300,6 +3310,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .landing-filter-option--social    { --opt-tint: var(--petal-plum-tint);  --opt-ink: var(--petal-plum-ink); }
 .landing-filter-option--practical { --opt-tint: var(--petal-amber-tint); --opt-ink: var(--petal-amber-ink); }
 .landing-filter-option--safety    { --opt-tint: var(--petal-ember-tint); --opt-ink: var(--petal-ember-ink); }
+.landing-filter-option--housing   { --opt-tint: var(--petal-teal-tint);  --opt-ink: var(--petal-teal-ink); }
 .landing-browse { margin-top: var(--space-lg); }
 .landing-browse-btn {
   min-height: 56px;

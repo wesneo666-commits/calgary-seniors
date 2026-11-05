@@ -117,7 +117,12 @@ export function filterPrograms(programs, filters) {
       if (serviceArea.startsWith('_group_')) {
         const groupName = serviceArea.slice(7)
         const groupValues = SERVICE_AREA_GROUPS.find((g) => g.group === groupName)?.items.map((i) => i.value) ?? []
-        if (!p.serviceArea.some((sa) => groupValues.includes(sa))) return false
+        // A program belongs to a category when the client tagged it with that
+        // category, or with any subcategory the framework places under it.
+        if (
+          !p.determinant.includes(groupName)
+          && !p.serviceArea.some((sa) => groupValues.includes(sa))
+        ) return false
       } else {
         if (!p.serviceArea.includes(serviceArea)) return false
       }

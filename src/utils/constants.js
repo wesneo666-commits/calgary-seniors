@@ -1,76 +1,83 @@
-// Actual taxonomy from the programs dataset
+// Service categories — Katherine's "Final EngAGE service types" framework
+// (Oct 21, 2026) and her revised workbook. Each program carries its parent
+// categories in `determinant` and its subcategories in `serviceArea`; the
+// names below match the dataset exactly and are what users see.
 
 export const DETERMINANTS = [
-  'Built & Service Environment',
-  'Community & Care Supports',
-  'Health & Wellbeing',
-  'Safety, Security & Rights',
-  'Social Participation & Engagement',
+  'Stay Healthy',
+  'Stay Connected',
+  'Get Help',
+  'Find Housing & Transportation',
+  'Manage Money & Legal Matters',
+  'Stay Safe',
 ]
 
 // Grouped service areas for the filter dropdown.
 // `value` must match the dataset exactly. `label` is what users see.
 export const SERVICE_AREA_GROUPS = [
   {
-    group: 'Getting help at home',
+    group: 'Stay Healthy',
     items: [
-      { value: 'Home support & maintenance', label: 'Home support & maintenance' },
-      { value: 'In-home care',              label: 'In-home care' },
-      { value: 'Moving & downsizing',       label: 'Moving & downsizing' },
-      { value: 'Respite',                   label: 'Respite (caregiver relief)' },
-      { value: 'Transportation',            label: 'Transportation' },
+      { value: 'Addiction', label: 'Addiction' },
+      { value: 'Brain health & memory', label: 'Brain health & memory' },
+      { value: 'Exercise & physical activity', label: 'Exercise & physical activity' },
+      { value: 'Food & meals', label: 'Food & meals' },
+      { value: 'Grief & loss', label: 'Grief & loss' },
+      { value: 'Mental health', label: 'Mental health' },
+      { value: 'Outdoor recreation', label: 'Outdoor recreation' },
+      { value: 'Physical health', label: 'Physical health' },
     ],
   },
   {
-    group: 'Health & wellness',
+    group: 'Stay Connected',
     items: [
-      { value: 'Substance use & addictions', label: 'Addictions support' },
-      { value: 'Brain health & memory',      label: 'Brain health & memory' },
-      { value: 'Chronic disease management', label: 'Chronic disease support' },
-      { value: 'Fitness & physical activity',label: 'Fitness & physical activity' },
-      { value: 'Food & nutrition',           label: 'Food & nutrition' },
-      { value: 'Grief & loss',               label: 'Grief & loss' },
-      { value: 'Mental health',              label: 'Mental health' },
-      { value: 'Outdoor recreation',         label: 'Outdoor recreation' },
-      { value: 'Physical health',            label: 'Physical health' },
+      { value: 'Arts & culture', label: 'Arts & culture' },
+      { value: 'Dating & relationships', label: 'Dating & relationships' },
+      { value: 'Learning & education', label: 'Learning & education' },
+      { value: 'Social connection', label: 'Social connection' },
+      { value: 'Volunteering', label: 'Volunteering' },
     ],
   },
   {
-    group: 'Social & community',
+    group: 'Get Help',
     items: [
-      { value: 'Arts & culture',               label: 'Arts & culture' },
-      { value: 'Intergenerational engagement', label: 'Intergenerational programs' },
-      { value: 'Intimacy & dating',            label: 'Intimacy & dating' },
-      { value: 'Language & communication',     label: 'Language & communication' },
-      { value: 'Lifelong learning & education',label: 'Lifelong learning' },
-      { value: 'Social connection',            label: 'Social connection' },
-      { value: 'Volunteerism',                 label: 'Volunteering' },
+      { value: 'Home care', label: 'Home care' },
+      { value: 'Home maintenance', label: 'Home maintenance' },
+      { value: 'Language & communication', label: 'Language & communication' },
+      { value: 'Moving & downsizing', label: 'Moving & downsizing' },
+      { value: 'Pet care', label: 'Pet care' },
+      { value: 'Respite', label: 'Respite' },
+      { value: 'Service navigation', label: 'Service navigation' },
+      { value: 'Technology', label: 'Technology' },
     ],
   },
   {
-    group: 'Practical support',
+    group: 'Find Housing & Transportation',
     items: [
-      { value: 'Advanced care & future planning',      label: 'Advanced care planning' },
-      { value: 'Employment',                           label: 'Employment' },
-      { value: 'Income & financial assistance',        label: 'Financial assistance' },
-      { value: 'Financial literacy',                   label: 'Financial literacy' },
-      { value: 'Service navigation & case management', label: 'Help finding services' },
-      { value: 'Housing',                              label: 'Housing' },
-      { value: 'Legal assistance',                     label: 'Legal assistance' },
-      { value: 'Pet care',                             label: 'Pet care' },
-      { value: 'Digital literacy & technology',        label: 'Technology & internet help' },
+      { value: 'Emergency housing', label: 'Emergency housing' },
+      { value: 'Housing', label: 'Housing' },
+      { value: 'Transportation', label: 'Transportation' },
     ],
   },
   {
-    group: 'Safety & crisis',
+    group: 'Manage Money & Legal Matters',
     items: [
-      { value: 'Abuse prevention & response',label: 'Abuse prevention & support' },
-      { value: 'Crisis intervention',        label: 'Crisis support' },
-      { value: 'Emergency shelters',         label: 'Emergency shelters' },
-      { value: 'Personal safety',            label: 'Personal safety' },
+      { value: 'Advance care & future planning', label: 'Advance care & future planning' },
+      { value: 'Employment', label: 'Employment' },
+      { value: 'Financial assistance', label: 'Financial assistance' },
+      { value: 'Legal assistance', label: 'Legal assistance' },
+      { value: 'Money management', label: 'Money management' },
     ],
   },
-]
+  {
+    group: 'Stay Safe',
+    items: [
+      { value: 'Abuse & mistreatment', label: 'Abuse & mistreatment' },
+      { value: 'Crisis situations', label: 'Crisis situations' },
+      { value: 'Personal safety', label: 'Personal safety' },
+    ],
+  },
+];
 
 // Flat list of all service areas — used for filter logic and chips
 export const SERVICE_AREAS = SERVICE_AREA_GROUPS.flatMap((g) => g.items)
@@ -79,11 +86,12 @@ export const SERVICE_AREAS = SERVICE_AREA_GROUPS.flatMap((g) => g.items)
 // (removed from program cards per REQ-051). Each group carries one color from
 // the roadmap's botanical palette; the slug selects that color family in CSS.
 export const GROUP_ICONS = {
-  'Getting help at home': { emoji: '🏠', slug: 'home' },
-  'Health & wellness':    { emoji: '🩺', slug: 'health' },
-  'Social & community':   { emoji: '🤝', slug: 'social' },
-  'Practical support':    { emoji: '🔧', slug: 'practical' },
-  'Safety & crisis':      { emoji: '🛡️', slug: 'safety' },
+  'Stay Healthy': { emoji: '🩺', slug: 'health' },
+  'Stay Connected': { emoji: '🤝', slug: 'social' },
+  'Get Help': { emoji: '🏠', slug: 'home' },
+  'Find Housing & Transportation': { emoji: '🚌', slug: 'housing' },
+  'Manage Money & Legal Matters': { emoji: '💼', slug: 'practical' },
+  'Stay Safe': { emoji: '🛡️', slug: 'safety' },
 }
 
 // Petal slug for a service-area value (via its parent group) — colors the

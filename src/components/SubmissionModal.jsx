@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from 'react'
 const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 const SERVICE_TYPES = [
-  'Getting help at home',
-  'Health and wellness',
-  'Social and community',
-  'Practical support',
-  'Safety and crisis',
+  'Stay Healthy',
+  'Stay Connected',
+  'Get Help',
+  'Find Housing & Transportation',
+  'Manage Money & Legal Matters',
+  'Stay Safe',
   'Other or not sure',
 ]
 
