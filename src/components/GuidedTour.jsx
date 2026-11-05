@@ -10,7 +10,8 @@ import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react
 // A step's `target` is a list of selectors; the first one visible on this
 // screen is used, so phones point at the Filters button rather than the
 // hidden drawer. A target can carry its own body text for that case. Steps
-// with nothing visible (voice search on small phones) are skipped.
+// with nothing visible (voice search on small phones) are skipped, which is
+// how one list serves both the landing page and the directory.
 const STEPS = [
   {
     title: 'Welcome to EngAGE',
@@ -38,9 +39,20 @@ const STEPS = [
         selector: '.mobile-filter-btn',
         body: 'Tap this button to show only the services that suit you. For example, only free services, or only ones in your part of the city.',
       },
+      {
+        // Landing page: the four Location / Service Type / Cost / Format buttons
+        selector: '.landing-filters',
+        body: 'Choose Location, Service Type, Cost or Format to see only the services that suit you. For example, only free services, or only ones in your part of the city.',
+      },
     ],
     title: 'Narrow the list with filters',
     body: 'Filters show only the services that suit you. For example, only free services, or only ones in your part of the city. Choose as many as you like, and scroll down to see them all.',
+  },
+  {
+    // Landing page only; skipped in the directory, where the cards are shown
+    target: ['.landing-browse-btn'],
+    title: 'Or see everything',
+    body: 'Select Browse Full Directory to see every service, then narrow the list from there.',
   },
   {
     target: ['.results-list .program-card'],

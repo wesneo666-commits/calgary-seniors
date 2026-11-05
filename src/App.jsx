@@ -75,10 +75,15 @@ function GearIcon() {
   )
 }
 
-// Keep the Phase 1 directory-first test intact while giving reviewers a
-// stable, direct URL for the retained landing experience.
+// Round two opens on the landing page (Kate, 2026-11-05; tracker B-01).
+// PHASE_ONE_TEST_MODE still hides the Direct Search / Directory header toggle.
+// ?view=landing remains a stable link to it.
+const LANDING_IS_HOME = true
 function isLandingPreview() {
   return new URLSearchParams(window.location.search).get('view') === 'landing'
+}
+function startsOnLanding() {
+  return LANDING_IS_HOME || isLandingPreview() || !PHASE_ONE_TEST_MODE
 }
 
 // Escape-to-close plus the same Tab focus-trap used by the other overlays in
@@ -126,7 +131,7 @@ export default function App() {
   // Alphabetical by organization by default (V5 D-01).
   const [sort, setSort] = useState('org-az')
   const [landingMode, setLandingMode] = useState(
-    isLandingPreview() || !PHASE_ONE_TEST_MODE ? 'wizard' : 'direct'
+    startsOnLanding() ? 'wizard' : 'direct'
   )
   const [sharedProgramId, setSharedProgramId] = useState(getSharedProgramId)
   const filterDrawerRef = useRef(null)
@@ -221,7 +226,7 @@ export default function App() {
   const resetHome = useCallback(() => {
     setFilters(EMPTY_FILTERS)
     setSort('org-az')
-    setLandingMode(isLandingPreview() || !PHASE_ONE_TEST_MODE ? 'wizard' : 'direct')
+    setLandingMode(startsOnLanding() ? 'wizard' : 'direct')
     if (view === 'about') closeAbout()
   }, [view, closeAbout])
 
@@ -273,7 +278,7 @@ export default function App() {
   // Filters only — the search term has its own Clear in the results header.
   const activeFilterCount = Object.entries(filters)
     .filter(([key, value]) => key !== 'query' && isFilterActive(value)).length
-  const showWizard = (isLandingPreview() || !PHASE_ONE_TEST_MODE) && landingMode === 'wizard' && !hasActiveFilters
+  const showWizard = startsOnLanding() && landingMode === 'wizard' && !hasActiveFilters
 
   if (sharedProgram) {
     return (
@@ -487,7 +492,7 @@ export default function App() {
       {showHelp && <HelpModal onClose={closeHelp} onStartTour={startTour} />}
       {/* The tour points at directory controls, so it waits until the
           directory is what's on screen. */}
-      {showTour && view === 'directory' && !showWizard && !selectedProgram && (
+      {showTour && view === 'directory' && !selectedProgram && (
         <GuidedTour onClose={closeTour} />
       )}
       {showSubmission && <SubmissionModal onClose={closeSubmission} />}
