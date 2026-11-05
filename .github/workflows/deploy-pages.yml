@@ -1,3 +1,5 @@
+# Builds the site and publishes it to https://wesneo666-commits.github.io/calgary-seniors/
+# on every push to master. Run it by hand from the Actions tab if needed.
 name: Deploy to GitHub Pages
 
 on:
