@@ -53,12 +53,15 @@ function getLandingLayout() {
   return new URLSearchParams(window.location.search).get('layout') === 'b' ? 'b' : 'a'
 }
 
-// Guided tour demo (2026-10-20 review, B-04): only on ?tour links for now,
-// so the UAT prototype is unchanged until the team approves it. It starts on
-// every load there so reviewers always see it; once approved, switch it to
-// first visit only using TOUR_SEEN_KEY.
-const TOUR_DEMO = new URLSearchParams(window.location.search).has('tour')
+// Guided tour (2026-10-20 review, B-04; Wes approved first-visit, 2026-11-05).
+// It starts on a visitor's first visit and is remembered once closed.
+// ?tour forces it on every load, for reviewers and for testing sessions that
+// share one device. "Take the guided tour" in How to use replays it anytime.
 const TOUR_SEEN_KEY = 'csrg-tour-seen'
+function shouldStartTour() {
+  if (new URLSearchParams(window.location.search).has('tour')) return true
+  try { return localStorage.getItem(TOUR_SEEN_KEY) !== '1' } catch { return false }
+}
 
 function GearIcon() {
   // Long-toothed gear so it reads unmistakably as settings (V5 DS-03). Eight
@@ -115,7 +118,7 @@ export default function App() {
   const [showHelp, setShowHelp] = useState(false)
   const [view, setView] = useState(getView)
   const [showSubmission, setShowSubmission] = useState(false)
-  const [showTour, setShowTour] = useState(TOUR_DEMO)
+  const [showTour, setShowTour] = useState(shouldStartTour)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [selectedProgram, setSelectedProgram] = useState(null)
   const [page, setPage] = useState(1)
@@ -481,7 +484,7 @@ export default function App() {
         />
       )}
 
-      {showHelp && <HelpModal onClose={closeHelp} onStartTour={TOUR_DEMO ? startTour : undefined} />}
+      {showHelp && <HelpModal onClose={closeHelp} onStartTour={startTour} />}
       {/* The tour points at directory controls, so it waits until the
           directory is what's on screen. */}
       {showTour && view === 'directory' && !showWizard && !selectedProgram && (
