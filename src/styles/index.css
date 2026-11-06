@@ -4453,3 +4453,25 @@ body:has(.main-layout) {
 [data-contrast="high"] .help-topic-badge { background: #ffffff; color: #00007a; border: 2px solid #00007a; }
 [data-contrast="high"] .help-topic-chevron { color: #00007a; }
 [data-contrast="high"] .help-drawer .help-tour-btn { background: #00007a; }
+
+/* ─── Directory backdrop depth (2026-11-06) ─────────────────────
+   The side margins were a flat ground on wide screens. Two large EngAGE
+   rings sit in the margins, cropped off the screen edges: soft blue on the
+   left, the search band's peach on the right. They are fixed to the
+   window, so the cards scroll over them and the page reads as layered.
+   Decoration only: cards and panels are opaque, so nothing sits behind
+   text. Hidden on phones, where there are no margins. */
+body:has(.main-layout)::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    url("/engage-rings-blue.svg") no-repeat left -340px top 52% / 680px auto,
+    url("/engage-rings-peach.svg") no-repeat right -300px top 18% / 560px auto;
+}
+@media (max-width: 900px) {
+  body:has(.main-layout)::before { display: none; }
+}
+[data-contrast="high"] body:has(.main-layout)::before { display: none; }
