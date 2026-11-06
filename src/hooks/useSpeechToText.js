@@ -18,12 +18,19 @@ const ERROR_MESSAGES = {
   'network':             'Voice search needs an internet connection. Please try again, or type your search instead.',
   'aborted':             null, // user stopped it on purpose — not an error worth showing
 }
+const SILENCE_MS = 2500
+const MAX_MS = 20000
+
 const FALLBACK_MESSAGE = "Voice search didn't work this time. Please try again, or type your search instead."
 
 /**
- * One-shot dictation: start() listens for a single phrase and streams
- * interim + final transcripts to onResult(transcript). Recognition ends by
- * itself after the phrase (or silence); stop() ends it early.
+ * One-shot dictation: start() listens for a phrase and streams interim +
+ * final transcripts to onResult(transcript). stop() ends it early.
+ *
+ * Browsers end a non-continuous session at the first short pause, which cut
+ * testers off mid-sentence ("I want to…", V5 round 3). So we listen
+ * continuously and end it ourselves once the speaker has been quiet for
+ * SILENCE_MS, with a hard cap of MAX_MS.
  */
 export function useSpeechToText(onResult) {
   const [listening, setListening] = useState(false)
@@ -40,9 +47,17 @@ export function useSpeechToText(onResult) {
     recognition.lang = 'en-CA'
     recognition.interimResults = true
     recognition.maxAlternatives = 1
-    recognition.continuous = false
+    recognition.continuous = true
+
+    let silenceTimer = null
+    const armSilenceTimer = () => {
+      clearTimeout(silenceTimer)
+      silenceTimer = setTimeout(() => recognition.stop(), SILENCE_MS)
+    }
+    const maxTimer = setTimeout(() => recognition.stop(), MAX_MS)
 
     recognition.onresult = (event) => {
+      armSilenceTimer()
       const transcript = [...event.results]
         .map((result) => result[0].transcript)
         .join(' ')
@@ -54,6 +69,8 @@ export function useSpeechToText(onResult) {
       if (message !== null) setError(message ?? FALLBACK_MESSAGE)
     }
     recognition.onend = () => {
+      clearTimeout(silenceTimer)
+      clearTimeout(maxTimer)
       recognitionRef.current = null
       setListening(false)
     }

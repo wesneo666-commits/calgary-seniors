@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import { useState, useMemo, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import programs from './data/programs.json'
 import SearchBar from './components/SearchBar.jsx'
 import FilterPanel from './components/FilterPanel.jsx'
@@ -244,10 +244,24 @@ export default function App() {
     if (q) scrollToResults()
   }, [scrollToResults])
 
-  const applyLandingFilter = useCallback((key, value) => {
-    setFilters({ ...EMPTY_FILTERS, [key]: value })
+  // Landing → directory always opens at the top of the page, not wherever
+  // the landing page was scrolled to (V5 round 3).
+  // The jump happens in a layout effect once the directory has rendered.
+  const scrollTopAfterLanding = useRef(false)
+  const leaveLanding = useCallback(() => {
+    scrollTopAfterLanding.current = true
     setLandingMode('direct')
   }, [])
+
+  const applyLandingFilters = useCallback((selection) => {
+    setFilters({ ...EMPTY_FILTERS, ...selection })
+    leaveLanding()
+  }, [leaveLanding])
+
+  const countLandingMatches = useCallback(
+    (selection) => filterPrograms(programs, { ...EMPTY_FILTERS, ...selection }).length,
+    [],
+  )
 
   const allResults = useMemo(() => {
     const filtered = filterPrograms(programs, filters)
@@ -280,6 +294,13 @@ export default function App() {
     .filter(([key, value]) => key !== 'query' && isFilterActive(value)).length
   const showWizard = startsOnLanding() && landingMode === 'wizard' && !hasActiveFilters
 
+  useLayoutEffect(() => {
+    if (!showWizard && scrollTopAfterLanding.current) {
+      scrollTopAfterLanding.current = false
+      window.scrollTo({ top: 0, behavior: 'instant' })
+    }
+  }, [showWizard])
+
   if (sharedProgram) {
     return (
       <ProgramDetail
@@ -296,7 +317,9 @@ export default function App() {
         Skip to main content
       </a>
 
-      <header className="site-header" role="banner">
+      {/* On the landing page the header opens up into the mockup's hero: the
+          large rings-left lockup over the skyline, no white bar or strip. */}
+      <header className={`site-header${view === 'directory' && showWizard ? ' site-header--landing' : ''}`} role="banner">
         <div className="container">
           <div className="site-header-inner">
             <button
@@ -304,13 +327,14 @@ export default function App() {
               onClick={resetHome}
               aria-label="EngAGE — reset to home"
             >
-              {/* Narrow screens get a stacked cut of the same artwork — wordmark
-                  centred, skyline-and-leaves underneath — so the wordmark can
-                  run full width instead of sharing the row with the motif. */}
+              {/* Official EngAGE lockups from the Calgary Seniors asset package:
+                  rings-left "Large" on the landing hero, rings-right "Regular"
+                  on inner pages, and the stacked "Vertical" cut on phones. The
+                  artwork carries the tagline, so it is not repeated as text. */}
               <picture className="site-logo-picture">
                 <source media="(max-width: 640px)" srcSet={`${import.meta.env.BASE_URL}engage-logo-stacked.svg`} />
                 <img
-                  src={`${import.meta.env.BASE_URL}engage-logo.svg`}
+                  src={`${import.meta.env.BASE_URL}${view === 'directory' && showWizard ? 'engage-logo-large.svg' : 'engage-logo.svg'}`}
                   alt=""
                   className="site-logo"
                 />
@@ -318,7 +342,6 @@ export default function App() {
             </button>
             <div className="site-header-text">
               <h1 className="sr-only">EngAGE: Calgary Directory for Aging Well</h1>
-              <p>Calgary Directory for Aging Well</p>
             </div>
             {!PHASE_ONE_TEST_MODE && (
               <div className="landing-mode-toggle" role="group" aria-label="Choose how to find a program">
@@ -425,8 +448,9 @@ export default function App() {
           <WizardLanding
             layout={getLandingLayout()}
             onSearch={submitSearch}
-            onApplyFilter={applyLandingFilter}
-            onBrowseAll={() => setLandingMode('direct')}
+            onApplyFilters={applyLandingFilters}
+            countMatches={countLandingMatches}
+            onBrowseAll={leaveLanding}
             onAbout={openAbout}
           />
         ) : (

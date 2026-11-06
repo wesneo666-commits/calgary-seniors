@@ -1,6 +1,6 @@
 import { postalToQuadrant } from './postal.js'
 import { SERVICE_AREA_GROUPS } from './constants.js'
-import { interpretQuery } from './mockAI.js'
+import { interpretQuery, stripStopwords } from './mockAI.js'
 
 /**
  * Two words match if the shorter is a prefix of the longer, provided the
@@ -132,8 +132,14 @@ export function filterPrograms(programs, filters) {
     // Service Type control. The parser removes recognized category words from
     // the remaining text tokens, so this check is what makes phrases such as
     // "fitness programs in northeast Calgary" actually filter to fitness.
+    //
+    // The guess can be wrong for a given listing: "taxes" maps to Money
+    // management, but the Tax Clinics are tagged Financial assistance. So a
+    // service whose name or keywords contain the word itself is kept too.
     if (aiParsed?.serviceAreaValue && !p.serviceArea.includes(aiParsed.serviceAreaValue)) {
-      return false
+      const ownWords = `${p.programName} ${p.keywords.join(' ')}`
+      const namesIt = (aiParsed.categoryWords || []).some((w) => matchStrength(ownWords, w) >= 0.7)
+      if (!namesIt) return false
     }
 
     // Cost filter
@@ -167,18 +173,88 @@ export function filterPrograms(programs, filters) {
   return matches
 }
 
+// Location words are handled by the quadrant filter, and "calgary" is in
+// nearly every listing, so neither helps tell results apart.
+const RANK_IGNORE = new Set([
+  'calgary', 'nw', 'ne', 'sw', 'se', 'northwest', 'northeast', 'southwest', 'southeast',
+  'north', 'south', 'east', 'west', 'central', 'downtown',
+])
+
 /**
- * Sort results: exact name matches first, then org matches, then rest.
+ * The words used to rank results: the person's own words minus filler
+ * ("I want to find…") and location words. Unlike filtering, these keep words
+ * the mock AI turned into a category ("fitness"), since they still say which
+ * services fit best. Postal codes rank nothing.
+ */
+function rankTokens(query) {
+  const q = normalizeSearchQuery(query)
+  if (!q || postalToQuadrant(q)) return []
+  return stripStopwords(q.split(/[^a-z0-9']+/)).filter((t) => !RANK_IGNORE.has(t))
+}
+
+// "Best match" scoring (V5 round 3). Where a word appears matters more than
+// whether it appears: a hit in the service name outranks one buried in a
+// long description.
+const FIELD_WEIGHTS = [
+  [(p) => p.programName, 10],
+  [(p) => p.organization, 8],
+  [(p) => p.keywords.join(' '), 6],
+  [(p) => [...p.serviceArea, ...p.determinant].join(' '), 5],
+  [(p) => p.intendedPopulation.join(' '), 3],
+  [(p) => p.description, 2],
+  [(p) => p.eligibility, 1],
+]
+
+// How closely a token matches one field's text:
+//   1    the whole word ("book" in "book club")
+//   0.7  the same word family ("book" ↔ "books", "taxes" ↔ "tax",
+//        "transport" → "transportation")
+//   0.2  only inside another word ("book" in "ebooks" or "bookings")
+function matchStrength(text, token) {
+  const words = (text || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
+  let best = 0
+  for (const w of words) {
+    if (w === token) return 1
+    const [short, long] = w.length <= token.length ? [w, token] : [token, w]
+    const sameFamily = (short.length >= 3 && long.startsWith(short) && long.length - short.length <= 2)
+      || prefixMatch(w, token)
+    if (sameFamily) best = Math.max(best, 0.7)
+    else if (w.includes(token)) best = Math.max(best, 0.2)
+  }
+  return best
+}
+
+export function scoreProgram(program, tokens, phrase) {
+  let score = 0
+  for (const token of tokens) {
+    // Each word counts once, at its strongest field
+    let best = 0
+    for (const [field, weight] of FIELD_WEIGHTS) {
+      best = Math.max(best, weight * matchStrength(field(program), token))
+    }
+    score += best
+  }
+  // Bonus when the whole search appears as typed in the name
+  if (phrase && tokens.length > 1 && `${program.programName} ${program.organization}`.toLowerCase().includes(phrase)) {
+    score += 10
+  }
+  return score
+}
+
+/**
+ * Best match: highest score first; ties fall back to organization A–Z so
+ * equal matches are in a predictable order rather than data order.
  */
 export function sortResults(programs, query) {
   if (!query) return programs
-  const q = query.trim().toLowerCase()
-  return [...programs].sort((a, b) => {
-    const aNameMatch = a.programName.toLowerCase().includes(q) ? 0 : 1
-    const bNameMatch = b.programName.toLowerCase().includes(q) ? 0 : 1
-    if (aNameMatch !== bNameMatch) return aNameMatch - bNameMatch
-    const aOrgMatch = a.organization.toLowerCase().includes(q) ? 0 : 1
-    const bOrgMatch = b.organization.toLowerCase().includes(q) ? 0 : 1
-    return aOrgMatch - bOrgMatch
-  })
+  const tokens = rankTokens(query)
+  if (!tokens.length) return programs
+  const phrase = normalizeSearchQuery(query)
+  return programs
+    .map((p) => ({ p, score: scoreProgram(p, tokens, phrase) }))
+    .sort((a, b) =>
+      b.score - a.score
+      || a.p.organization.localeCompare(b.p.organization)
+      || a.p.programName.localeCompare(b.p.programName))
+    .map(({ p }) => p)
 }

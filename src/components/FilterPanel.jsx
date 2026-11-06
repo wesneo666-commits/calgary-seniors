@@ -20,7 +20,7 @@ function FilterIntro() {
   return (
     <div className="filter-intro" role="note">
       <p>
-        <strong>Show only relevant results.</strong> Choose a location, type, cost, or format to narrow your search. Use one filter or combine several.
+        <strong>Show only relevant results.</strong> Choose a service type, location, cost, or format to narrow your search. Use one filter or combine several.
       </p>
       <button type="button" className="filter-intro-close" onClick={dismiss} aria-label="Dismiss filter tip">
         <span aria-hidden="true">✕</span>
@@ -118,14 +118,6 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
 
       <FilterIntro />
 
-      <MultiCheckboxGroup
-        label="Location"
-        options={QUADRANTS}
-        values={filters.quadrant}
-        onChange={(v) => onFilterChange('quadrant', v)}
-        allLabel="All"
-      />
-
       <div className={`filter-group${filters.serviceArea ? ' filter-group--active' : ''}`}>
         <label id="filter-service-label">
           Select service type{filters.serviceArea ? ' ✓' : ''}
@@ -136,6 +128,14 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
           labelledBy="filter-service-label"
         />
       </div>
+
+      <MultiCheckboxGroup
+        label="Location"
+        options={QUADRANTS}
+        values={filters.quadrant}
+        onChange={(v) => onFilterChange('quadrant', v)}
+        allLabel="All"
+      />
 
       <CheckboxGroup
         label="Cost"

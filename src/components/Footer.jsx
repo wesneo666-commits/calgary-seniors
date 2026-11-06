@@ -4,10 +4,8 @@ export default function Footer({ onAbout, onSubmitProgram, submissionTriggerRef 
       <div className="container">
         <div className="footer-columns">
           <div className="footer-brand">
-            <div className="footer-logo-wrap">
-              <img src={`${import.meta.env.BASE_URL}engage-logo.svg`} alt="EngAGE: Calgary Directory for Aging Well" className="footer-logo" />
-            </div>
-            <p className="footer-tagline">Calgary Directory for Aging Well</p>
+            {/* Knockout (white) lockup straight on the dark band, per the mockup */}
+            <img src={`${import.meta.env.BASE_URL}engage-logo-ko.svg`} alt="EngAGE: Calgary Directory for Aging Well" className="footer-logo" />
           </div>
 
           <div className="footer-col">
@@ -38,8 +36,9 @@ export default function Footer({ onAbout, onSubmitProgram, submissionTriggerRef 
             <p className="footer-funding-label">Funding Acknowledgement</p>
             <p>The development of this directory was funded by the <strong>University of Calgary Centre on Aging</strong>, the <strong>University of Calgary Brenda Strafford Foundation Chair in Geriatric Medicine</strong>, and the <strong>Canadian Institutes of Health Research Betty Havens Prize for Knowledge Mobilization in Aging</strong>.</p>
           </div>
-          <div className="footer-funding-logo-wrap">
-            <img src={`${import.meta.env.BASE_URL}coa-logo.png`} alt="University of Calgary Centre on Aging" className="footer-funding-logo" />
+          <div className="footer-partner-logos">
+            <img src={`${import.meta.env.BASE_URL}coa-logo-ko.png`} alt="University of Calgary Centre on Aging" className="footer-funding-logo" />
+            <img src={`${import.meta.env.BASE_URL}calgary-seniors-ko.svg`} alt="Calgary Seniors' Resource Society" className="footer-funding-logo footer-funding-logo--cs" />
           </div>
         </div>
 

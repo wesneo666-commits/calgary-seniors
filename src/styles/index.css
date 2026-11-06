@@ -8,30 +8,37 @@
 
 /* ─── Design tokens ─────────────────────────────────────────── */
 :root {
-  /* Botanical palette — carried forward from the roadmap and tuned for
-     contrast. Each color has: base (identity), ink (text-safe), tint (surface). */
-  --petal-slate:      oklch(52% 0.075 235);
-  --petal-slate-ink:  oklch(40% 0.07 235);
-  --petal-slate-deep: oklch(32% 0.055 235);
-  --petal-slate-tint: oklch(94.5% 0.02 235);
-  --color-search-surface: oklch(94% 0.025 202);
+  /* EngAGE brand palette (Calgary Seniors asset package, Nov 2026).
+     Base = the exact identity colour from the logo artwork (Rings_CMYK.svg);
+     ink = the same hue darkened for text (≥7:1 on white, ≥4.5:1 on its tint);
+     tint = light surface. Token names are kept from the roadmap palette so
+     every component picks up the rebrand without renaming. */
+  --petal-slate:      #34647f;                   /* brand blue  — Pantone 7699 C */
+  --petal-slate-ink:  oklch(40% 0.062 235);
+  --petal-slate-deep: oklch(32% 0.052 235);
+  --petal-slate-tint: oklch(95% 0.016 230);
+  /* Peach band behind search — the mockups' orange-tinted search surface */
+  --color-search-surface: oklch(94.5% 0.04 65);
 
-  --petal-sage:       oklch(65% 0.09 128);
-  --petal-sage-ink:   oklch(40% 0.08 130);
-  --petal-sage-tint:  oklch(94.5% 0.035 128);
+  --petal-sage:       #898f65;                   /* brand olive — Pantone 5773 C */
+  --petal-sage-ink:   oklch(40% 0.055 115);
+  --petal-sage-tint:  oklch(95% 0.025 115);
 
-  --petal-plum:       oklch(65% 0.11 315);
-  --petal-plum-ink:   oklch(42% 0.11 315);
-  --petal-plum-tint:  oklch(94.5% 0.025 315);
+  --petal-plum:       #a67bb7;                   /* brand lavender — Pantone 2577 C */
+  --petal-plum-ink:   oklch(42% 0.1 316);
+  --petal-plum-tint:  oklch(95% 0.025 316);
 
-  --petal-amber:      oklch(75% 0.13 78);
-  --petal-amber-ink:  oklch(44% 0.09 75);
-  --petal-amber-tint: oklch(95% 0.045 85);
+  --petal-amber:      #faa31a;                   /* brand gold — Pantone 137 C */
+  --petal-amber-ink:  oklch(45% 0.09 65);
+  --petal-amber-tint: oklch(95.5% 0.05 80);
 
-  --petal-ember:      oklch(56% 0.14 40);
-  --petal-ember-ink:  oklch(45% 0.125 38);
-  --petal-ember-deep: oklch(48% 0.13 40);
-  --petal-ember-tint: oklch(94.5% 0.03 40);
+  --petal-ember:      #f47e44;                   /* brand orange — Pantone 164 C */
+  --petal-ember-ink:  oklch(46% 0.13 42);
+  /* Filled orange buttons carry white text, so they use a deepened brand
+     orange (5:1 on white). The pure brand orange is only 2.65:1 and is kept
+     for borders, strokes and decoration — never under text. */
+  --petal-ember-deep: oklch(56% 0.17 44);
+  --petal-ember-tint: oklch(95% 0.035 55);
 
   /* Sixth service category (Find Housing & Transportation), Nov 2026 */
   --petal-teal:       oklch(60% 0.085 180);
@@ -42,7 +49,9 @@
   --color-ink:        oklch(25% 0.01 240);
   --color-ink-soft:   oklch(40% 0.015 240);
 
-  --color-bg:            oklch(96.5% 0.005 240);
+  /* Ground matches the background of the supplied Calgary Seniors rosette
+     artwork (CS_Logo_bg) exactly, so the watermark sits seamlessly on it. */
+  --color-bg:            #f0f4f6;
   --color-surface:       #ffffff;
   --color-surface-sunken:oklch(95% 0.006 240);
   --color-border:        oklch(87% 0.012 240);
@@ -53,11 +62,13 @@
   --color-primary:       var(--petal-slate-ink);
   --color-primary-dark:  var(--petal-slate-deep);
   --color-primary-light: var(--petal-slate);
-  --color-accent:        var(--petal-ember);
-  --color-accent-dark:   var(--petal-ember-deep);
+  --color-accent:        var(--petal-ember-deep);
+  --color-accent-dark:   var(--petal-ember-ink);
 
-  --color-filter-active:      var(--petal-slate-deep);
-  --color-filter-active-dark: oklch(26% 0.05 235);
+  --color-filter-active:      var(--petal-slate);
+  --color-filter-active-dark: var(--petal-slate-deep);
+  /* Footer: deep brand-blue band from the mockups */
+  --color-footer-bg:          oklch(35% 0.042 226);
 
   --color-text:          var(--color-ink);
   --color-text-secondary:var(--color-ink-soft);
@@ -534,53 +545,6 @@ a:hover { color: var(--petal-slate-deep); }
   max-width: 48rem;
   margin: 0 auto var(--space-xl);
 }
-.wizard-welcome-mark {
-  width: min(270px, 42vw);
-  height: auto;
-  flex: 0 1 270px;
-  overflow: visible;
-}
-.wizard-welcome-stroke {
-  stroke: var(--color-ink-soft);
-  stroke-width: 10;
-}
-.wizard-welcome-leaf {
-  fill: var(--petal-sage);
-  stroke: var(--color-ink-soft);
-  stroke-width: 10;
-}
-.wizard-welcome-trace {
-  fill: none;
-  stroke: var(--petal-ember);
-  stroke-width: 8;
-  stroke-linecap: round;
-  stroke-dasharray: 1;
-  animation: wizard-growth-trace var(--dur-welcome) var(--ease-out) both;
-}
-.wizard-welcome-dot {
-  fill: var(--petal-plum);
-}
-@keyframes wizard-growth-trace {
-  0%   { stroke-dashoffset: 1; opacity: 0; }
-  15%  { opacity: 0.8; }
-  75%  { stroke-dashoffset: 0; opacity: 0.65; }
-  100% { stroke-dashoffset: 0; opacity: 0; }
-}
-.wizard-welcome-copy {
-  flex: 1 1 20rem;
-  max-width: 34rem;
-  text-align: left;
-}
-.wizard-welcome-title {
-  color: var(--color-ink);
-  font-size: var(--font-size-xl);
-  font-weight: 700;
-  line-height: 1.25;
-  margin-bottom: var(--space-xs);
-  text-wrap: balance;
-}
-.wizard-welcome-eng { color: var(--petal-slate-ink); }
-.wizard-welcome-age { color: var(--petal-ember-ink); }
 .wizard-welcome-text {
   color: var(--color-text);
   max-width: 44ch;
@@ -653,21 +617,10 @@ a:hover { color: var(--petal-slate-deep); }
   max-width: 60ch;
   text-wrap: pretty;
 }
-@media (prefers-reduced-motion: reduce) {
-  .wizard-welcome-trace { display: none; }
-}
 @media (max-width: 700px) {
   .wizard-welcome {
     flex-direction: column;
     margin-bottom: var(--space-lg);
-  }
-  .wizard-welcome-mark {
-    width: min(280px, 78vw);
-    flex-basis: auto;
-  }
-  .wizard-welcome-copy {
-    flex: 0 1 auto;
-    text-align: center;
   }
   .wizard-welcome-text { margin-inline: auto; }
 }
@@ -689,13 +642,6 @@ a:hover { color: var(--petal-slate-deep); }
 .wizard-landing-card--safety    { --wizard-card-bg: var(--petal-ember-tint); --wizard-card-color: var(--petal-ember-ink); }
 .wizard-landing-card--housing   { --wizard-card-bg: var(--petal-teal-tint);  --wizard-card-color: var(--petal-teal-ink); }
 
-[data-contrast="high"] .wizard-welcome-stroke,
-[data-contrast="high"] .wizard-welcome-leaf { stroke: var(--color-ink); }
-[data-contrast="high"] .wizard-welcome-leaf { fill: var(--color-surface); }
-[data-contrast="high"] .wizard-welcome-trace { display: none; }
-[data-contrast="high"] .wizard-welcome-dot { fill: var(--color-primary); }
-[data-contrast="high"] .wizard-welcome-eng,
-[data-contrast="high"] .wizard-welcome-age { color: var(--color-ink); }
 
 /* ─── Help button ────────────────────────────────────────────── */
 /* Outline treatment, not a solid fill — a solid orange button here competed
@@ -1055,7 +1001,7 @@ a:hover { color: var(--petal-slate-deep); }
 }
 .voice-btn--listening,
 .voice-btn--listening:hover {
-  background: var(--petal-ember);
+  background: var(--petal-ember-deep);
   color: var(--color-text-inverse);
 }
 .voice-btn--listening .voice-btn-icon {
@@ -1076,7 +1022,7 @@ a:hover { color: var(--petal-slate-deep); }
 .search-btn {
   height: 52px;
   padding: 0 var(--space-lg);
-  background: var(--petal-ember);
+  background: var(--petal-ember-deep);
   color: var(--color-text-inverse);
   font-size: var(--font-size-lg);
   font-weight: 700;
@@ -1086,7 +1032,7 @@ a:hover { color: var(--petal-slate-deep); }
   white-space: nowrap;
   transition: background var(--dur-fast) var(--ease-out);
 }
-.search-btn:hover { background: var(--petal-ember-deep); }
+.search-btn:hover { background: var(--petal-ember-ink); }
 
 /* ─── Main layout ────────────────────────────────────────────── */
 .main-layout {
@@ -1857,7 +1803,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
               border-color var(--dur-fast) var(--ease-out);
 }
 .contact-btn-phone    { background: var(--petal-slate-deep); color: var(--color-text-inverse); font-size: var(--font-size-lg); }
-.contact-btn-register { background: var(--petal-ember);      color: var(--color-text-inverse); }
+.contact-btn-register { background: var(--petal-ember-deep); color: var(--color-text-inverse); }
 .contact-btn-web      { background: transparent; border: 2px solid var(--petal-slate-ink); color: var(--petal-slate-ink); }
 .contact-btn-web-org  { background: transparent; border: 2px solid var(--color-border-strong); color: var(--color-text); }
 .contact-btn-form     { background: transparent; border: 2px solid var(--petal-slate-ink); color: var(--petal-slate-ink); }
@@ -1883,7 +1829,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 }
 
 .contact-btn-phone:hover    { background: var(--color-filter-active-dark); color: var(--color-text-inverse); }
-.contact-btn-register:hover { background: var(--petal-ember-deep);          color: var(--color-text-inverse); }
+.contact-btn-register:hover { background: var(--petal-ember-ink);           color: var(--color-text-inverse); }
 .contact-btn-web:hover      { background: var(--petal-slate-ink);           color: var(--color-text-inverse); border-color: var(--petal-slate-ink); }
 .contact-btn-web-org:hover  { background: var(--color-ink-soft);            color: var(--color-text-inverse); border-color: var(--color-ink-soft); }
 .contact-btn-form:hover     { background: var(--petal-slate-ink);           color: var(--color-text-inverse); }
@@ -2495,7 +2441,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: var(--petal-ember);
+  background: var(--petal-ember-deep);
   color: var(--color-text-inverse);
   border: none;
   font-size: 24px;
@@ -2507,7 +2453,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   transition: background var(--dur-fast) var(--ease-out),
               transform var(--dur-fast) var(--ease-out);
 }
-.chat-fab:hover { background: var(--petal-ember-deep); transform: scale(1.05); }
+.chat-fab:hover { background: var(--petal-ember-ink); transform: scale(1.05); }
 
 /* Floating label so people know the bubble is a chatbot. Clickable
    (a larger, clearer target than the emoji alone), with a dismiss button. */
@@ -3176,12 +3122,21 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   to   { transform: translateY(0); }
 }
 
-/* ─── About page (A-01) ──────────────────────────────────────── */
+/* ─── About page (A-01; brand redesign V5 round 3) ───────────────
+   Each section and card takes one ring colour via .about-accent--*:
+   --acc for strokes/strips, --acc-ink for text, --acc-tint for surfaces. */
+.about-accent--slate { --acc: var(--petal-slate); --acc-ink: var(--petal-slate-ink); --acc-tint: var(--petal-slate-tint); }
+.about-accent--sage  { --acc: var(--petal-sage);  --acc-ink: var(--petal-sage-ink);  --acc-tint: var(--petal-sage-tint); }
+.about-accent--plum  { --acc: var(--petal-plum);  --acc-ink: var(--petal-plum-ink);  --acc-tint: var(--petal-plum-tint); }
+.about-accent--amber { --acc: var(--petal-amber); --acc-ink: var(--petal-amber-ink); --acc-tint: var(--petal-amber-tint); }
+.about-accent--ember { --acc: var(--petal-ember); --acc-ink: var(--petal-ember-ink); --acc-tint: var(--petal-ember-tint); }
+
 .about-page {
-  max-width: 46rem;
+  max-width: 66rem;
   margin: 0 auto;
   padding: var(--space-lg) 0 var(--space-xl);
 }
+.about-page p { max-width: 68ch; }
 .about-back-btn {
   min-height: var(--touch-target);
   padding: 0 var(--space-md);
@@ -3194,49 +3149,335 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   cursor: pointer;
 }
 .about-back-btn:hover { background: var(--petal-slate-tint); }
-.about-back-btn--bottom { margin-top: var(--space-lg); }
+.about-back-btn--bottom { margin-top: var(--space-xl); }
+
+/* Hero: the peach search-band ground, rings drifting in, petal strip on top */
+.about-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+  padding: calc(var(--space-xl) + 6px) var(--space-xl) var(--space-xl);
+  border-radius: var(--radius-lg);
+  background:
+    url("/engage-rings-peach.svg") no-repeat left -90px bottom -120px / 300px auto,
+    var(--color-search-surface);
+  overflow: hidden;
+}
+.about-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: var(--petal-strip);
+}
+.about-hero-text { position: relative; }
+.about-eyebrow {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--petal-ember-ink);
+  margin-bottom: var(--space-xs);
+}
 .about-title {
-  font-size: var(--font-size-2xl);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1.1;
   color: var(--color-ink);
-  margin: var(--space-lg) 0 var(--space-md);
+  margin: 0 0 var(--space-md);
 }
 .about-title:focus { outline: none; }
-.about-toc {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-sm) var(--space-md);
-  margin-bottom: var(--space-lg);
-}
-.about-toc-label { font-weight: 700; margin-bottom: var(--space-xs); }
-.about-toc ul { list-style: none; display: grid; gap: 2px; }
-.about-toc a { color: var(--petal-slate-deep); font-weight: 600; }
-.about-section { margin-bottom: var(--space-lg); scroll-margin-top: var(--space-md); }
-.about-section h2 {
-  font-size: var(--font-size-xl);
+.about-lead {
+  font-size: var(--font-size-lg);
+  font-weight: 500;
   color: var(--color-ink);
   margin-bottom: var(--space-sm);
 }
-.about-section--major {
-  padding-top: var(--space-lg);
-  border-top: 3px solid var(--petal-slate);
+.about-hero-mark {
+  width: clamp(140px, 18vw, 220px);
+  height: auto;
 }
-.about-section h3 {
-  font-size: var(--font-size-lg);
-  color: var(--petal-slate-ink);
-  margin: var(--space-md) 0 var(--space-xs);
+
+/* On this page: numbered links, each in its section's colour */
+.about-toc { margin: var(--space-lg) 0 var(--space-xl); }
+.about-toc-label {
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-bottom: var(--space-sm);
 }
-.about-section p { margin-bottom: var(--space-sm); max-width: 68ch; }
-.about-section ul { padding-left: 1.4em; margin-bottom: var(--space-sm); }
-.about-section li { margin-bottom: 2px; }
+/* Five links: one row of five when there's room, otherwise 3 + 2 centred
+   (never a lone straggler), and a single column on phones. */
+.about-toc ol {
+  --toc-gap: var(--space-sm);
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--toc-gap);
+}
+.about-toc li { flex: 0 1 calc((100% - 2 * var(--toc-gap)) / 3); }
+@media (min-width: 1080px) {
+  .about-toc li { flex-basis: calc((100% - 4 * var(--toc-gap)) / 5); }
+}
+@media (max-width: 640px) {
+  .about-toc li { flex-basis: 100%; }
+}
+.about-toc-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: 100%;
+  min-height: 64px;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-surface);
+  border: 2px solid var(--acc);
+  border-radius: var(--radius-md);
+  color: var(--acc-ink);
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.about-toc-link:hover { background: var(--acc-tint); transform: translateY(-2px); }
+.about-toc-num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--acc-tint);
+  border: 2px solid var(--acc);
+  color: var(--acc-ink);
+}
+
+/* Sections: a coloured rule leads into each title */
+.about-section {
+  margin-bottom: var(--space-xl);
+  scroll-margin-top: var(--space-md);
+}
+.about-section > p { margin-bottom: var(--space-sm); }
+.about-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-xl);
+  color: var(--color-ink);
+  margin: 0 0 var(--space-md);
+}
+.about-section-title::before {
+  content: '';
+  flex: none;
+  width: 40px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--acc);
+}
 .about-section a { color: var(--petal-slate-deep); }
 
+/* Cards */
+.about-cards {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-md);
+  margin: var(--space-md) 0;
+}
+.about-cards--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.about-card {
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border-top: 6px solid var(--acc);
+  box-shadow: var(--shadow-card);
+}
+.about-card .about-icon { color: var(--acc-ink); margin-bottom: var(--space-xs); }
+.about-card > p { font-size: var(--font-size-lg); font-weight: 600; color: var(--color-ink); }
+.about-card h4 {
+  font-size: var(--font-size-lg);
+  line-height: 1.3;
+  color: var(--acc-ink);
+  margin-bottom: var(--space-xs);
+}
+.about-card--list > p { font-size: var(--font-size-base); font-weight: 400; margin-bottom: var(--space-xs); }
+.about-card ul { padding-left: 1.2em; }
+.about-card li { margin-bottom: var(--space-xs); }
+.about-card li::marker { color: var(--acc-ink); }
+
+/* A highlighted closing line */
+.about-callout {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  background: var(--acc-tint);
+  border-left: 6px solid var(--acc);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.about-page .about-callout { max-width: none; }
+
+/* What EngAGE means: stacked logo beside the copy, values as ring chips */
+.about-name {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-xl);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+.about-name-logo { width: clamp(140px, 16vw, 200px); height: auto; }
+.about-values {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+.about-value {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--acc-tint);
+  border: 2px solid var(--acc);
+  border-radius: var(--radius-pill);
+  color: var(--acc-ink);
+  font-weight: 700;
+}
+
+/* How it was developed: numbered steps joined by a line */
+.about-steps {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-sm) 0 var(--space-md);
+  counter-reset: about-step;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+  position: relative;
+}
+/* Runs from the first circle's centre to the last one's */
+.about-steps::before {
+  content: '';
+  position: absolute;
+  top: calc(1.5rem - 1px);
+  left: 1.5rem;
+  right: calc((100% - 2 * var(--space-md)) / 3 - 1.5rem);
+  height: 3px;
+  background: linear-gradient(90deg, var(--petal-slate), var(--petal-sage), var(--petal-plum));
+  border-radius: var(--radius-pill);
+}
+.about-step {
+  position: relative;
+  counter-increment: about-step;
+  padding-top: calc(3rem + var(--space-sm));
+}
+.about-step::before {
+  content: counter(about-step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 3px solid var(--acc);
+  color: var(--acc-ink);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+/* How we select services: a full tinted band */
+.about-section--band {
+  padding: var(--space-xl) var(--space-lg);
+  background: var(--petal-slate-tint);
+  border-radius: var(--radius-lg);
+}
+.about-section--band .about-cards { margin-bottom: 0; }
+
+/* How we keep information current */
+.about-current {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background:
+    url("/engage-rings-peach.svg") no-repeat right -60px bottom -80px / 220px auto,
+    var(--color-surface);
+  border: 3px solid var(--acc);
+  border-radius: var(--radius-lg);
+}
+.about-current > .about-icon { color: var(--acc-ink); }
+.about-current p { margin-bottom: var(--space-md); }
+.about-correction-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-lg);
+  background: var(--petal-slate);
+  color: var(--color-text-inverse) !important;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  text-decoration: none;
+}
+.about-correction-btn:hover { background: var(--petal-slate-deep); }
+
+@media (max-width: 860px) {
+  .about-cards--3,
+  .about-steps { grid-template-columns: 1fr; }
+  /* Stacked: a short connector below each circle down to the next one */
+  .about-steps::before { display: none; }
+  .about-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: calc(1.5rem - 1.5px);
+    top: 3rem;
+    bottom: calc(-1 * var(--space-md));
+    width: 3px;
+    background: var(--acc);
+  }
+  .about-step { padding: var(--space-xs) 0 0 calc(3rem + var(--space-md)); min-height: 3rem; }
+}
+@media (max-width: 640px) {
+  .about-hero {
+    grid-template-columns: 1fr;
+    padding: calc(var(--space-lg) + 6px) var(--space-md) var(--space-lg);
+  }
+  .about-hero-mark { display: none; }
+  .about-name { grid-template-columns: 1fr; justify-items: center; padding: var(--space-md); }
+  .about-section--band { padding: var(--space-lg) var(--space-md); }
+  .about-current { grid-template-columns: 1fr; padding: var(--space-md); }
+}
+
+/* High contrast: white grounds, black rules, keep the strip and logos */
+[data-contrast="high"] .about-hero,
+[data-contrast="high"] .about-current {
+  background: #ffffff;
+  border: 2px solid #000000;
+}
+[data-contrast="high"] .about-section--band { background: #ffffff; border: 2px solid #000000; }
+[data-contrast="high"] .about-eyebrow { color: #000000; }
+[data-contrast="high"] .about-card,
+[data-contrast="high"] .about-name { border: 2px solid #000000; border-top-width: 6px; }
+[data-contrast="high"] .about-callout,
+[data-contrast="high"] .about-value,
+[data-contrast="high"] .about-toc-num { background: #ffffff; }
+[data-contrast="high"] .about-toc-link,
+[data-contrast="high"] .about-value,
+[data-contrast="high"] .about-card h4,
+[data-contrast="high"] .about-card .about-icon,
+[data-contrast="high"] .about-current > .about-icon { color: #00007a; border-color: #00007a; }
+[data-contrast="high"] .about-correction-btn { background: #00007a; }
+
 /* ─── Landing page (L-01, L-03, L-04, L-05) ──────────────────── */
-/* Interim styling until Joel's mockup: smaller graphic, tighter top. */
+/* Base landing spacing; the EngAGE brand layer at the end of the file refines it. */
 .wizard-landing { padding: var(--space-md) 0 var(--space-xl); }
 .wizard-welcome { margin-bottom: var(--space-lg); max-width: 56rem; }
-.wizard-welcome-mark { width: min(180px, 34vw); flex-basis: 180px; }
-.wizard-welcome-copy { max-width: 40rem; }
 .wizard-welcome-text { max-width: 64ch; margin-bottom: var(--space-xs); }
 .wizard-welcome-text a { color: var(--petal-slate-deep); font-weight: 700; }
 .landing-search,
@@ -3327,7 +3568,6 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .landing-browse-text { margin-top: var(--space-xs); color: var(--color-text); }
 @media (max-width: 700px) {
   .landing-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .wizard-welcome-mark { width: min(160px, 50vw); }
 }
 
 /* ─── Help phone line (X-01) ─────────────────────────────────── */
@@ -3587,3 +3827,381 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   cursor: pointer;
 }
 .help-tour-btn:hover { background: var(--petal-slate-tint); }
+
+/* ═══════════════════════════════════════════════════════════════
+   EngAGE brand layer — Calgary Seniors asset package (Nov 2026)
+   Skins the app to Joel's FrontPage / InternalPage mockups using the
+   supplied artwork. Visual only: type scale, reading order, controls
+   and contrast floors are unchanged. Last in the file so it wins.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Page grounds ──────────────────────────────────────────────
+   Landing: the white hand-drawn Calgary skyline behind the hero.
+   Inner pages: the Calgary Seniors rosette (CS_Logo_bg), whose own
+   ground is exactly --color-bg so its square edge never shows.
+   :has() is progressive — older browsers simply get the flat ground. */
+body:has(.wizard-landing) {
+  background:
+    url("/calgary-skyline.svg") no-repeat center 40px / min(1500px, 130vw) auto,
+    var(--color-bg);
+}
+body:has(.main-layout) {
+  background:
+    url("/cs-rosette-bg.png") no-repeat center 200px / min(1400px, 140vw) auto,
+    var(--color-bg);
+}
+
+/* ─── Header ─────────────────────────────────────────────────── */
+.site-logo {
+  height: 80px;
+  max-width: min(340px, 56vw);
+}
+/* Landing hero: no white bar, no strip — the large rings-left lockup sits
+   straight on the skyline ground. */
+.site-header--landing {
+  background: transparent;
+  padding: var(--space-xl) 0 var(--space-md);
+}
+.site-header--landing::after { display: none; }
+.site-header--landing .site-logo {
+  height: clamp(110px, 14vw, 190px);
+  max-width: min(600px, 62vw);
+}
+@media (max-width: 640px) {
+  .site-logo { height: 120px; max-width: 70vw; }
+  .site-header--landing { padding-top: var(--space-lg); }
+  .site-header--landing .site-logo { height: 160px; max-width: 80vw; }
+}
+
+/* The header text block now holds only the sr-only h1, so it should not
+   claim a 10em slot and push the buttons onto a second row. */
+.site-header-text { flex: 1 1 0; }
+
+/* Header buttons: orange-outline help, brand-blue outline for the rest */
+.help-btn {
+  border-color: var(--petal-ember);
+  color: var(--petal-ember-deep);
+}
+.help-btn,
+.about-btn,
+.a11y-toggle-btn { border-width: 2px; }
+.about-btn,
+.a11y-toggle-btn {
+  border-color: var(--petal-slate);
+  color: var(--petal-slate-ink);
+}
+
+/* ─── Landing ────────────────────────────────────────────────── */
+.wizard-welcome {
+  display: block;
+  max-width: 62rem;
+  margin: 0 auto var(--space-xl);
+}
+.wizard-welcome-text {
+  max-width: 72ch;
+  margin-inline: auto;
+  font-size: var(--font-size-lg);
+  text-align: center;
+}
+.landing-search,
+.landing-filters { max-width: 64rem; }
+.landing-search {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+}
+.landing-section-title {
+  font-size: var(--font-size-xl);
+  text-align: center;
+  margin-bottom: var(--space-md);
+}
+/* The peach band with the rings drifting in from both edges */
+.landing-search-band,
+.search-section {
+  background-color: var(--color-search-surface);
+  background-image:
+    url("/engage-rings-peach.svg"),
+    url("/engage-rings-peach.svg");
+  background-repeat: no-repeat, no-repeat;
+}
+.landing-search-band {
+  padding: var(--space-lg);
+  border: 3px solid var(--petal-ember);
+  border-radius: var(--radius-lg);
+  background-position: left -70px bottom -90px, right -50px top -60px;
+  background-size: 260px auto, 300px auto;
+  text-align: left;
+}
+.search-section {
+  border-bottom: none;
+  background-position: left -80px center, right -40px center;
+  background-size: 240px auto, 260px auto;
+}
+.search-input { border-color: var(--color-ink); box-shadow: none; }
+.search-input-icon { color: var(--color-ink); }
+.voice-btn { border-color: var(--color-ink); color: var(--color-ink); }
+.voice-btn:hover { background: var(--color-surface-sunken); }
+/* Orange focus on a peach band needs the ink ring to stay visible */
+.landing-search-band :focus-visible,
+.search-section :focus-visible { outline-color: var(--color-ink); }
+
+.landing-filter-btn {
+  border-color: var(--petal-slate);
+  color: var(--petal-slate-ink);
+  box-shadow: var(--shadow-card);
+}
+.landing-filter-btn--open,
+.landing-filter-btn--open:hover {
+  background: var(--petal-slate);
+  color: var(--color-text-inverse);
+}
+.landing-filter-options { border-color: var(--petal-slate); }
+
+/* Selected filter options: brand blue, as in the InternalPage mockup
+   (white on #34647f is 6.4:1) */
+.checkbox-option--active {
+  background: var(--petal-slate);
+  border-color: var(--petal-slate);
+}
+
+.landing-browse { margin-top: var(--space-xl); }
+.landing-browse-btn { background: var(--petal-slate); }
+.landing-browse-btn:hover { background: var(--petal-slate-deep); }
+.landing-about {
+  max-width: 62rem;
+  margin: var(--space-xl) auto 0;
+  font-weight: 700;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+.landing-about a { color: var(--petal-slate-ink); }
+.landing-about a:hover { color: var(--petal-slate-deep); }
+
+/* ─── Footer ─────────────────────────────────────────────────── */
+.site-footer {
+  background-color: var(--color-footer-bg);
+  /* Rings + leaves watermark, cropped off the lower left like the mockup */
+  background-image: url("/engage-rings-footer.svg");
+  background-repeat: no-repeat;
+  background-position: left -140px bottom -160px;
+  background-size: 620px auto;
+  padding-top: var(--space-xl);
+}
+.footer-brand { max-width: 22em; }
+.footer-logo { height: 76px; max-width: 100%; }
+.footer-partner-logos {
+  flex: 0 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md) var(--space-xl);
+}
+/* The UC artwork ships with generous transparent padding, so it needs more
+   height than the Calgary Seniors mark to read at a similar size. */
+.footer-funding-logo { height: 96px; }
+.footer-funding-logo--cs { height: 64px; }
+.footer-links a:hover,
+.footer-link-btn:hover,
+.footer-about-btn:hover { color: oklch(90% 0.05 65); }
+
+/* ─── High contrast: drop every decorative ground and watermark ─ */
+[data-contrast="high"] body,
+[data-contrast="high"] .site-footer,
+[data-contrast="high"] .landing-search-band { background-image: none; }
+[data-contrast="high"] .landing-search-band {
+  background-color: var(--color-surface);
+  border-color: #000000;
+}
+[data-contrast="high"] .site-footer { background-color: #000000; }
+[data-contrast="high"] .help-btn { border-color: #8c3d00; color: #8c3d00; }
+/* The landing band turns white in high contrast (the results-page bar stays
+   navy), so its hint text must flip back to black. */
+[data-contrast="high"] .landing-search-band .search-hint,
+[data-contrast="high"] .landing-search-band .search-hint--detected,
+[data-contrast="high"] .landing-search-band .search-hint--ai,
+[data-contrast="high"] .landing-search-band .search-hint--error { color: #000000; }
+
+/* ─── Landing: choose several filters, then Apply (V5 round 3) ── */
+.landing-filter-option--on,
+.landing-filter-option--on:hover {
+  background: var(--opt-ink, var(--petal-slate-ink));
+  color: var(--color-text-inverse);
+}
+.landing-filter-btn--chosen:not(.landing-filter-btn--open) {
+  background: var(--petal-slate-tint);
+  border-width: 4px;
+}
+.landing-filter-count {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+.landing-apply {
+  margin-top: var(--space-md);
+  text-align: center;
+}
+.landing-apply-hint { color: var(--color-text); }
+.landing-apply-summary {
+  max-width: 60ch;
+  margin: 0 auto var(--space-sm);
+  font-size: var(--font-size-lg);
+  color: var(--color-ink);
+}
+.landing-apply-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-sm) var(--space-md);
+}
+.landing-apply-btn {
+  min-height: 56px;
+  padding: 0 var(--space-xl);
+  background: var(--petal-ember-ink);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  cursor: pointer;
+}
+.landing-apply-btn:hover { filter: brightness(0.88); }
+.landing-apply-clear {
+  min-height: var(--touch-target);
+  padding: 0 var(--space-sm);
+  background: none;
+  border: none;
+  color: var(--petal-slate-ink);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ─── High contrast: landing filters and the results banner ───── */
+[data-contrast="high"] .landing-filter-option {
+  --opt-tint: #ffffff;
+  --opt-ink: #000000;
+}
+[data-contrast="high"] .landing-filter-option--on,
+[data-contrast="high"] .landing-filter-option--on:hover {
+  background: #00007a;
+  border-color: #00007a;
+  color: #ffffff;
+}
+[data-contrast="high"] .landing-filter-btn--chosen:not(.landing-filter-btn--open) {
+  background: #e6e6ff;
+  border-color: #00007a;
+}
+[data-contrast="high"] .landing-apply-btn { background: #00007a; }
+[data-contrast="high"] .landing-apply-btn:hover { background: #000055; }
+[data-contrast="high"] .landing-apply-btn:focus-visible { outline: 3px solid #000000; outline-offset: 3px; }
+/* White banner on a white page needs a full black outline to stay visible */
+[data-contrast="high"] .results-header,
+[data-contrast="high"] .results-header--filtered {
+  border: 2px solid #000000;
+  border-left: 8px solid #000000;
+  background: #ffffff;
+}
+[data-contrast="high"] .results-query { color: #00007a; }
+
+/* Last updated at the foot of the full listing (V5 round 3) */
+.detail-updated {
+  margin: var(--space-md) 0;
+  font-size: var(--font-size-sm);
+}
+
+/* ─── Tour cards: EngAGE brand dressing (V5 round 3) ─────────────
+   Every card: the five-colour petal strip across the top and the peach
+   rings drifting in from the lower right, as on the search band. The
+   welcome card carries the full logo on a peach panel; later cards show
+   the rings mark by the step count and take one ring colour each. */
+.tour-card {
+  --tour-accent: var(--petal-ember);
+  --tour-accent-ink: var(--petal-ember-ink);
+  border-top: none;
+  padding-top: calc(var(--space-md) + 6px);
+  background:
+    url("/engage-rings-peach.svg") no-repeat right -46px bottom -58px / 170px auto,
+    var(--color-surface);
+}
+.tour-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  z-index: 1;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--petal-strip);
+}
+.tour-card--slate { --tour-accent: var(--petal-slate); --tour-accent-ink: var(--petal-slate-ink); }
+.tour-card--sage  { --tour-accent: var(--petal-sage);  --tour-accent-ink: var(--petal-sage-ink); }
+.tour-card--plum  { --tour-accent: var(--petal-plum);  --tour-accent-ink: var(--petal-plum-ink); }
+.tour-card--amber { --tour-accent: var(--petal-amber); --tour-accent-ink: var(--petal-amber-ink); }
+.tour-card--ember { --tour-accent: var(--petal-ember); --tour-accent-ink: var(--petal-ember-ink); }
+
+.tour-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--tour-accent-ink);
+}
+.tour-mark { width: 30px; height: auto; flex: none; }
+.tour-title {
+  padding-bottom: var(--space-xs);
+  border-bottom: 3px solid var(--tour-accent);
+}
+.tour-dot--done,
+.tour-dot--current { background: var(--tour-accent); }
+.tour-card--bottom .tour-arrow { background: var(--petal-slate); }
+
+/* Welcome card: logo on the peach search-band ground, centred copy */
+.tour-card--welcome {
+  width: min(28rem, calc(100vw - 24px));
+  padding: 0 0 var(--space-md);
+  overflow: hidden;
+}
+.tour-card--welcome .tour-card-head {
+  position: relative;
+  justify-content: center;
+  /* Equal side room for the close button keeps the logo centred and clear of it */
+  padding: calc(var(--space-lg) + 6px) calc(var(--touch-target) + var(--space-xs)) var(--space-md);
+  background:
+    url("/engage-rings-peach.svg") no-repeat left -60px top -70px / 190px auto,
+    var(--color-search-surface);
+  border-bottom: 2px solid var(--petal-ember);
+}
+.tour-card--welcome .tour-close {
+  position: absolute;
+  top: calc(var(--space-xs) + 6px);
+  right: var(--space-sm);
+  margin: 0;
+}
+.tour-logo {
+  display: block;
+  width: min(100%, 17rem);
+  height: auto;
+}
+.tour-card--welcome .tour-title,
+.tour-card--welcome .tour-body,
+.tour-card--welcome .tour-actions { padding-inline: var(--space-lg); }
+.tour-card--welcome .tour-title {
+  margin-top: var(--space-md);
+  text-align: center;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.tour-card--welcome .tour-body { text-align: center; }
+
+/* High contrast: keep the logo and strip, drop the watermarks and tints */
+[data-contrast="high"] .tour-card { background: #ffffff; }
+[data-contrast="high"] .tour-card--welcome .tour-card-head {
+  background: #ffffff;
+  border-bottom-color: #000000;
+}
+[data-contrast="high"] .tour-progress { color: #000000; }
+[data-contrast="high"] .tour-title { border-bottom-color: #000000; }
+[data-contrast="high"] .tour-card--welcome .tour-title { border-bottom: none; }
+[data-contrast="high"] .tour-dot--done,
+[data-contrast="high"] .tour-dot--current { background: #00007a; }
+/* The refresh icon already leads this title */
+.about-current .about-section-title::before { display: none; }

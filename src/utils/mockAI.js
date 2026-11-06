@@ -68,7 +68,7 @@ const CATEGORY_SYNONYMS = [
 
 const FREE_RE = /\bfree\b|\bno cost\b/
 
-function stripStopwords(tokens) {
+export function stripStopwords(tokens) {
   return tokens.filter((t) => t && !STOPWORDS.has(t))
 }
 
@@ -113,12 +113,15 @@ export function interpretQuery(raw) {
     .replace(/\b(ne|nw|se|sw)\b/g, ' ')
     .replace(CENTRAL_PHRASE, ' ')
     .replace(/[.,!?]/g, ' ')
+  let categoryWords = []
   if (matchedCatRe) {
     // Remove the whole word(s) that triggered the category — the synonyms match
     // prefixes ("paint", "diabet", "socializ"), so wrap each match in \w* to
     // take the entire word and avoid leaving fragments like "ing" or "ize".
     const inner = matchedCatRe.source.replace(/\\b/g, '')
-    withoutPhrases = withoutPhrases.replace(new RegExp(`\\b\\w*(?:${inner})\\w*\\b`, 'gi'), ' ')
+    const wholeWords = new RegExp(`\\b\\w*(?:${inner})\\w*\\b`, 'gi')
+    categoryWords = [...new Set((withoutPhrases.match(wholeWords) || []).map((w) => w.toLowerCase()))]
+    withoutPhrases = withoutPhrases.replace(wholeWords, ' ')
   }
   const cleanedKeywords = stripStopwords(withoutPhrases.split(/\s+/)).join(' ').trim()
 
@@ -132,6 +135,9 @@ export function interpretQuery(raw) {
     serviceAreaLabel,
     costFree,
     cleanedKeywords,
+    // The words that triggered the category guess ("taxes"), so search can
+    // keep services that name them even when tagged another category.
+    categoryWords,
   }
 }
 

@@ -15,7 +15,7 @@ import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react
 const STEPS = [
   {
     title: 'Welcome to EngAGE',
-    body: 'This short tour shows you the main parts of the directory. It takes about a minute, and you can close it at any time.',
+    body: 'EngAGE is a trusted online directory of non-medical, community-based services in Calgary. This short tour shows you the main parts of the directory. It takes about a minute, and you can close it at any time.',
   },
   {
     target: ['.search-input-wrap'],
@@ -42,7 +42,7 @@ const STEPS = [
       {
         // Landing page: the four Location / Service Type / Cost / Format buttons
         selector: '.landing-filters',
-        body: 'Choose Location, Service Type, Cost or Format to see only the services that suit you. For example, only free services, or only ones in your part of the city.',
+        body: 'Choose Service Type, Location, Cost or Format to see only the services that suit you. For example, only free services, or only ones in your part of the city.',
       },
     ],
     title: 'Narrow the list with filters',
@@ -70,6 +70,11 @@ const STEPS = [
     body: 'Select How to use this whenever you need a reminder. You can take this tour again from there.',
   },
 ]
+
+// Brand dressing (V5 round 3): each step after the welcome takes the next of
+// the five ring colours, so the walk-through moves through the logo's palette.
+const ACCENTS = ['slate', 'sage', 'plum', 'amber', 'ember']
+const ASSET = import.meta.env.BASE_URL
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input, select, [tabindex]:not([tabindex="-1"])'
 const GAP = 14     // space between the lit-up control and the card
@@ -369,7 +374,12 @@ export default function GuidedTour({ onClose }) {
 
       <div
         ref={cardRef}
-        className={`tour-card${pos?.side ? ` tour-card--${pos.side}` : ''}${shown && pos ? ' tour-card--shown' : ''}`}
+        className={[
+          'tour-card',
+          pos?.side && `tour-card--${pos.side}`,
+          shown && pos && 'tour-card--shown',
+          isWelcome ? 'tour-card--welcome' : `tour-card--${ACCENTS[(position - 2) % ACCENTS.length]}`,
+        ].filter(Boolean).join(' ')}
         role="dialog"
         aria-modal="true"
         aria-labelledby="tour-title"
@@ -379,8 +389,13 @@ export default function GuidedTour({ onClose }) {
         {pos?.side && <span className="tour-arrow" aria-hidden="true" />}
 
         <div className="tour-card-head">
-          {!isWelcome && (
-            <p className="tour-progress">Step {position - 1} of {total - 1}</p>
+          {isWelcome ? (
+            <img className="tour-logo" src={`${ASSET}engage-logo.svg`} alt="EngAGE: Calgary Directory for Aging Well" />
+          ) : (
+            <p className="tour-progress">
+              <img className="tour-mark" src={`${ASSET}engage-mark.svg`} alt="" />
+              Step {position - 1} of {total - 1}
+            </p>
           )}
           <button type="button" className="tour-close" onClick={onClose} aria-label="Close the tour">
             <span aria-hidden="true">✕</span>

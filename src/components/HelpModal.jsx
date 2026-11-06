@@ -34,6 +34,12 @@ export default function HelpModal({ onClose, onStartTour }) {
       </div>
 
       <div className="help-drawer-body">
+        {onStartTour && (
+          <button type="button" className="help-tour-btn" onClick={onStartTour}>
+            Take the guided tour
+          </button>
+        )}
+
         <div className="help-section">
           <div className="help-icon" aria-hidden="true">🔍</div>
           <div>
@@ -54,7 +60,7 @@ export default function HelpModal({ onClose, onStartTour }) {
           <div className="help-icon" aria-hidden="true">🗂</div>
           <div>
             <h3>Use filters to narrow results</h3>
-            <p>Filters help you reduce the number of services shown on the screen. For example, you can choose a service location, type, cost, or format to see only the services that match your needs. You can use one filter or combine several filters.</p>
+            <p>Filters help you reduce the number of services shown on the screen. For example, you can choose a service type, location, cost, or format to see only the services that match your needs. You can use one filter or combine several filters.</p>
           </div>
         </div>
 
@@ -73,12 +79,6 @@ export default function HelpModal({ onClose, onStartTour }) {
             <p>Within any service listing, use the <strong>Print</strong> button to print a copy or the <strong>Share</strong> button to copy a link to the service.</p>
           </div>
         </div>
-
-        {onStartTour && (
-          <button type="button" className="help-tour-btn" onClick={onStartTour}>
-            Take the guided tour
-          </button>
-        )}
 
         {DEMO_VIDEO_URL && (
           <a className="help-video-btn" href={DEMO_VIDEO_URL} target="_blank" rel="noopener noreferrer">

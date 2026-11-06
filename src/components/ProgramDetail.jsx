@@ -323,6 +323,10 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
           <TagRow label="Who this serves" values={population} />
         )}
 
+        {program.lastUpdated && (
+          <p className="card-updated detail-updated">Last updated: {program.lastUpdated}</p>
+        )}
+
         <button
           className="detail-close-btn"
           onClick={onClose}
