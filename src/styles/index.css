@@ -4291,3 +4291,165 @@ body:has(.main-layout) {
 }
 /* White skyline on a white high-contrast page is just a blank gap */
 [data-contrast="high"] .wizard-landing::after { display: none; }
+
+/* ─── How to Use panel: brand redesign (2026-11-06) ─────────────
+   Branded header, the tour as the one filled button, five colour-coded
+   topics that open one at a time, and the phone line + "Got it" pinned
+   at the foot so they never scroll away. */
+.help-accent--slate { --acc: var(--petal-slate); --acc-ink: var(--petal-slate-ink); --acc-tint: var(--petal-slate-tint); }
+.help-accent--sage  { --acc: var(--petal-sage);  --acc-ink: var(--petal-sage-ink);  --acc-tint: var(--petal-sage-tint); }
+.help-accent--plum  { --acc: var(--petal-plum);  --acc-ink: var(--petal-plum-ink);  --acc-tint: var(--petal-plum-tint); }
+.help-accent--amber { --acc: var(--petal-amber); --acc-ink: var(--petal-amber-ink); --acc-tint: var(--petal-amber-tint); }
+.help-accent--ember { --acc: var(--petal-ember); --acc-ink: var(--petal-ember-ink); --acc-tint: var(--petal-ember-tint); }
+
+.help-drawer {
+  width: min(440px, 94vw);
+  border-left: none;
+  background: var(--color-bg);
+}
+.help-drawer .help-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: calc(var(--space-md) + 6px) var(--space-sm) var(--space-md) var(--space-md);
+  border-bottom: none;
+  background:
+    url("/engage-rings-peach.svg") no-repeat right -50px top -60px / 170px auto,
+    var(--color-search-surface);
+}
+.help-drawer .help-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: var(--petal-strip);
+}
+.help-mark { width: 44px; height: auto; }
+.help-drawer .help-header h2 {
+  font-size: var(--font-size-xl);
+  line-height: 1.2;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+.help-x {
+  width: var(--touch-target);
+  height: var(--touch-target);
+  display: grid;
+  place-items: center;
+  background: var(--color-surface);
+  border: 2px solid var(--petal-slate-ink);
+  border-radius: 50%;
+  color: var(--petal-slate-ink);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.help-x:hover { background: var(--petal-slate-tint); }
+
+.help-drawer-body {
+  gap: var(--space-md);
+  padding: var(--space-md);
+}
+.help-drawer .help-tour-btn {
+  gap: var(--space-xs);
+  min-height: 56px;
+  background: var(--petal-slate);
+  border: none;
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-lg);
+  box-shadow: var(--shadow-card);
+}
+.help-drawer .help-tour-btn:hover { background: var(--petal-slate-deep); }
+
+/* Topics */
+.help-topics {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-sm);
+}
+.help-topic details {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.help-topic details[open] { border-color: var(--acc); box-shadow: var(--shadow-card); }
+.help-topic summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 60px;
+  padding: var(--space-xs) var(--space-sm);
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--radius-md);
+}
+.help-topic summary::-webkit-details-marker { display: none; }
+.help-topic summary:hover { background: var(--acc-tint); }
+.help-topic-badge {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--acc-tint);
+  color: var(--acc-ink);
+}
+.help-topic-title {
+  flex: 1;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-ink);
+}
+.help-topic-chevron {
+  flex: none;
+  color: var(--acc-ink);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.help-topic details[open] .help-topic-chevron { transform: rotate(180deg); }
+.help-topic details[open] summary { border-radius: var(--radius-md) var(--radius-md) 0 0; }
+.help-topic-body {
+  padding: 0 var(--space-md) var(--space-md) calc(var(--space-sm) + 44px + var(--space-sm));
+}
+.help-topic-body p {
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+/* Footer: always visible */
+.help-footer {
+  flex: none;
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+.help-footer .help-phone {
+  padding-top: 0;
+  border-top: none;
+}
+.help-footer .help-close-btn { margin-top: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .help-topic-chevron { transition: none; }
+}
+@media (max-width: 640px) {
+  .help-drawer { height: 70vh; }
+  .help-mark { width: 36px; }
+  .help-drawer .help-header h2 { font-size: var(--font-size-lg); }
+}
+
+/* High contrast */
+[data-contrast="high"] .help-drawer { background: #ffffff; border-left: 3px solid #000000; }
+[data-contrast="high"] .help-drawer .help-header { background: #ffffff; border-bottom: 2px solid #000000; }
+[data-contrast="high"] .help-topic details { border: 2px solid #000000; }
+[data-contrast="high"] .help-topic-badge { background: #ffffff; color: #00007a; border: 2px solid #00007a; }
+[data-contrast="high"] .help-topic-chevron { color: #00007a; }
+[data-contrast="high"] .help-drawer .help-tour-btn { background: #00007a; }
