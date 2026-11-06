@@ -182,7 +182,7 @@ export default function WizardLanding({ layout = 'a', onSearch, onApplyFilters, 
         {/* Same copy, split so the first sentence reads as the page's
             headline (design review 2026-11-06). */}
         <p className="wizard-welcome-lead">
-          EngAGE is a trusted online directory of non-medical, <span className="nowrap">community-based</span> services in Calgary.
+          EngAGE is a trusted online directory of <span className="nowrap">non-medical,</span> <span className="nowrap">community-based</span> services in Calgary.
         </p>
         <p className="wizard-welcome-text">
           Operated by Calgary Seniors' Resource Society, it helps people find reliable information about local supports as they age, all in one place. The directory can also be used by family members, caregivers, and service providers.
