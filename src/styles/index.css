@@ -4216,3 +4216,33 @@ body:has(.main-layout) {
 [data-contrast="high"] .tour-dot--current { background: #00007a; }
 /* The refresh icon already leads this title */
 .about-current .about-section-title::before { display: none; }
+
+/* ─── Design review 2026-11-06: landing hierarchy ───────────────
+   The intro was one centred paragraph with no headline, which on phones
+   pushed the search below the first screen. The first sentence now
+   carries the page; the rest is quieter supporting text. */
+.wizard-welcome-lead {
+  max-width: 30ch;
+  margin: 0 auto var(--space-sm);
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--color-ink);
+  text-align: center;
+  text-wrap: balance;
+}
+.wizard-welcome .wizard-welcome-text {
+  max-width: 60ch;
+  font-size: var(--font-size-base);
+  color: var(--color-ink-soft);
+}
+@media (max-width: 640px) {
+  /* Bring the search up into the first screen on phones */
+  .site-header--landing { padding-top: var(--space-md); }
+  .site-header--landing .site-logo { height: 116px; }
+  .wizard-welcome-lead { font-size: 1.375rem; margin-bottom: var(--space-xs); }
+  .wizard-welcome { margin-bottom: var(--space-md); }
+  .wizard-welcome .wizard-welcome-text { line-height: 1.55; }
+  .landing-section-title { margin-bottom: var(--space-sm); }
+}
+.nowrap { white-space: nowrap; }
