@@ -69,6 +69,10 @@
   --color-filter-active-dark: var(--petal-slate-deep);
   /* Footer: deep brand-blue band from the mockups */
   --color-footer-bg:          oklch(35% 0.042 226);
+  /* Footer body text tinted from the footer blue, not neutral grey, so it
+     doesn't look washed out (design review 2026-11-06) */
+  --color-footer-text:      oklch(91% 0.022 226);
+  --color-footer-text-soft: oklch(85% 0.03 226);
 
   --color-text:          var(--color-ink);
   --color-text-secondary:var(--color-ink-soft);
@@ -186,6 +190,8 @@ body {
   border-radius: 0 0 var(--radius-sm) 0;
 }
 .skip-link:focus { top: 0; }
+/* Beat the global a:hover colour, which matched this dark background */
+.skip-link:hover { color: var(--color-text-inverse); }
 
 /* ─── Focus ring ─────────────────────────────────────────────── */
 :focus-visible {
@@ -663,7 +669,7 @@ a:hover { color: var(--petal-slate-deep); }
   flex-shrink: 0;
   transition: background var(--dur-fast) var(--ease-out);
 }
-.help-btn:hover { background: var(--petal-ember-tint); }
+.help-btn:hover { background: var(--petal-ember-tint); color: var(--petal-ember-ink); }
 /* About (Q-05): same size as the other header buttons, quieter slate outline
    so "How to use this" stays the one that stands out. */
 .about-btn {
@@ -1928,7 +1934,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .footer-tagline {
   font-size: var(--font-size-sm);
   line-height: 1.5;
-  color: oklch(88% 0.008 240);
+  color: var(--color-footer-text);
 }
 .footer-col {
   flex: 1 1 16em;
@@ -1942,7 +1948,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .footer-col p {
   font-size: var(--font-size-sm);
   line-height: 1.6;
-  color: oklch(88% 0.008 240);
+  color: var(--color-footer-text);
 }
 .footer-col p + p { margin-top: var(--space-xs); }
 .footer-col strong { color: #ffffff; }
@@ -2240,7 +2246,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 }
 .footer-funding p {
   font-size: var(--font-size-sm);
-  color: oklch(88% 0.008 240);
+  color: var(--color-footer-text);
   line-height: 1.6;
   max-width: 72ch;
 }
@@ -2271,7 +2277,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   padding: var(--space-md) 5em 0 0;
   border-top: 1px solid oklch(100% 0 0 / 0.18);
   font-size: var(--font-size-sm);
-  color: oklch(82% 0.008 240);
+  color: var(--color-footer-text-soft);
 }
 .footer-about-btn {
   background: none;
