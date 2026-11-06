@@ -3840,10 +3840,21 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
    Inner pages: the Calgary Seniors rosette (CS_Logo_bg), whose own
    ground is exactly --color-bg so its square edge never shows.
    :has() is progressive — older browsers simply get the flat ground. */
-body:has(.wizard-landing) {
-  background:
-    url("/calgary-skyline.svg") no-repeat center 40px / min(1500px, 130vw) auto,
-    var(--color-bg);
+/* Design review 2026-11-06: the skyline used to sit behind the hero at
+   ~785px tall, so the Calgary Tower cut through the intro, the search band
+   and the filter buttons. It now closes the page as a horizon that the
+   footer's petal strip grounds, with nothing drawn behind text. */
+body:has(.wizard-landing) { background: var(--color-bg); }
+/* The skyline's ground line sits right on the footer's petal strip */
+body:has(.wizard-landing) .site-footer { margin-top: 0; }
+.wizard-landing { padding-bottom: 0; }
+.wizard-landing::after {
+  content: '';
+  display: block;
+  width: min(680px, 92%);
+  aspect-ratio: 532.14 / 278.34;
+  margin: var(--space-xl) auto 0;
+  background: url("/calgary-skyline.svg") no-repeat center bottom / contain;
 }
 body:has(.main-layout) {
   background:
