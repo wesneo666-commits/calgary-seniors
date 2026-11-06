@@ -4473,3 +4473,11 @@ body:has(.main-layout)::before {
   body:has(.main-layout)::before { display: none; }
 }
 [data-contrast="high"] body:has(.main-layout)::before { display: none; }
+
+/* ─── Line icons (Joel, Nov 2026: line icons everywhere, no emoji) ── */
+.line-icon { flex: none; display: block; }
+.contact-btn .line-icon,
+.contact-email-plain .line-icon { color: currentColor; margin-top: 3px; }
+.share-menu-item .line-icon { color: var(--petal-slate-ink); }
+.mobile-filter-btn { gap: var(--space-xs); }
+.mock-captcha-brand .line-icon { color: var(--petal-sage-ink); margin-inline: auto; }

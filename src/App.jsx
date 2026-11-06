@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import programs from './data/programs.json'
 import SearchBar from './components/SearchBar.jsx'
+import LineIcon from './components/LineIcon.jsx'
 import FilterPanel from './components/FilterPanel.jsx'
 import ResultsList from './components/ResultsList.jsx'
 import ProgramDetail from './components/ProgramDetail.jsx'
@@ -431,7 +432,7 @@ export default function App() {
               >
                 {/* On phones the full-width button says what filters are for,
                     since the panel is hidden behind it (2026-10-20 review, Q-07). */}
-                🗂 <span className="mobile-filter-label-long">Narrow your search with filters</span>
+                <LineIcon name="filter" /> <span className="mobile-filter-label-long">Narrow your search with filters</span>
                 <span className="mobile-filter-label-short">Filters</span>
                 {activeFilterCount ? ` (${activeFilterCount})` : ''}
               </button>

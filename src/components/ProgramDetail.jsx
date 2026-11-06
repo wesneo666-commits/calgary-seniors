@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import LineIcon from './LineIcon.jsx'
 import CostBadge from './CostBadge.jsx'
 import ContactButtons from './ContactButtons.jsx'
 import { SERVICE_AREAS, quadrantFullLabel, serviceGroupSlug } from '../utils/constants.js'
@@ -220,7 +221,7 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
               {shareOpen && (
                 <div className="share-menu" role="menu" aria-label="Share options">
                   <button className="share-menu-item" role="menuitem" onClick={handleCopyUrl}>
-                    {copied ? '✓ Copied!' : '📋 Copy URL'}
+                    {copied ? <><LineIcon name="check" /> Copied!</> : <><LineIcon name="link" /> Copy URL</>}
                   </button>
                   <a
                     className="share-menu-item"
@@ -228,7 +229,7 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
                     href={`mailto:?subject=${encodeURIComponent(`Take a look: ${program.programName}`)}&body=${mailtoBody}`}
                     onClick={() => setShareOpen(false)}
                   >
-                    ✉️ Share by email
+                    <LineIcon name="mail" /> Share by email
                   </a>
                   {onPhone && (
                     <>
@@ -238,7 +239,7 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
                         href={`sms:?&body=${mailtoBody}`}
                         onClick={() => setShareOpen(false)}
                       >
-                        💬 Share by text message
+                        <LineIcon name="message" /> Share by text message
                       </a>
                       <a
                         className="share-menu-item"
@@ -248,7 +249,7 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
                         rel="noopener noreferrer"
                         onClick={() => setShareOpen(false)}
                       >
-                        🟢 Share on WhatsApp
+                        <LineIcon name="chat" /> Share on WhatsApp
                       </a>
                     </>
                   )}

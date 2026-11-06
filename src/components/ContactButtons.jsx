@@ -1,4 +1,5 @@
 import { extractRegistrationUrl, parseContactEmail, parsePhones } from '../utils/program.js'
+import LineIcon from './LineIcon.jsx'
 
 export default function ContactButtons({ program }) {
   const { programWebsite, orgWebsite, howToAccess } = program
@@ -18,7 +19,7 @@ export default function ContactButtons({ program }) {
           className="contact-btn contact-btn-phone"
           aria-label={`Call ${program.organization}${entry.label ? ` (${entry.label})` : ''}: ${entry.number}`}
         >
-          <span aria-hidden="true">📞</span> {entry.label ? `${entry.label}: ` : 'Call: '}{entry.number}
+          <LineIcon name="phone" /> {entry.label ? `${entry.label}: ` : 'Call: '}{entry.number}
         </a>
       ))}
       {email && (
@@ -26,7 +27,7 @@ export default function ContactButtons({ program }) {
           className="contact-email-plain"
           aria-label={`Email ${program.organization}: ${email}`}
         >
-          <span aria-hidden="true">✉️</span>
+          <LineIcon name="mail" />
           <span className="contact-email-label">Email:</span>
           <span className="contact-email-value">{email}</span>
         </div>
@@ -39,7 +40,7 @@ export default function ContactButtons({ program }) {
           className="contact-btn contact-btn-form"
           aria-label={`Open contact form for ${program.organization} (opens in new tab)`}
         >
-          <span aria-hidden="true">📋</span> Contact form
+          <LineIcon name="form" /> Contact form
         </a>
       )}
       {registrationUrl && (
@@ -50,7 +51,7 @@ export default function ContactButtons({ program }) {
           className="contact-btn contact-btn-register"
           aria-label={`Register or book online for ${program.programName} (opens in new tab)`}
         >
-          <span aria-hidden="true">📝</span> Register / book online
+          <LineIcon name="register" /> Register / book online
         </a>
       )}
       {programWebsite && (
@@ -61,7 +62,7 @@ export default function ContactButtons({ program }) {
           className="contact-btn contact-btn-web"
           aria-label={`Visit program page for ${program.programName} (opens in new tab)`}
         >
-          <span aria-hidden="true">🌐</span> Service page
+          <LineIcon name="globe" /> Service page
         </a>
       )}
       {orgWebsite && orgWebsite !== programWebsite && (
@@ -72,7 +73,7 @@ export default function ContactButtons({ program }) {
           className="contact-btn contact-btn-web-org"
           aria-label={`Visit ${program.organization} website (opens in new tab)`}
         >
-          <span aria-hidden="true">🏢</span> Organization website
+          <LineIcon name="building" /> Organization website
         </a>
       )}
     </div>

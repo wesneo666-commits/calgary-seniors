@@ -86,12 +86,12 @@ export const SERVICE_AREAS = SERVICE_AREA_GROUPS.flatMap((g) => g.items)
 // (removed from program cards per REQ-051). Each group carries one color from
 // the roadmap's botanical palette; the slug selects that color family in CSS.
 export const GROUP_ICONS = {
-  'Stay Healthy': { emoji: '🩺', slug: 'health' },
-  'Stay Connected': { emoji: '🤝', slug: 'social' },
-  'Get Help': { emoji: '🏠', slug: 'home' },
-  'Find Housing & Transportation': { emoji: '🚌', slug: 'housing' },
-  'Manage Money & Legal Matters': { emoji: '💼', slug: 'practical' },
-  'Stay Safe': { emoji: '🛡️', slug: 'safety' },
+  'Stay Healthy': { slug: 'health' },
+  'Stay Connected': { slug: 'social' },
+  'Get Help': { slug: 'home' },
+  'Find Housing & Transportation': { slug: 'housing' },
+  'Manage Money & Legal Matters': { slug: 'practical' },
+  'Stay Safe': { slug: 'safety' },
 }
 
 // Petal slug for a service-area value (via its parent group) — colors the

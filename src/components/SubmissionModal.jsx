@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import LineIcon from './LineIcon.jsx'
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
@@ -179,7 +180,7 @@ export default function SubmissionModal({ onClose }) {
                   <label htmlFor="mock-captcha">I’m not a robot</label>
                 </div>
                 <div className="mock-captcha-brand" aria-hidden="true">
-                  <span>🍃</span>
+                  <LineIcon name="leaf" size={26} />
                   <strong>Mock CAPTCHA</strong>
                 </div>
                 <p id="mock-captcha-note" className="mock-captcha-note"><strong>Mock CAPTCHA — prototype only:</strong> this demonstrates where spam protection would appear.</p>
