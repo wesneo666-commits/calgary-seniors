@@ -2147,14 +2147,14 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .submission-review-note,
 .submission-prototype-note {
   padding: var(--space-md);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  border-radius: var(--radius-md);
 }
 .submission-review-note {
-  border-left: 5px solid var(--petal-slate);
+  border: 2px solid var(--petal-slate);
   background: var(--petal-slate-tint);
 }
 .submission-prototype-note {
-  border-left: 5px solid var(--petal-amber);
+  border: 2px solid var(--petal-amber);
   background: var(--petal-amber-tint);
 }
 .submission-prototype-note--before-form { margin-top: var(--space-md); }
@@ -2910,11 +2910,11 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   margin-bottom: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-md);
-  border-left: 6px solid var(--color-border-strong);
+  border: 2px solid var(--color-border);
   background: var(--color-surface);
 }
 .results-header--filtered {
-  border-left-color: var(--petal-ember);
+  border-color: var(--petal-ember);
   background: var(--petal-ember-tint);
 }
 .results-header--flash { animation: results-header-flash 1.2s var(--ease-out); }
@@ -3297,8 +3297,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   padding: var(--space-md);
   background: var(--color-surface);
   border-radius: var(--radius-lg);
-  border-top: 6px solid var(--acc);
-  box-shadow: var(--shadow-card);
+  border: 2px solid var(--acc);
 }
 .about-card .about-icon { color: var(--acc-ink); margin-bottom: var(--space-xs); }
 .about-card > p { font-size: var(--font-size-lg); font-weight: 600; color: var(--color-ink); }
@@ -3318,8 +3317,8 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   margin-top: var(--space-md);
   padding: var(--space-md);
   background: var(--acc-tint);
-  border-left: 6px solid var(--acc);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  border: 2px solid var(--acc);
+  border-radius: var(--radius-md);
   font-weight: 600;
   color: var(--color-ink);
 }
@@ -3469,7 +3468,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 [data-contrast="high"] .about-section--band { background: #ffffff; border: 2px solid #000000; }
 [data-contrast="high"] .about-eyebrow { color: #000000; }
 [data-contrast="high"] .about-card,
-[data-contrast="high"] .about-name { border: 2px solid #000000; border-top-width: 6px; }
+[data-contrast="high"] .about-name { border: 2px solid #000000; }
 [data-contrast="high"] .about-callout,
 [data-contrast="high"] .about-value,
 [data-contrast="high"] .about-toc-num { background: #ffffff; }
@@ -4116,7 +4115,6 @@ body:has(.main-layout) {
 [data-contrast="high"] .results-header,
 [data-contrast="high"] .results-header--filtered {
   border: 2px solid #000000;
-  border-left: 8px solid #000000;
   background: #ffffff;
 }
 [data-contrast="high"] .results-query { color: #00007a; }
