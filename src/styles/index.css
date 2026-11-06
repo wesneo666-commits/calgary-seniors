@@ -4267,3 +4267,19 @@ body:has(.main-layout) {
      appears once something is typed */
   .search-input:placeholder-shown { padding-right: var(--space-sm); }
 }
+
+/* Header buttons travel as one group (design review 2026-11-06). As loose
+   flex items, "Text & Display" dropped alone onto a second row at laptop
+   widths next to the large landing logo. */
+@media (min-width: 641px) {
+  .site-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+    margin-left: auto;
+  }
+  .site-header-actions .a11y-btn-wrap { margin-left: 0; }
+  .site-header--landing .site-logo { height: clamp(110px, 12vw, 190px); }
+}
