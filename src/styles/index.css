@@ -4246,3 +4246,24 @@ body:has(.main-layout) {
   .landing-section-title { margin-bottom: var(--space-sm); }
 }
 .nowrap { white-space: nowrap; }
+/* Small phones (design review 2026-11-06): the box and an icon-only
+   Search button shared one row, which cut the placeholder to "What are
+   you l…". The box now takes the full width and a labelled Search button
+   sits under it. */
+@media (max-width: 480px) {
+  .search-bar-wrap { flex-wrap: wrap; }
+  .search-bar-wrap > .search-input-wrap { flex: 1 1 100%; }
+  .search-bar-wrap > .search-btn {
+    flex: 1 1 100%;
+    width: auto;
+    min-height: 52px;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: 0 var(--space-md);
+  }
+  .search-bar-wrap > .search-btn span { display: inline; }
+  .landing-search-band { padding: var(--space-md) var(--space-sm); }
+  /* The right padding makes room for the clear (×) button, which only
+     appears once something is typed */
+  .search-input:placeholder-shown { padding-right: var(--space-sm); }
+}
