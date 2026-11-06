@@ -4289,3 +4289,5 @@ body:has(.main-layout) {
   .site-header-actions .a11y-btn-wrap { margin-left: 0; }
   .site-header--landing .site-logo { height: clamp(110px, 12vw, 190px); }
 }
+/* White skyline on a white high-contrast page is just a blank gap */
+[data-contrast="high"] .wizard-landing::after { display: none; }
