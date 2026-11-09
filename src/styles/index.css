@@ -4498,3 +4498,33 @@ body:has(.main-layout)::before {
   .landing-search { margin-bottom: var(--space-md); }
   .landing-filter-btn { min-height: 84px; }
 }
+
+/* ─── Very short laptop screens (2026-11-09) ────────────────────
+   A 1920×1080 Windows laptop at its default 150% scaling leaves the page
+   about 1280×587 once the browser bars and taskbar are counted; the filter
+   row still started below the fold there. Same copy again: the search
+   heading is kept for screen readers but hidden from view (the search
+   band speaks for itself), the headline and intro are a touch tighter,
+   and the filter buttons set their icon beside the label. */
+@media (min-width: 900px) and (max-height: 650px) {
+  .wizard-welcome-lead { font-size: 2rem; }
+  .wizard-welcome .wizard-welcome-text { line-height: 1.5; }
+  .landing-search .landing-section-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .landing-filters .landing-section-title { margin-bottom: var(--space-xs); }
+  .landing-filter-btn {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0 var(--space-xs);
+    min-height: 60px;
+    padding-block: var(--space-xs);
+  }
+  /* "✓ 2 selected" keeps its own line under the label */
+  .landing-filter-count { flex-basis: 100%; text-align: center; }
+}
