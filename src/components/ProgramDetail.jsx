@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import LineIcon from './LineIcon.jsx'
 import CostBadge from './CostBadge.jsx'
 import ContactButtons from './ContactButtons.jsx'
+import LinkedText from './LinkedText.jsx'
 import { SERVICE_AREAS, quadrantFullLabel, serviceGroupSlug } from '../utils/constants.js'
 import { cleanPopulationTags, extractRegistrationUrl, parseContactEmail, parsePhones } from '../utils/program.js'
 
@@ -16,12 +17,14 @@ function normalizeEligibility(value) {
   return trimmed
 }
 
-function InfoRow({ label, value }) {
+function InfoRow({ label, value, addresses = false }) {
   if (!value) return null
   return (
     <div className="detail-section">
       <span className="detail-label">{label}</span>
-      <span className="detail-value">{value}</span>
+      <span className={`detail-value${addresses ? ' detail-value--lines' : ''}`}>
+        <LinkedText text={value} addresses={addresses} />
+      </span>
     </div>
   )
 }
@@ -310,14 +313,14 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
 
         <div className="detail-section">
           <span className="detail-label">About this resource</span>
-          <p className="detail-value">{program.description}</p>
+          <p className="detail-value"><LinkedText text={program.description} /></p>
         </div>
 
         <InfoRow label="Who can participate" value={eligibility} />
         <InfoRow label="How to access"       value={program.howToAccess} />
         <InfoRow label="Cost details"        value={program.costDetails} />
         <InfoRow label="Important notes"     value={program.importantNotes} />
-        <InfoRow label="Address"             value={program.address} />
+        <InfoRow label="Address"             value={program.address} addresses />
 
         <TagRow label="When offered"     values={program.cadence} />
         {population.length > 0 && (

@@ -38,25 +38,30 @@ const FILTERS = [
     label: 'Location',
     prompt: 'Which part of Calgary? Choose one or more.',
     multi: true,
+    all: true,
     options: QUADRANTS,
   },
   {
     key: 'cost',
     icon: 'cost',
     label: 'Cost',
-    prompt: 'Free or paid?',
+    // One choice: with only Free and Paid, choosing both is the same as All.
+    prompt: 'Free or paid? Choose one.',
+    all: true,
     options: COST_TYPES,
   },
   {
     key: 'format',
     icon: 'format',
     label: 'Format',
-    prompt: 'How would you like to take part?',
+    prompt: 'How would you like to take part? Choose one or more.',
+    multi: true,
+    all: true,
     options: FORMAT_TYPES,
   },
 ]
 
-const EMPTY_SELECTION = { quadrant: [], serviceArea: '', cost: '', format: '' }
+const EMPTY_SELECTION = { quadrant: [], serviceArea: '', cost: '', format: [] }
 
 function selectedLabels(f, selection) {
   const v = selection[f.key]
@@ -66,8 +71,9 @@ function selectedLabels(f, selection) {
 
 // People can pick from several filters before going to the directory
 // (V5 round 3): choices are held here and only applied with "Apply filters".
-// Location allows several areas; the other filters take one choice each,
-// the same as the directory's filter panel.
+// Location and Format allow several choices; Service Type and Cost take one,
+// the same as the directory's filter panel. Location, Cost and Format start
+// on "All", which clears that filter (V5, 2026-11-10).
 function FilterButtons({ onApplyFilters, countMatches }) {
   const [openKey, setOpenKey] = useState(null)
   const [selection, setSelection] = useState(EMPTY_SELECTION)
@@ -83,6 +89,10 @@ function FilterButtons({ onApplyFilters, countMatches }) {
       }
       return { ...prev, [f.key]: cur === value ? '' : value }
     })
+  }
+
+  function chooseAll(f) {
+    setSelection((prev) => ({ ...prev, [f.key]: EMPTY_SELECTION[f.key] }))
   }
 
   function isSelected(f, value) {
@@ -119,6 +129,19 @@ function FilterButtons({ onApplyFilters, countMatches }) {
         <div className="landing-filter-options" id="landing-filter-options" role="group" aria-label={open.prompt}>
           <p className="landing-filter-prompt">{open.prompt}</p>
           <div className="landing-filter-option-grid">
+            {open.all && (() => {
+              const on = selectedLabels(open, selection).length === 0
+              return (
+                <button
+                  type="button"
+                  aria-pressed={on}
+                  className={`landing-filter-option landing-filter-option--all${on ? ' landing-filter-option--on' : ''}`}
+                  onClick={() => chooseAll(open)}
+                >
+                  {on && <span aria-hidden="true">✓ </span>}All
+                </button>
+              )
+            })()}
             {open.options.map((opt) => {
               const on = isSelected(open, opt.value)
               return (

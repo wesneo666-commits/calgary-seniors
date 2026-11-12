@@ -165,6 +165,9 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   overflow-x: hidden;
+  /* A word too long for the screen (large phone text settings) breaks
+     instead of running off the side. Normal words are unaffected. */
+  overflow-wrap: break-word;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -244,17 +247,8 @@ a:hover { color: var(--petal-slate-deep); }
   align-items: center;
   gap: var(--space-sm) var(--space-md);
 }
-.site-logo-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
+.site-logo-wrap {
   flex-shrink: 0;
-  border-radius: var(--radius-sm);
-}
-.site-logo-btn:focus-visible {
-  outline: 3px solid var(--color-border-focus);
-  outline-offset: 3px;
 }
 .site-logo {
   height: 86px;
@@ -290,7 +284,7 @@ a:hover { color: var(--petal-slate-deep); }
   flex-shrink: 0;
 }
 .a11y-toggle-btn {
-  height: var(--touch-target);
+  min-height: var(--touch-target);
   padding: 0 var(--space-md);
   background: var(--color-surface);
   color: var(--petal-slate-ink);
@@ -656,7 +650,7 @@ a:hover { color: var(--petal-slate-deep); }
    the Display Settings button beside it, just in the ember color family so
    it's still identifiable as its own action. */
 .help-btn {
-  height: var(--touch-target);
+  min-height: var(--touch-target);
   padding: 0 var(--space-md);
   background: var(--color-surface);
   color: var(--petal-ember-deep);
@@ -672,11 +666,12 @@ a:hover { color: var(--petal-slate-deep); }
 .help-btn:hover { background: var(--petal-ember-tint); color: var(--petal-ember-ink); }
 /* About (Q-05): same size as the other header buttons, quieter slate outline
    so "How to use this" stays the one that stands out. */
-.about-btn {
+.about-btn,
+.home-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: var(--touch-target);
+  min-height: var(--touch-target);
   padding: 0 var(--space-md);
   background: var(--color-surface);
   color: var(--petal-slate-ink);
@@ -690,7 +685,10 @@ a:hover { color: var(--petal-slate-deep); }
   transition: background var(--dur-fast) var(--ease-out);
 }
 .about-btn:hover,
-.about-btn[aria-current="page"] { background: var(--petal-slate-tint); }
+.about-btn[aria-current="page"],
+.home-btn:hover,
+.home-btn[aria-current="page"] { background: var(--petal-slate-tint); }
+.home-btn { gap: 6px; cursor: pointer; }
 
 /* ─── Help modal ─────────────────────────────────────────────── */
 .help-panel {
@@ -985,7 +983,7 @@ a:hover { color: var(--petal-slate-deep); }
 /* Voice dictation button — white like the input so the pair reads as one
    control; flips to ember while recording (the accent already means "act") */
 .voice-btn {
-  height: 52px;
+  min-height: 52px;
   padding: 0 var(--space-md);
   display: inline-flex;
   align-items: center;
@@ -1043,7 +1041,10 @@ a:hover { color: var(--petal-slate-deep); }
 /* ─── Main layout ────────────────────────────────────────────── */
 .main-layout {
   display: grid;
-  grid-template-columns: 264px 1fr;
+  /* minmax(0, …): a plain 1fr can't shrink below its widest content, so
+     with large phone text the sort menu pushed every card past the right
+     edge of the screen (V5 usability, 2026-11-10). */
+  grid-template-columns: 264px minmax(0, 1fr);
   gap: var(--space-lg);
   padding: var(--space-lg) 0 var(--space-xl);
   align-items: start;
@@ -1051,7 +1052,7 @@ a:hover { color: var(--petal-slate-deep); }
 
 @media (max-width: 768px) {
   .main-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .mobile-filter-btn {
     display: inline-flex;
@@ -1163,13 +1164,16 @@ a:hover { color: var(--petal-slate-deep); }
 .filter-group--active .filter-group-label { color: var(--petal-slate-ink); }
 
 .checkbox-options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Two per row, but a button whose word won't fit in half the narrow panel
+     ("✓ Northwest" once selected, or larger text) takes the whole row rather
+     than breaking mid-word (V5, 2026-11-10). */
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-xs);
 }
 .checkbox-option {
-  width: 100%;
-  min-width: 0;
+  flex: 1 1 40%;
+  max-width: 100%;
   padding: var(--space-xs) var(--space-sm);
   font-size: var(--font-size-sm);
   border: 2px solid var(--color-border);
@@ -1186,10 +1190,10 @@ a:hover { color: var(--petal-slate-deep); }
 }
 
 /* At Maximum text, a single location column preserves readable whole words. */
-html[data-text-size="3"] .filter-group--location .checkbox-options {
-  grid-template-columns: 1fr;
+html[data-text-size="3"] .filter-group--location .checkbox-option {
+  flex-basis: 100%;
 }
-.checkbox-option--all { grid-column: 1 / -1; text-align: center; font-weight: 700; }
+.checkbox-option--all { flex-basis: 100%; text-align: center; font-weight: 700; }
 .checkbox-option:hover { border-color: var(--petal-slate); background: var(--petal-slate-tint); }
 .checkbox-option--active {
   background: var(--petal-slate-ink);
@@ -1441,8 +1445,10 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 
 .sort-control {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-xs);
+  max-width: 100%;
 }
 .sort-label {
   font-size: var(--font-size-sm);
@@ -1451,7 +1457,8 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   white-space: nowrap;
 }
 .sort-select {
-  height: var(--touch-target);
+  min-height: var(--touch-target);
+  max-width: 100%;
   padding: 0 28px 0 var(--space-sm);
   font-size: var(--font-size-sm);
   border: 2px solid var(--color-border);
@@ -1484,7 +1491,9 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .results-list {
   list-style: none;
   display: grid;
-  grid-template-columns: 1fr;
+  /* minmax(0, …) so a card can't grow wider than the screen under large
+     phone text (V5 usability, 2026-11-10). */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-md);
 }
 .results-list > li { height: 100%; }
@@ -1775,6 +1784,28 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   color: var(--petal-slate-ink);
 }
 .detail-value { font-size: var(--font-size-base); max-width: 72ch; text-wrap: pretty; }
+/* Web and email addresses in the program text (LinkedText). Long form
+   addresses break anywhere so they never run off a phone screen. */
+.text-link {
+  color: var(--petal-slate-ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+.text-link:hover { color: var(--petal-slate-deep); text-decoration-thickness: 2px; }
+/* Street addresses that open Google Maps, with a map pin in front. */
+.map-link { overflow-wrap: break-word; }
+/* Underlined itself: an inline-block doesn't pick up the link's underline. */
+.map-link-piece {
+  display: inline-block;
+  max-width: 100%;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.map-link .map-link-icon { display: inline-block; vertical-align: -3px; margin-right: 2px; }
+/* Several locations are written one per line; keep those line breaks. */
+.detail-value--lines { white-space: pre-line; }
 
 .detail-divider {
   border: none;
@@ -1853,13 +1884,14 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 }
 .pagination-buttons {
   display: flex;
-  flex-wrap: nowrap;
+  /* Wraps to two rows when large phone text makes the pair too wide. */
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-md);
 }
 .page-btn {
-  height: var(--touch-target);
-  min-width: 120px;
+  min-height: var(--touch-target);
+  min-width: min(120px, 100%);
   padding: 0 var(--space-md);
   font-size: var(--font-size-base);
   font-weight: 700;
@@ -2296,6 +2328,8 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .print-only-header { display: none; }
 
 @media print {
+  /* Shortened web addresses print in full, since paper can't be clicked. */
+  .text-link--short::after { content: " (" attr(href) ")"; font-weight: 400; }
   @page {
     size: letter portrait;
     margin: 1.5cm 1.8cm;
@@ -2749,7 +2783,7 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
     flex-wrap: wrap;
     justify-content: center;
   }
-  .site-logo-btn {
+  .site-logo-wrap {
     flex-basis: 100%;
     display: flex;
     justify-content: center;
@@ -2787,8 +2821,13 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   .a11y-btn-wrap { margin-left: 0; }
   .help-btn,
   .about-btn,
+  .home-btn,
   .a11y-toggle-btn {
-    padding: 0 var(--space-sm);
+    padding: 2px var(--space-sm);
+    /* Large phone text: wrap inside the button rather than burst out of it
+       (V5 usability, 2026-11-10). Heights above are min-heights for this. */
+    white-space: normal;
+    text-align: center;
   }
   /* Just "About" on phones so the three buttons share one row. */
   .about-btn-long { display: none; }
@@ -2876,9 +2915,10 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   color: var(--color-ink-soft);
 }
 .search-hint { line-height: 1.5; }
-/* Phones have dictation on the keyboard, so the voice button goes (S-03). */
+/* Voice search is back on phones (V5 usability, 2026-11-10). It had been
+   hidden because phones have dictation on the keyboard (S-03), but testers
+   looked for the button rather than the keyboard's small microphone. */
 @media (max-width: 640px) {
-  .voice-btn { display: none; }
   .search-btn { padding: 0 var(--space-md); }
   .search-suggest-kind { display: none; }
 }
@@ -3121,7 +3161,6 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     animation-name: help-sheet-in;
   }
-  .help-section--voice { display: none; }
 }
 @keyframes help-sheet-in {
   from { transform: translateY(100%); }
@@ -3551,6 +3590,8 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   cursor: pointer;
 }
 .landing-filter-option:hover { background: var(--color-surface); }
+/* "All" heads the list on its own row, as in the directory's filter panel. */
+.landing-filter-option--all { grid-column: 1 / -1; text-align: center; }
 .landing-filter-option--home      { --opt-tint: var(--petal-slate-tint); --opt-ink: var(--petal-slate-ink); }
 .landing-filter-option--health    { --opt-tint: var(--petal-sage-tint);  --opt-ink: var(--petal-sage-ink); }
 .landing-filter-option--social    { --opt-tint: var(--petal-plum-tint);  --opt-ink: var(--petal-plum-ink); }
@@ -3572,7 +3613,13 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .landing-browse-btn:hover { background: var(--color-filter-active-dark); }
 .landing-browse-text { margin-top: var(--space-xs); color: var(--color-text); }
 @media (max-width: 700px) {
-  .landing-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Two across on a phone, dropping to one across when a label no longer
+     fits; a fixed two-column grid left "Location" spilling out of its box
+     under large phone text (V5 usability, 2026-11-10). Flex rather than an
+     em-sized grid because Android's text scaling enlarges the text but not
+     em lengths; a flex item never shrinks below its own text. */
+  .landing-filter-grid { display: flex; flex-wrap: wrap; }
+  .landing-filter-btn { flex: 1 1 40%; max-width: 100%; }
 }
 
 /* ─── Help phone line (X-01) ─────────────────────────────────── */
@@ -3684,6 +3731,14 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .tour-card {
   position: fixed;
   width: min(24rem, calc(100vw - 24px));
+  /* Never taller than the screen: with Display Zoom, Safari zoom or a large
+     system font the welcome card outgrew the phone and "Show me around" sat
+     below the bottom edge (V5 usability, 2026-11-10). The text scrolls inside
+     the card; the buttons stay pinned at its foot. 24px = MARGIN × 2. */
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
   padding: var(--space-md) var(--space-md) var(--space-md) var(--space-lg);
   background: var(--color-surface);
   color: var(--color-text);
@@ -3735,6 +3790,13 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
 .tour-card--top .tour-arrow    { bottom: -8px; left: clamp(16px, calc(var(--tour-arrow) - 8px), calc(100% - 32px)); }
 .tour-card--right .tour-arrow  { left: -8px; top: clamp(16px, calc(var(--tour-arrow) - 8px), calc(100% - 32px)); }
 .tour-card--left .tour-arrow   { right: -8px; top: clamp(16px, calc(var(--tour-arrow) - 8px), calc(100% - 32px)); }
+.tour-card-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.tour-actions { flex-shrink: 0; }
 .tour-card-head {
   display: flex;
   align-items: center;
@@ -3802,9 +3864,14 @@ html[data-text-size="3"] .filter-group--location .checkbox-options {
   border: 2px solid var(--petal-slate-deep);
   transition: background var(--dur-fast) var(--ease-out);
 }
-.tour-btn--secondary { background: var(--color-surface); color: var(--petal-slate-deep); }
+/* Grows too, so when the pair no longer fits side by side (narrow phones,
+   large text) both stack full width instead of "No thanks" / "Back" hugging
+   the right edge on its own row. */
+.tour-btn--secondary { flex: 1 1 auto; background: var(--color-surface); color: var(--petal-slate-deep); }
 .tour-btn--secondary:hover { background: var(--petal-slate-tint); }
-.tour-btn--primary { flex: 1 1 8em; background: var(--petal-slate-deep); color: var(--color-text-inverse); }
+/* Sized from its label: when both labels can't sit on one line, the pair
+   stacks rather than squeezing "Show me around" onto two lines. */
+.tour-btn--primary { flex: 3 1 auto; background: var(--petal-slate-deep); color: var(--color-text-inverse); }
 .tour-btn--primary:hover { background: var(--color-filter-active-dark); }
 @media (prefers-reduced-motion: reduce) {
   .tour-pointer { display: none; }
@@ -3900,8 +3967,10 @@ body:has(.main-layout) {
 }
 .help-btn,
 .about-btn,
+.home-btn,
 .a11y-toggle-btn { border-width: 2px; }
 .about-btn,
+.home-btn,
 .a11y-toggle-btn {
   border-color: var(--petal-slate);
   color: var(--petal-slate-ink);
@@ -4249,12 +4318,16 @@ body:has(.main-layout) {
   .wizard-welcome .wizard-welcome-text { line-height: 1.55; }
   .landing-section-title { margin-bottom: var(--space-sm); }
 }
-.nowrap { white-space: nowrap; }
+/* Keeps "community-based" from splitting at its hyphen, but still lets it
+   wrap when the word alone is wider than the screen (large system text). A
+   plain nowrap ran it off the edge of the phone (V5 usability, 2026-11-10). */
+.nowrap { display: inline-block; max-width: 100%; }
 /* Small phones (design review 2026-11-06): the box and an icon-only
    Search button shared one row, which cut the placeholder to "What are
    you l…". The box now takes the full width and a labelled Search button
-   sits under it. */
-@media (max-width: 480px) {
+   sits under it. Runs up to 640px (V5 usability, 2026-11-10) so Voice
+   search keeps its label on every phone, not just an unlabelled mic. */
+@media (max-width: 640px) {
   .search-bar-wrap { flex-wrap: wrap; }
   .search-bar-wrap > .search-input-wrap { flex: 1 1 100%; }
   .search-bar-wrap > .search-btn {
@@ -4266,6 +4339,16 @@ body:has(.main-layout) {
     padding: 0 var(--space-md);
   }
   .search-bar-wrap > .search-btn span { display: inline; }
+  /* Search and Voice search share the row under the box, both labelled;
+     they stack when large text means they don't fit side by side. */
+  .search-bar-wrap > .search-btn { flex: 2 1 auto; }
+  .search-bar-wrap > .voice-btn {
+    flex: 1 1 auto;
+    width: auto;
+    padding: 0 var(--space-md);
+    justify-content: center;
+  }
+  .search-bar-wrap > .voice-btn .voice-btn-label { display: inline; }
   .landing-search-band { padding: var(--space-md) var(--space-sm); }
   /* The right padding makes room for the clear (×) button, which only
      appears once something is typed */
