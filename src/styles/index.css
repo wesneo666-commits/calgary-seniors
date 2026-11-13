@@ -1931,6 +1931,17 @@ html[data-text-size="3"] .filter-group--location .checkbox-option {
   user-select: text;
   overflow-wrap: anywhere;
 }
+.contact-email-link {
+  text-decoration: none;
+  cursor: pointer;
+}
+.contact-email-link .contact-email-value {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 700;
+  color: var(--petal-slate-ink);
+}
+.contact-email-link:hover { background: var(--color-surface); }
 
 .contact-btn-phone:hover    { background: var(--color-filter-active-dark); color: var(--color-text-inverse); }
 .contact-btn-register:hover { background: var(--petal-ember-ink);           color: var(--color-text-inverse); }

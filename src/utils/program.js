@@ -5,6 +5,29 @@ export function cleanPopulationTags(values) {
     .map((v) => (v === 'Older adults (no age specified)' ? 'Older adults' : v))
 }
 
+// A website field as a list of links (2026-11-13). Most hold one address,
+// but some hold several with labels ("…/support. Program brochure: https://…",
+// "Facebook: … Instagram: …"), and some leave off the https:// ("www.x.ca",
+// "calgaryjca.com"). Used whole, those made broken buttons. Each link keeps
+// the words written before it as its label (null when there are none).
+const SITE_RE = /(?:https?:\/\/|www\.)[^\s]+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:ca|com|org|net|info)\b(?:\/[^\s]*)?/gi
+
+export function websiteLinks(value) {
+  if (!value || !value.trim()) return []
+  const links = []
+  let last = 0
+  for (const m of value.matchAll(SITE_RE)) {
+    const address = m[0].replace(/[.,;:)]+$/, '')
+    const label = value.slice(last, m.index).replace(/^[\s.,;]+|[\s:–-]+$/g, '').trim()
+    links.push({
+      href: /^https?:\/\//i.test(address) ? address : `https://${address}`,
+      label: label || null,
+    })
+    last = m.index + m[0].length
+  }
+  return links
+}
+
 // Some "how to access" entries embed a registration/booking URL inline
 // (e.g. "Book online: https://…"). Surface it as a clickable button — REQ-047.
 export function extractRegistrationUrl(howToAccess) {
