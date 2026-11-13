@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback, useEffect, useLayoutEffect, useRef } fr
 import programs from './data/programs.json'
 import SearchBar from './components/SearchBar.jsx'
 import LineIcon from './components/LineIcon.jsx'
+import SiteMenu from './components/SiteMenu.jsx'
 import FilterPanel from './components/FilterPanel.jsx'
 import ResultsList from './components/ResultsList.jsx'
 import ProgramDetail from './components/ProgramDetail.jsx'
@@ -55,14 +56,13 @@ function getLandingLayout() {
   return new URLSearchParams(window.location.search).get('layout') === 'b' ? 'b' : 'a'
 }
 
-// Guided tour (2026-10-20 review, B-04; Wes approved first-visit, 2026-11-05).
-// It starts on a visitor's first visit and is remembered once closed.
-// ?tour forces it on every load, for reviewers and for testing sessions that
-// share one device. "Take the guided tour" in How to use replays it anytime.
+// Guided tour (2026-10-20 review, B-04). It no longer pops up on a first
+// visit (V5 round 6, 2026-11-13): it starts from "Take the guided tour" in
+// How to use this. ?tour still opens it on load, for reviewers and testing
+// sessions.
 const TOUR_SEEN_KEY = 'csrg-tour-seen'
 function shouldStartTour() {
-  if (new URLSearchParams(window.location.search).has('tour')) return true
-  try { return localStorage.getItem(TOUR_SEEN_KEY) !== '1' } catch { return false }
+  return new URLSearchParams(window.location.search).has('tour')
 }
 
 function GearIcon() {
@@ -181,6 +181,7 @@ export default function App() {
       const id = getSharedProgramId()
       setSelectedProgram(id ? programs.find((p) => p.id === id) ?? null : null)
       setView(getView())
+      setShowHelp(window.history.state?.help === true)
     }
     window.addEventListener('popstate', handlePop)
     return () => window.removeEventListener('popstate', handlePop)
@@ -207,7 +208,20 @@ export default function App() {
   // Stable identities so useOverlayKeys' effect isn't torn down and rebuilt
   // on every render (an inline arrow here would change every time).
   const closeMobileFilters = useCallback(() => setShowMobileFilters(false), [])
-  const closeHelp = useCallback(() => setShowHelp(false), [])
+  // On a phone, How to use this is a page of its own (V5 round 6), so it
+  // gets a history entry: the phone's Back button returns to the directory.
+  const openHelp = useCallback(() => {
+    const phone = window.matchMedia?.('(max-width: 640px)').matches
+    if (phone && window.history.state?.help !== true) {
+      window.history.pushState({ ...(window.history.state || {}), help: true }, '', window.location.href)
+    }
+    setShowHelp(true)
+  }, [])
+  const closeHelp = useCallback(() => {
+    // Going back fires popstate, which closes it.
+    if (window.history.state?.help === true) window.history.back()
+    else setShowHelp(false)
+  }, [])
 
   const closeTour = useCallback(() => {
     try { localStorage.setItem(TOUR_SEEN_KEY, '1') } catch { /* private mode */ }
@@ -215,11 +229,11 @@ export default function App() {
   }, [])
 
   const startTour = useCallback(() => {
-    setShowHelp(false)
+    closeHelp()
     setShowA11y(false)
     window.scrollTo(0, 0)
     setShowTour(true)
-  }, [])
+  }, [closeHelp])
 
   const clearFilters = useCallback(() => {
     setFilters((prev) => ({ ...EMPTY_FILTERS, query: prev.query }))
@@ -230,10 +244,10 @@ export default function App() {
     setSort('org-az')
     setLandingMode(startsOnLanding() ? 'wizard' : 'direct')
     if (view === 'about') closeAbout()
-    setShowHelp(false)
+    if (showHelp) closeHelp()
     setShowA11y(false)
     window.scrollTo(0, 0)
-  }, [view, closeAbout])
+  }, [view, closeAbout, showHelp, closeHelp])
 
   // Bring the results into view after a search or filter is applied, so the
   // change is visible — especially on phones (V5 S-05/F-09).
@@ -329,10 +343,15 @@ export default function App() {
       <header className={`site-header${view === 'directory' && showWizard ? ' site-header--landing' : ''}`} role="banner">
         <div className="container">
           <div className="site-header-inner">
-            {/* Just the logo now: testers didn't know it led home, so a
-                labelled Home button sits with the other header buttons
-                instead (V5 usability, 2026-11-10). */}
-            <div className="site-logo-wrap">
+            {/* The logo leads home, and so does the labelled Home button:
+                testers didn't know the logo did (V5 2026-11-10; logo kept
+                clickable in round 6). */}
+            <button
+              type="button"
+              className="site-logo-wrap site-logo-btn"
+              onClick={resetHome}
+              aria-label="EngAGE home"
+            >
               {/* Official EngAGE lockups from the Calgary Seniors asset package:
                   rings-left "Large" on the landing hero, rings-right "Regular"
                   on inner pages, and the stacked "Vertical" cut on phones. The
@@ -345,7 +364,7 @@ export default function App() {
                   className="site-logo"
                 />
               </picture>
-            </div>
+            </button>
             <div className="site-header-text">
               <h1 className="sr-only">EngAGE: Calgary Directory for Aging Well</h1>
             </div>
@@ -369,9 +388,9 @@ export default function App() {
                 </button>
               </div>
             )}
-            {/* display:contents on desktop, so this wrapper changes nothing there;
-                on mobile it becomes the right-aligned action row under the
-                centred logo (replacing the old hamburger menu). */}
+            {/* On a computer: Home, About, How to use this, Text & Display as
+                buttons. On a phone: a row above the logo with Home on the left
+                and ☰ Menu (the other three) on the right (V5 round 6). */}
             <div className="site-header-actions">
               <button
                 type="button"
@@ -395,7 +414,7 @@ export default function App() {
               </a>
               <button
                 className="help-btn"
-                onClick={() => setShowHelp((v) => !v)}
+                onClick={() => (showHelp ? closeHelp() : openHelp())}
                 aria-expanded={showHelp}
                 aria-label="How to use this directory"
               >
@@ -412,7 +431,7 @@ export default function App() {
                 </button>
                 {showA11y && (
                   <>
-                    <div className="a11y-backdrop" aria-hidden="true" />
+                    <div className="a11y-backdrop" aria-hidden="true" onClick={() => setShowA11y(false)} />
                     <AccessibilityPanel
                       prefs={prefs}
                       set={set}
@@ -422,6 +441,12 @@ export default function App() {
                   </>
                 )}
               </div>
+              <SiteMenu
+                onAbout={openAbout}
+                onHelp={openHelp}
+                onDisplay={() => setShowA11y(true)}
+                aboutCurrent={view === 'about'}
+              />
             </div>
           </div>
         </div>

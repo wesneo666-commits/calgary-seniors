@@ -319,7 +319,7 @@ export default function ProgramDetail({ program, onClose, backLabel = '← Back 
         <InfoRow label="Who can participate" value={eligibility} />
         <InfoRow label="How to access"       value={program.howToAccess} />
         <InfoRow label="Cost details"        value={program.costDetails} />
-        <InfoRow label="Important notes"     value={program.importantNotes} />
+        {/* Important notes no longer shown (V5 round 6, 2026-11-13). */}
         <InfoRow label="Address"             value={program.address} addresses />
 
         <TagRow label="When offered"     values={program.cadence} />
