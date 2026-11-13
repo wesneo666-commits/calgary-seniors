@@ -152,10 +152,10 @@ export function filterPrograms(programs, filters) {
     // correctly produces no matches instead of silently overriding either one.
     if (aiParsed?.costFree && !p.cost.includes('Free')) return false
 
-    // Format filter
-    if (format) {
-      if (!p.format.includes(format)) return false
-    }
+    // Format filter: several can be chosen (V5, 2026-11-10), OR-combined
+    // like Location. A plain string is still accepted.
+    const formats = Array.isArray(format) ? format : format ? [format] : []
+    if (formats.length > 0 && !p.format.some((f) => formats.includes(f))) return false
 
     return true
   })

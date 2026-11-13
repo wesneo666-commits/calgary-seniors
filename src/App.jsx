@@ -20,7 +20,8 @@ const EMPTY_FILTERS = {
   quadrant: [],
   serviceArea: '',
   cost: '',
-  format: '',
+  // Several formats can be chosen at once, like Location (V5, 2026-11-10).
+  format: [],
 }
 
 export function isFilterActive(value) {
@@ -229,6 +230,9 @@ export default function App() {
     setSort('org-az')
     setLandingMode(startsOnLanding() ? 'wizard' : 'direct')
     if (view === 'about') closeAbout()
+    setShowHelp(false)
+    setShowA11y(false)
+    window.scrollTo(0, 0)
   }, [view, closeAbout])
 
   // Bring the results into view after a search or filter is applied, so the
@@ -294,6 +298,8 @@ export default function App() {
   const activeFilterCount = Object.entries(filters)
     .filter(([key, value]) => key !== 'query' && isFilterActive(value)).length
   const showWizard = startsOnLanding() && landingMode === 'wizard' && !hasActiveFilters
+  // Home is the landing page; the Home button shows as current there.
+  const isHome = view === 'directory' && showWizard
 
   useLayoutEffect(() => {
     if (!showWizard && scrollTopAfterLanding.current) {
@@ -323,11 +329,10 @@ export default function App() {
       <header className={`site-header${view === 'directory' && showWizard ? ' site-header--landing' : ''}`} role="banner">
         <div className="container">
           <div className="site-header-inner">
-            <button
-              className="site-logo-btn"
-              onClick={resetHome}
-              aria-label="EngAGE — reset to home"
-            >
+            {/* Just the logo now: testers didn't know it led home, so a
+                labelled Home button sits with the other header buttons
+                instead (V5 usability, 2026-11-10). */}
+            <div className="site-logo-wrap">
               {/* Official EngAGE lockups from the Calgary Seniors asset package:
                   rings-left "Large" on the landing hero, rings-right "Regular"
                   on inner pages, and the stacked "Vertical" cut on phones. The
@@ -340,7 +345,7 @@ export default function App() {
                   className="site-logo"
                 />
               </picture>
-            </button>
+            </div>
             <div className="site-header-text">
               <h1 className="sr-only">EngAGE: Calgary Directory for Aging Well</h1>
             </div>
@@ -368,6 +373,14 @@ export default function App() {
                 on mobile it becomes the right-aligned action row under the
                 centred logo (replacing the old hamburger menu). */}
             <div className="site-header-actions">
+              <button
+                type="button"
+                className="home-btn"
+                onClick={resetHome}
+                aria-current={isHome ? 'page' : undefined}
+              >
+                <LineIcon name="home" size={18} /> Home
+              </button>
               {/* Visible About link alongside the other header controls; the
                   footer one was easy to miss (2026-10-20 review, Q-05). */}
               <a

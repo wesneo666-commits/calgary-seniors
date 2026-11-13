@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "import": "node scripts/import-programs.js",
-    "screenshots:ab": "node scripts/capture-ab-screenshots.mjs"
+    "screenshots:ab": "node scripts/capture-ab-screenshots.mjs",
+    "check:display": "node scripts/check-display-settings.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

@@ -57,7 +57,8 @@ function CheckboxGroup({ label, options, value, onChange, allLabel }) {
 }
 
 // Location supports selecting more than one quadrant at once (e.g. NW + NE) — REQ-020.
-function MultiCheckboxGroup({ label, options, values, onChange, allLabel }) {
+// Format does too (V5, 2026-11-10): "In-person or by phone" is a real need.
+function MultiCheckboxGroup({ label, options, values, onChange, allLabel, className = '' }) {
   const hasSelection = values.length > 0
 
   function toggle(optValue) {
@@ -69,7 +70,7 @@ function MultiCheckboxGroup({ label, options, values, onChange, allLabel }) {
   }
 
   return (
-    <div className={`filter-group filter-group--location${hasSelection ? ' filter-group--active' : ''}`}>
+    <div className={`filter-group${className ? ` ${className}` : ''}${hasSelection ? ' filter-group--active' : ''}`}>
       <span className="filter-group-label">{label}{hasSelection ? ' ✓' : ''}</span>
       <div className="checkbox-options">
         <button
@@ -135,6 +136,7 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
         values={filters.quadrant}
         onChange={(v) => onFilterChange('quadrant', v)}
         allLabel="All"
+        className="filter-group--location"
       />
 
       <CheckboxGroup
@@ -145,10 +147,10 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
         allLabel="All"
       />
 
-      <CheckboxGroup
+      <MultiCheckboxGroup
         label="Service Format"
         options={FORMAT_TYPES}
-        value={filters.format}
+        values={filters.format}
         onChange={(v) => onFilterChange('format', v)}
         allLabel="All"
       />

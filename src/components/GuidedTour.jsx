@@ -255,7 +255,9 @@ export default function GuidedTour({ onClose }) {
       }, reduced ? 0 : GLIDE_MS))
     }
 
-    function follow() {
+    function follow(e) {
+      // Scrolling inside the card's own text moves nothing outside it.
+      if (e?.target instanceof Node && cardRef.current?.contains(e.target)) return
       if (!settled) {
         if (prevElRef.current) measure(prevElRef.current)
         return
@@ -289,7 +291,15 @@ export default function GuidedTour({ onClose }) {
 
     window.addEventListener('scroll', follow, true)
     window.addEventListener('resize', follow)
+    // Re-place the card whenever it changes size. It was measured once, so
+    // when the welcome logo or the web font loaded afterwards the card grew
+    // past the bottom of the screen and took "Show me around" with it
+    // (iPhone, V5 usability 2026-11-10).
+    const ro = typeof ResizeObserver !== 'undefined' && cardRef.current
+      ? new ResizeObserver(follow) : null
+    ro?.observe(cardRef.current)
     return () => {
+      ro?.disconnect()
       timers.forEach(clearTimeout)
       window.removeEventListener('scrollend', settle)
       window.removeEventListener('scroll', follow, true)
@@ -388,6 +398,9 @@ export default function GuidedTour({ onClose }) {
       >
         {pos?.side && <span className="tour-arrow" aria-hidden="true" />}
 
+        {/* Scrolls when the card would be taller than the screen (large
+            phone text, Display Zoom); the buttons below stay in view. */}
+        <div className="tour-card-scroll">
         <div className="tour-card-head">
           {isWelcome ? (
             <img className="tour-logo" src={`${ASSET}engage-logo.svg`} alt="EngAGE: Calgary Directory for Aging Well" />
@@ -415,6 +428,7 @@ export default function GuidedTour({ onClose }) {
             ))}
           </ol>
         )}
+        </div>
 
         <div className="tour-actions">
           {isWelcome ? (
