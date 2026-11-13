@@ -29,33 +29,6 @@ function FilterIntro() {
   )
 }
 
-function CheckboxGroup({ label, options, value, onChange, allLabel }) {
-  return (
-    <div className={`filter-group${value ? ' filter-group--active' : ''}`}>
-      <span className="filter-group-label">{label}{value ? ' ✓' : ''}</span>
-      <div className="checkbox-options">
-        <button
-          className={`checkbox-option checkbox-option--all${!value ? ' checkbox-option--active' : ''}`}
-          onClick={() => onChange('')}
-          aria-pressed={!value}
-        >
-          {allLabel}
-        </button>
-        {options.map((opt) => (
-          <button
-            key={opt.value}
-            className={`checkbox-option${value === opt.value ? ' checkbox-option--active' : ''}`}
-            onClick={() => onChange(value === opt.value ? '' : opt.value)}
-            aria-pressed={value === opt.value}
-          >
-            {value === opt.value ? '✓ ' : ''}{opt.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 // Location supports selecting more than one quadrant at once (e.g. NW + NE) — REQ-020.
 // Format does too (V5, 2026-11-10): "In-person or by phone" is a real need.
 function MultiCheckboxGroup({ label, options, values, onChange, allLabel, className = '' }) {
@@ -119,9 +92,9 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
 
       <FilterIntro />
 
-      <div className={`filter-group${filters.serviceArea ? ' filter-group--active' : ''}`}>
+      <div className={`filter-group${filters.serviceArea.length ? ' filter-group--active' : ''}`}>
         <label id="filter-service-label">
-          Select service type{filters.serviceArea ? ' ✓' : ''}
+          Select service types{filters.serviceArea.length ? ' ✓' : ''}
         </label>
         <ServiceTypeSelect
           value={filters.serviceArea}
@@ -139,10 +112,10 @@ export default function FilterPanel({ filters, onFilterChange, onClear, hasActiv
         className="filter-group--location"
       />
 
-      <CheckboxGroup
+      <MultiCheckboxGroup
         label="Cost"
         options={COST_TYPES}
-        value={filters.cost}
+        values={filters.cost}
         onChange={(v) => onFilterChange('cost', v)}
         allLabel="All"
       />

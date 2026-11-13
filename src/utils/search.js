@@ -34,8 +34,29 @@ export function normalizeSearchQuery(query) {
  * stripped before the AND-token text match so the sentence doesn't fail
  * to match just because "i'm" or "looking" never appears in program text.
  */
+// A filter value as a list: filters hold arrays, but a plain string (older
+// links, the chat widget) still works.
+function asList(value) {
+  return Array.isArray(value) ? value : value ? [value] : []
+}
+
+// Whether a program is in a service type: a whole category ("_group_X") or
+// one subcategory.
+function inServiceArea(p, value) {
+  if (value.startsWith('_group_')) {
+    const groupName = value.slice(7)
+    const groupValues = SERVICE_AREA_GROUPS.find((g) => g.group === groupName)?.items.map((i) => i.value) ?? []
+    // A program belongs to a category when the client tagged it with that
+    // category, or with any subcategory the framework places under it.
+    return p.determinant.includes(groupName) || p.serviceArea.some((sa) => groupValues.includes(sa))
+  }
+  return p.serviceArea.includes(value)
+}
+
 export function filterPrograms(programs, filters) {
   const { query, quadrant, serviceArea, cost, format } = filters
+  const areas = asList(serviceArea)
+  const costs = asList(cost)
 
   const queryNorm = query ? normalizeSearchQuery(query) : ''
 
@@ -112,21 +133,8 @@ export function filterPrograms(programs, filters) {
       return false
     }
 
-    // Service area filter — supports both sub-category and parent group selection
-    if (serviceArea) {
-      if (serviceArea.startsWith('_group_')) {
-        const groupName = serviceArea.slice(7)
-        const groupValues = SERVICE_AREA_GROUPS.find((g) => g.group === groupName)?.items.map((i) => i.value) ?? []
-        // A program belongs to a category when the client tagged it with that
-        // category, or with any subcategory the framework places under it.
-        if (
-          !p.determinant.includes(groupName)
-          && !p.serviceArea.some((sa) => groupValues.includes(sa))
-        ) return false
-      } else {
-        if (!p.serviceArea.includes(serviceArea)) return false
-      }
-    }
+    // Service type: several can be chosen, OR-combined like Location.
+    if (areas.length > 0 && !areas.some((sa) => inServiceArea(p, sa))) return false
 
     // Natural-language category intent uses the same structured field as the
     // Service Type control. The parser removes recognized category words from
@@ -142,10 +150,8 @@ export function filterPrograms(programs, filters) {
       if (!namesIt) return false
     }
 
-    // Cost filter
-    if (cost) {
-      if (!p.cost.includes(cost)) return false
-    }
+    // Cost: Free, Paid or both (both is the same as no filter).
+    if (costs.length > 0 && !costs.some((c) => p.cost.includes(c))) return false
 
     // Apply "free" recognized in a natural-language query. Keep this separate
     // from the explicit Cost control so a contradictory query/filter pair

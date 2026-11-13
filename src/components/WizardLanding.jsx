@@ -25,7 +25,9 @@ const FILTERS = [
     key: 'serviceArea',
     icon: 'type',
     label: 'Service Type',
-    prompt: 'What kind of service?',
+    multi: true,
+    all: true,
+    prompt: 'What kind of service? Choose one or more.',
     options: SERVICE_AREA_GROUPS.map((g) => ({
       value: `_group_${g.group}`,
       label: g.group,
@@ -45,8 +47,8 @@ const FILTERS = [
     key: 'cost',
     icon: 'cost',
     label: 'Cost',
-    // One choice: with only Free and Paid, choosing both is the same as All.
-    prompt: 'Free or paid? Choose one.',
+    prompt: 'Free or paid? Choose one or more.',
+    multi: true,
     all: true,
     options: COST_TYPES,
   },
@@ -61,7 +63,7 @@ const FILTERS = [
   },
 ]
 
-const EMPTY_SELECTION = { quadrant: [], serviceArea: '', cost: '', format: [] }
+const EMPTY_SELECTION = { quadrant: [], serviceArea: [], cost: [], format: [] }
 
 function selectedLabels(f, selection) {
   const v = selection[f.key]
@@ -71,9 +73,9 @@ function selectedLabels(f, selection) {
 
 // People can pick from several filters before going to the directory
 // (V5 round 3): choices are held here and only applied with "Apply filters".
-// Location and Format allow several choices; Service Type and Cost take one,
-// the same as the directory's filter panel. Location, Cost and Format start
-// on "All", which clears that filter (V5, 2026-11-10).
+// Every filter allows several choices, the same as the directory's filter
+// panel (Service Type and Cost joined Location and Format, 2026-11-13). Each
+// starts on "All", which clears that filter.
 function FilterButtons({ onApplyFilters, countMatches }) {
   const [openKey, setOpenKey] = useState(null)
   const [selection, setSelection] = useState(EMPTY_SELECTION)
