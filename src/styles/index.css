@@ -250,6 +250,73 @@ a:hover { color: var(--petal-slate-deep); }
 .site-logo-wrap {
   flex-shrink: 0;
 }
+.site-logo-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+.site-logo-btn:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 3px;
+}
+
+/* ☰ Menu for phones (SiteMenu.jsx); hidden on larger screens. */
+.site-menu { display: none; position: relative; }
+.site-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--touch-target);
+  padding: 2px var(--space-md);
+  background: var(--color-surface);
+  color: var(--petal-slate-ink);
+  border: 2px solid var(--petal-slate);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.site-menu-btn[aria-expanded="true"],
+.site-menu-btn:hover { background: var(--petal-slate-tint); }
+.site-menu-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: var(--z-dropdown);
+  width: max-content;
+  min-width: 14rem;
+  max-width: calc(100vw - 2 * var(--space-md));
+  margin: 0;
+  padding: var(--space-xs);
+  list-style: none;
+  background: var(--color-surface);
+  border: 2px solid var(--petal-slate);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-overlay);
+}
+.site-menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: var(--space-xs) var(--space-sm);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--petal-slate-ink);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.site-menu-item:hover,
+.site-menu-item[aria-current="page"] { background: var(--petal-slate-tint); }
+.site-menu-list li + li { border-top: 1px solid var(--color-border); }
+[data-contrast="high"] .site-menu-btn,
+[data-contrast="high"] .site-menu-list { border-color: #000000; }
 .site-logo {
   height: 86px;
   width: auto;
@@ -1886,12 +1953,14 @@ html[data-text-size="3"] .filter-group--location .checkbox-option {
   display: flex;
   /* Wraps to two rows when large phone text makes the pair too wide. */
   flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
   gap: var(--space-md);
 }
 .page-btn {
   min-height: var(--touch-target);
-  min-width: min(120px, 100%);
+  min-width: 120px;
+  max-width: 100%;
   padding: 0 var(--space-md);
   font-size: var(--font-size-base);
   font-weight: 700;
@@ -2805,20 +2874,24 @@ html[data-text-size="3"] .filter-group--location .checkbox-option {
   .landing-mode-toggle {
     order: 2;
   }
-  /* Only two items lived behind the hamburger, so show them directly instead:
-     a right-aligned row under the brand (replaces the ☰ Menu button). */
+  /* A row above the logo: Home on the left, ☰ Menu (About, How to use this,
+     Text & Display) in the top right corner (V5 round 6, 2026-11-13). */
   .site-header-actions {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     gap: var(--space-sm);
     flex-basis: 100%;
-    order: 2;
+    order: -1;
   }
-  /* Both grow to fill the row, so when the pair no longer fits side by side
-     they stack as two full-width buttons rather than a ragged right edge. */
-  .site-header-actions > * { flex: 1 1 auto; }
-  .a11y-btn-wrap { margin-left: 0; }
+  .site-header-actions > .about-btn,
+  .site-header-actions > .help-btn,
+  .a11y-btn-wrap > .a11y-toggle-btn { display: none; }
+  /* Keeps the Text & Display panel (fixed to the screen) without taking
+     space in the row. */
+  .a11y-btn-wrap { margin-left: 0; flex: none; width: 0; }
+  .site-menu { display: block; }
   .help-btn,
   .about-btn,
   .home-btn,
@@ -4026,6 +4099,29 @@ body:has(.main-layout) {
 .search-input-icon { color: var(--color-ink); }
 .voice-btn { border-color: var(--color-ink); color: var(--color-ink); }
 .voice-btn:hover { background: var(--color-surface-sunken); }
+/* Listening (V5 round 6, 2026-11-13): a dark button with white text and an
+   orange ring, so it's plainly "on" and different from the orange Search
+   button. Kept the same on hover; the hover rule above used to turn the
+   background light behind the white text, making it unreadable. */
+.voice-btn.voice-btn--listening,
+.voice-btn.voice-btn--listening:hover,
+.voice-btn.voice-btn--listening:focus-visible {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: #ffffff;
+  box-shadow: 0 0 0 3px var(--petal-ember);
+}
+/* The icon stays solid white; the orange ring pulses instead (fading the
+   icon made it grey on the dark button). */
+.voice-btn.voice-btn--listening .voice-btn-icon { animation: none; }
+.voice-btn.voice-btn--listening { animation: voice-ring 1.2s var(--ease-out) infinite; }
+@keyframes voice-ring {
+  0%, 100% { box-shadow: 0 0 0 3px var(--petal-ember); }
+  50%      { box-shadow: 0 0 0 6px var(--petal-ember); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .voice-btn.voice-btn--listening { animation: none; }
+}
 /* Orange focus on a peach band needs the ink ring to stay visible */
 .landing-search-band :focus-visible,
 .search-section :focus-visible { outline-color: var(--color-ink); }
@@ -4339,16 +4435,16 @@ body:has(.main-layout) {
     padding: 0 var(--space-md);
   }
   .search-bar-wrap > .search-btn span { display: inline; }
-  /* Search and Voice search share the row under the box, both labelled;
-     they stack when large text means they don't fit side by side. */
-  .search-bar-wrap > .search-btn { flex: 2 1 auto; }
+  /* Search fills the row under the box with the microphone beside it, icon
+     only (V5 round 6, 2026-11-13); its aria-label still says "Search by
+     voice". */
+  .search-bar-wrap > .search-btn { flex: 1 1 auto; }
   .search-bar-wrap > .voice-btn {
-    flex: 1 1 auto;
-    width: auto;
-    padding: 0 var(--space-md);
+    flex: none;
+    width: 52px;
+    padding: 0;
     justify-content: center;
   }
-  .search-bar-wrap > .voice-btn .voice-btn-label { display: inline; }
   .landing-search-band { padding: var(--space-md) var(--space-sm); }
   /* The right padding makes room for the clear (×) button, which only
      appears once something is typed */
@@ -4452,24 +4548,19 @@ body:has(.main-layout) {
   display: grid;
   gap: var(--space-sm);
 }
-.help-topic details {
+.help-topic-box {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--acc);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
 }
-.help-topic details[open] { border-color: var(--acc); box-shadow: var(--shadow-card); }
-.help-topic summary {
+.help-topic-head {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
   min-height: 60px;
   padding: var(--space-xs) var(--space-sm);
-  cursor: pointer;
-  list-style: none;
-  border-radius: var(--radius-md);
 }
-.help-topic summary::-webkit-details-marker { display: none; }
-.help-topic summary:hover { background: var(--acc-tint); }
 .help-topic-badge {
   flex: none;
   display: grid;
@@ -4487,13 +4578,6 @@ body:has(.main-layout) {
   line-height: 1.3;
   color: var(--color-ink);
 }
-.help-topic-chevron {
-  flex: none;
-  color: var(--acc-ink);
-  transition: transform var(--dur-fast) var(--ease-out);
-}
-.help-topic details[open] .help-topic-chevron { transform: rotate(180deg); }
-.help-topic details[open] summary { border-radius: var(--radius-md) var(--radius-md) 0 0; }
 .help-topic-body {
   padding: 0 var(--space-md) var(--space-md) calc(var(--space-sm) + 44px + var(--space-sm));
 }
@@ -4518,21 +4602,42 @@ body:has(.main-layout) {
 }
 .help-footer .help-close-btn { margin-top: 0; }
 
-@media (prefers-reduced-motion: reduce) {
-  .help-topic-chevron { transition: none; }
-}
+.help-x-back { display: none; }
 @media (max-width: 640px) {
-  .help-drawer { height: 70vh; }
+  /* A page of its own on phones (V5 round 6, 2026-11-13), not a sheet over
+     part of the screen: it fills the screen, opens with the top of the
+     guide, and "← Back" (or the phone's Back) returns to the directory. */
+  .help-drawer {
+    inset: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    border: none;
+    border-radius: 0;
+    animation: none;
+    z-index: var(--z-modal);
+  }
   .help-mark { width: 36px; }
   .help-drawer .help-header h2 { font-size: var(--font-size-lg); }
+  .help-x {
+    width: auto;
+    padding: 0 var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    white-space: nowrap;
+  }
+  .help-x-icon { display: none; }
+  .help-x-back { display: inline; }
+  /* Full width for the text under each heading on a narrow screen. */
+  .help-topic-body { padding-left: var(--space-md); }
 }
 
 /* High contrast */
 [data-contrast="high"] .help-drawer { background: #ffffff; border-left: 3px solid #000000; }
 [data-contrast="high"] .help-drawer .help-header { background: #ffffff; border-bottom: 2px solid #000000; }
-[data-contrast="high"] .help-topic details { border: 2px solid #000000; }
+[data-contrast="high"] .help-topic-box { border: 2px solid #000000; }
 [data-contrast="high"] .help-topic-badge { background: #ffffff; color: #00007a; border: 2px solid #00007a; }
-[data-contrast="high"] .help-topic-chevron { color: #00007a; }
 [data-contrast="high"] .help-drawer .help-tour-btn { background: #00007a; }
 
 /* ─── Directory backdrop depth (2026-11-06) ─────────────────────

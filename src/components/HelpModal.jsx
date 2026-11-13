@@ -23,10 +23,9 @@ function Icon({ name }) {
   )
 }
 
-// The client's copy (EngAGE Content.docx, H-01), unchanged. Each topic shows
-// only its title until opened, so the panel reads as five short choices
-// rather than five paragraphs (design pass 2026-11-06). Each takes one of
-// the logo's ring colours.
+// The client's copy (EngAGE Content.docx, H-01), unchanged. Each topic is a
+// box that's always open: testers didn't open the drop-downs (V5 round 6,
+// 2026-11-13). Each takes one of the logo's ring colours.
 const TOPICS = [
   {
     id: 'search',
@@ -67,7 +66,7 @@ const TOPICS = [
 
 // A side panel, not a modal (V5 H-03): no backdrop and no focus trap, so
 // people can keep the instructions open and practise on the page beside
-// them. Escape or the close buttons dismiss it; focus returns to whatever
+// them. On phones it fills the screen as a page of its own (V5 round 6). Escape or the close buttons dismiss it; focus returns to whatever
 // opened it.
 export default function HelpModal({ onClose, onStartTour }) {
   const closeRef = useRef(null)
@@ -90,8 +89,11 @@ export default function HelpModal({ onClose, onStartTour }) {
       <div className="help-header">
         <img className="help-mark" src={`${ASSET}engage-mark.svg`} alt="" />
         <h2 id="help-drawer-title">How to Use This Directory</h2>
+        {/* ✕ beside the panel on a computer; "← Back" on a phone, where the
+            guide is a page of its own (V5 round 6). */}
         <button ref={closeRef} className="help-x" onClick={onClose} aria-label="Close how to use this directory">
-          <span aria-hidden="true">✕</span>
+          <span className="help-x-icon" aria-hidden="true">✕</span>
+          <span className="help-x-back" aria-hidden="true">← Back</span>
         </button>
       </div>
 
@@ -106,14 +108,13 @@ export default function HelpModal({ onClose, onStartTour }) {
         <ul className="help-topics">
           {TOPICS.map((t) => (
             <li key={t.id} className={`help-topic help-accent--${t.accent}${t.id === 'voice' ? ' help-section--voice' : ''}`}>
-              <details>
-                <summary>
+              <div className="help-topic-box">
+                <div className="help-topic-head">
                   <span className="help-topic-badge"><Icon name={t.icon} /></span>
-                  <span className="help-topic-title">{t.title}</span>
-                  <svg className="help-topic-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
-                </summary>
+                  <h3 className="help-topic-title">{t.title}</h3>
+                </div>
                 <div className="help-topic-body">{t.body}</div>
-              </details>
+              </div>
             </li>
           ))}
         </ul>
