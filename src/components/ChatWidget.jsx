@@ -189,7 +189,7 @@ export default function ChatWidget({ onApplyFilters }) {
     // Keep the original sentence as the single source of truth. Both the chat
     // and main search now pass it through filterPrograms, so category, cost,
     // location, leftover keywords, and structured fallback behave identically.
-    const derivedFilters = { query: text, quadrant: [], serviceArea: '', cost: '', format: [] }
+    const derivedFilters = { query: text, quadrant: [], serviceArea: [], cost: [], format: [] }
 
     const summary = describeInterpretation(parsed) || `"${text}"`
     const botMsg = makeBotMessage(derivedFilters, summary)

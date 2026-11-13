@@ -2,15 +2,18 @@ import { useEffect, useRef, useState } from 'react'
 import ProgramCard from './ProgramCard.jsx'
 import FilterChips from './FilterChips.jsx'
 import Pagination from './Pagination.jsx'
-import { QUADRANTS, SERVICE_AREAS } from '../utils/constants.js'
+import { QUADRANTS, serviceAreaLabel } from '../utils/constants.js'
 import { PAGE_SIZE_OPTIONS, isFilterActive } from '../App.jsx'
 
 function emptyMessage(filters) {
-  const { query, quadrant, serviceArea, cost } = filters
+  const { query, quadrant } = filters
+  const asList = (v) => (Array.isArray(v) ? v : v ? [v] : [])
+  const serviceArea = asList(filters.serviceArea).length > 0
+  const cost = asList(filters.cost).length > 0
   const qLabel = quadrant.length > 0
     ? quadrant.map((q) => QUADRANTS.find((qq) => qq.value === q)?.label ?? q).join(', ')
     : null
-  const sLabel = serviceArea ? (SERVICE_AREAS.find((s) => s.value === serviceArea)?.label ?? serviceArea) : null
+  const sLabel = serviceArea ? asList(filters.serviceArea).map(serviceAreaLabel).join(' or ') : null
 
   if (query && quadrant.length > 0) {
     return {

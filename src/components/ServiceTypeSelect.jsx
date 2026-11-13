@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { SERVICE_AREA_GROUPS, GROUP_ICONS, serviceAreaLabel, serviceGroupSlug } from '../utils/constants.js'
 
-export default function ServiceTypeSelect({ value, onChange, labelledBy }) {
+// Several service types can be ticked (V5, 2026-11-13): choosing one keeps
+// the list open; "All" clears them. `value` is an array of '_group_X' and
+// subcategory values.
+export default function ServiceTypeSelect({ value = [], onChange, labelledBy }) {
   const [open, setOpen] = useState(false)
   const wrapRef = useRef(null)
 
@@ -20,15 +23,27 @@ export default function ServiceTypeSelect({ value, onChange, labelledBy }) {
     }
   }, [])
 
-  const triggerSlug = !value
+  const first = value[0]
+  const triggerSlug = !first
     ? null
-    : value.startsWith('_group_')
-      ? GROUP_ICONS[value.slice(7)]?.slug
-      : serviceGroupSlug(value)
+    : first.startsWith('_group_')
+      ? GROUP_ICONS[first.slice(7)]?.slug
+      : serviceGroupSlug(first)
+  const triggerLabel = value.length === 0
+    ? 'All'
+    : value.length === 1
+      ? serviceAreaLabel(first)
+      : `${value.length} service types`
+
+  const isOn = (v) => value.includes(v)
 
   function pick(v) {
-    onChange(v)
-    setOpen(false)
+    if (v === '') {
+      onChange([])
+      setOpen(false)
+      return
+    }
+    onChange(isOn(v) ? value.filter((x) => x !== v) : [...value, v])
   }
 
   return (
@@ -42,20 +57,20 @@ export default function ServiceTypeSelect({ value, onChange, labelledBy }) {
         aria-labelledby={labelledBy}
       >
         <span className="service-select-current">
-          {value && <span className={`service-select-dot service-select-dot--${triggerSlug}`} aria-hidden="true" />}
-          {serviceAreaLabel(value)}
+          {first && <span className={`service-select-dot service-select-dot--${triggerSlug}`} aria-hidden="true" />}
+          {triggerLabel}
         </span>
         <span aria-hidden="true" className="service-select-caret">▾</span>
       </button>
 
       {open && (
-        <ul className="service-select-list" role="listbox" aria-label="Select service type">
+        <ul className="service-select-list" role="listbox" aria-label="Select service types" aria-multiselectable="true">
           <li>
             <button
               type="button"
-              className={`service-select-option service-select-all${!value ? ' service-select-option--active' : ''}`}
+              className={`service-select-option service-select-all${value.length === 0 ? ' service-select-option--active' : ''}`}
               role="option"
-              aria-selected={!value}
+              aria-selected={value.length === 0}
               onClick={() => pick('')}
             >
               All
@@ -70,25 +85,25 @@ export default function ServiceTypeSelect({ value, onChange, labelledBy }) {
               <li key={group.group} className={`service-select-section service-select-section--${slug}`}>
                 <button
                   type="button"
-                  className={`service-select-option service-select-group${value === groupValue ? ' service-select-option--active' : ''}`}
+                  className={`service-select-option service-select-group${isOn(groupValue) ? ' service-select-option--active' : ''}`}
                   role="option"
-                  aria-selected={value === groupValue}
+                  aria-selected={isOn(groupValue)}
                   onClick={() => pick(groupValue)}
                 >
                   <span className="service-select-dot" aria-hidden="true" />
-                  {group.group}
+                  {isOn(groupValue) && <span aria-hidden="true">✓ </span>}{group.group}
                 </button>
                 <ul>
                   {group.items.map((item) => (
                     <li key={item.value}>
                       <button
                         type="button"
-                        className={`service-select-option service-select-item${value === item.value ? ' service-select-option--active' : ''}`}
+                        className={`service-select-option service-select-item${isOn(item.value) ? ' service-select-option--active' : ''}`}
                         role="option"
-                        aria-selected={value === item.value}
+                        aria-selected={isOn(item.value)}
                         onClick={() => pick(item.value)}
                       >
-                        {item.label}
+                        {isOn(item.value) && <span aria-hidden="true">✓ </span>}{item.label}
                       </button>
                     </li>
                   ))}

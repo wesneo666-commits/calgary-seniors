@@ -19,8 +19,10 @@ import { useAccessibility } from './hooks/useAccessibility.js'
 const EMPTY_FILTERS = {
   query: '',
   quadrant: [],
-  serviceArea: '',
-  cost: '',
+  // Every filter takes several choices (V5, 2026-11-13: service type and
+  // cost joined location and format).
+  serviceArea: [],
+  cost: [],
   // Several formats can be chosen at once, like Location (V5, 2026-11-10).
   format: [],
 }
