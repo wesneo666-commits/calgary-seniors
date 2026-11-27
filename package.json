@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "import": "node scripts/import-programs.js",
     "screenshots:ab": "node scripts/capture-ab-screenshots.mjs",
-    "check:display": "node scripts/check-display-settings.mjs"
+    "check:display": "node scripts/check-display-settings.mjs",
+    "check:round7": "node scripts/check-round7.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

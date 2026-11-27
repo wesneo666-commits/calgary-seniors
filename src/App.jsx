@@ -230,12 +230,25 @@ export default function App() {
     setShowTour(false)
   }, [])
 
+  // The tour walks through the home page, so starting it from the About page
+  // or an open service first goes home; otherwise the tour switched on but
+  // stayed hidden, then popped up later on leaving that page (2026-11-27).
+  // A fresh history entry keeps the phone's Back button returning to the
+  // page the tour was started from.
   const startTour = useCallback(() => {
-    closeHelp()
     setShowA11y(false)
+    if (view !== 'directory' || selectedProgram || sharedProgramId) {
+      window.history.pushState({}, '', window.location.pathname)
+      setShowHelp(false)
+      setSelectedProgram(null)
+      setSharedProgramId(null)
+      setView('directory')
+    } else {
+      closeHelp()
+    }
     window.scrollTo(0, 0)
     setShowTour(true)
-  }, [closeHelp])
+  }, [view, selectedProgram, sharedProgramId, closeHelp])
 
   const clearFilters = useCallback(() => {
     setFilters((prev) => ({ ...EMPTY_FILTERS, query: prev.query }))
