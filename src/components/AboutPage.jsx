@@ -54,7 +54,7 @@ export default function AboutPage({ onBack }) {
   return (
     <article className="about-page">
       <button type="button" className="about-back-btn" onClick={onBack}>
-        ← Back to the directory
+        ← Back
       </button>
 
       {/* ─── Hero ─── */}
@@ -190,7 +190,7 @@ export default function AboutPage({ onBack }) {
       </section>
 
       <button type="button" className="about-back-btn about-back-btn--bottom" onClick={onBack}>
-        ← Back to the directory
+        ← Back
       </button>
     </article>
   )

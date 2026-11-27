@@ -18,6 +18,19 @@ const STEPS = [
     body: 'EngAGE is a trusted online directory of non-medical, community-based services in Calgary. This short tour shows you the main parts of the directory. It takes about a minute, and you can close it at any time.',
   },
   {
+    target: [
+      '.a11y-toggle-btn',
+      {
+        // Phones: Text & Display sits behind the Menu button (V5 round 6)
+        selector: '.site-menu-btn',
+        body: 'Start here if the words are hard to read. Tap Menu, then Text & Display, to make them bigger or change the colours.',
+      },
+    ],
+    // First, so people can make the tour itself easier to read (2026-11-26)
+    title: 'Make the text easier to read',
+    body: 'Start here if the words are hard to read. Use Text & Display to make them bigger or change the colours.',
+  },
+  {
     target: ['.search-input-wrap'],
     title: 'Search in your own words',
     body: 'Type what you are looking for, such as "exercise classes" or "help getting to appointments." You can also type a postal code, like T2N, to find services near you.',
@@ -60,12 +73,13 @@ const STEPS = [
     body: 'Each card shows a service and who runs it. Select one to see the full details, including how to contact them. You can print or share it from there.',
   },
   {
-    target: ['.a11y-toggle-btn'],
-    title: 'Make the text easier to read',
-    body: 'Use Text & Display to make the words bigger or change the colours.',
-  },
-  {
-    target: ['.help-btn'],
+    target: [
+      '.help-btn',
+      {
+        selector: '.site-menu-btn',
+        body: 'Tap Menu, then How to use this, whenever you need a reminder. You can take this tour again from there.',
+      },
+    ],
     title: 'Help is always here',
     body: 'Select How to use this whenever you need a reminder. You can take this tour again from there.',
   },

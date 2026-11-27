@@ -1378,6 +1378,37 @@ html[data-text-size="3"] .filter-group--location .checkbox-option {
   color: var(--color-text-inverse);
   font-weight: 700;
 }
+/* Type-to-search box at the top of the service type list; stays in view
+   while the list scrolls under it. */
+.service-select-search {
+  position: sticky;
+  top: calc(-1 * var(--space-xs));
+  z-index: 1;
+  margin: calc(-1 * var(--space-xs)) calc(-1 * var(--space-xs)) var(--space-xs);
+  padding: var(--space-xs);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+.service-select-search-input {
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: var(--space-xs) var(--space-sm);
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-base);
+}
+.service-select-search-input:focus-visible {
+  outline-color: var(--color-border-focus);
+  outline-offset: 1px;
+}
+.service-select-empty {
+  padding: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
 .service-select-all { font-weight: 700; border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-xs); border-radius: 0; }
 .service-select-group {
   font-weight: 700;
@@ -3624,64 +3655,172 @@ html[data-text-size="3"] .filter-group--location .checkbox-option {
   color: var(--color-ink);
   margin-bottom: var(--space-sm);
 }
-.landing-filter-grid {
+/* ─── Landing filter cards (Joel's mockup, 2026-11-26) ──────────
+   Four numbered cards, always open, with GO! beside them. Four across
+   plus GO! on a wide screen, two across on a tablet, one on a phone. */
+.landing-card-row {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* GO! takes only the room it needs, leaving the rest to the cards */
+  grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(7rem, 9rem);
   gap: var(--space-sm);
+  align-items: stretch;
 }
-.landing-filter-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
-  min-height: 112px;
-  padding: var(--space-md) var(--space-sm);
-  background: var(--color-surface);
-  border: 3px solid var(--petal-slate-ink);
-  border-radius: var(--radius-lg);
-  color: var(--petal-slate-deep);
-  cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
-}
-.landing-filter-btn:hover { background: var(--petal-slate-tint); transform: translateY(-2px); }
-.landing-filter-btn--open { background: var(--petal-slate-deep); color: var(--color-text-inverse); }
-.landing-filter-btn--open:hover { background: var(--petal-slate-deep); }
-.landing-filter-label { font-size: var(--font-size-lg); font-weight: 700; }
-.landing-filter-options {
-  margin-top: var(--space-sm);
-  padding: var(--space-md);
-  background: var(--color-surface);
-  border: 2px solid var(--petal-slate-deep);
-  border-radius: var(--radius-lg);
-}
-.landing-filter-prompt { font-weight: 700; margin-bottom: var(--space-sm); }
-.landing-filter-option-grid {
+/* Each card spans three shared rows (number, question, choices) so the
+   choices start at the same height in every card, even when one question
+   wraps to two lines and its neighbour doesn't. */
+.landing-card {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: var(--space-sm);
+  align-content: start;
+  min-width: 0;
+  padding: calc(var(--space-md) + 4px) var(--space-sm) var(--space-md);
+  background: var(--color-surface);
+  /* A 2px border and a 6px strip along the top in the card's ring colour.
+     The strip is an inset shadow so it follows the rounded corners without
+     clipping the service type list that opens out of card 1. */
+  border: 2px solid var(--acc);
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 6px 0 var(--acc), var(--shadow-card);
+}
+.landing-card--slate { --acc: var(--petal-slate); --acc-ink: var(--petal-slate-ink); --acc-tint: var(--petal-slate-tint); }
+.landing-card--sage  { --acc: var(--petal-sage);  --acc-ink: var(--petal-sage-ink);  --acc-tint: var(--petal-sage-tint); }
+.landing-card--plum  { --acc: var(--petal-plum);  --acc-ink: var(--petal-plum-ink);  --acc-tint: var(--petal-plum-tint); }
+.landing-card--amber { --acc: var(--petal-amber); --acc-ink: var(--petal-amber-ink); --acc-tint: var(--petal-amber-tint); }
+.landing-card-num {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: var(--acc-tint);
+  border: 2px solid var(--acc);
+  border-radius: 50%;
+  color: var(--acc-ink);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  line-height: 1;
+}
+.landing-card-question {
+  align-self: end;
+  font-size: var(--font-size-lg);
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+.landing-card-body { min-width: 0; }
+.landing-card-hint {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--color-text);
+}
+/* The dropdown matches the chips beside it: same height, type and border */
+.landing-card .service-select-trigger {
+  min-height: var(--touch-target);
+  font-size: var(--font-size-base);
+  border-width: 2px;
+}
+/* Two chips per row, as in the mockup; long names wrap inside the chip. */
+.landing-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-xs);
 }
-.landing-filter-option {
-  min-height: 52px;
-  padding: var(--space-xs) var(--space-md);
-  background: var(--opt-tint, var(--petal-slate-tint));
-  border: 2px solid var(--opt-ink, var(--petal-slate-ink));
+.landing-chip {
+  min-width: 0;
+  overflow-wrap: break-word;
+  min-height: var(--touch-target);
+  padding: var(--space-xs) 10px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  color: var(--opt-ink, var(--petal-slate-ink));
+  color: var(--color-ink);
   font-size: var(--font-size-base);
-  font-weight: 700;
   text-align: left;
   cursor: pointer;
 }
-.landing-filter-option:hover { background: var(--color-surface); }
-/* "All" heads the list on its own row, as in the directory's filter panel. */
-.landing-filter-option--all { grid-column: 1 / -1; text-align: center; }
-.landing-filter-option--home      { --opt-tint: var(--petal-slate-tint); --opt-ink: var(--petal-slate-ink); }
-.landing-filter-option--health    { --opt-tint: var(--petal-sage-tint);  --opt-ink: var(--petal-sage-ink); }
-.landing-filter-option--social    { --opt-tint: var(--petal-plum-tint);  --opt-ink: var(--petal-plum-ink); }
-.landing-filter-option--practical { --opt-tint: var(--petal-amber-tint); --opt-ink: var(--petal-amber-ink); }
-.landing-filter-option--safety    { --opt-tint: var(--petal-ember-tint); --opt-ink: var(--petal-ember-ink); }
-.landing-filter-option--housing   { --opt-tint: var(--petal-teal-tint);  --opt-ink: var(--petal-teal-ink); }
+.landing-chip:hover { background: var(--acc-tint); }
+.landing-chip--all { grid-column: 1 / -1; text-align: center; font-weight: 700; }
+/* Chosen: a light tint of the card's colour, its dark ink for the border
+   and text, and a ✓ badge on the corner, rather than a heavy filled block.
+   The badge sits outside the text so the label never changes width and
+   re-wraps when chosen. Ink on tint is at least 4.5:1 for every ring
+   colour (DESIGN.md). aria-pressed carries the state for screen readers. */
+.landing-chip { position: relative; }
+.landing-chip--on,
+.landing-chip--on:hover {
+  background: var(--acc-tint);
+  border-color: var(--acc-ink);
+  box-shadow: inset 0 0 0 1px var(--acc-ink);
+  color: var(--acc-ink);
+}
+.landing-chip--all.landing-chip--on { font-weight: 700; }
+.landing-chip--on::after {
+  content: '✓';
+  position: absolute;
+  /* On the chip's top edge, inside its width, so it never pokes past the
+     chip (or the card) at narrow widths and large text. */
+  top: -11px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--acc-ink);
+  color: var(--color-text-inverse);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+/* Service type: the directory's dropdown, full width of its card */
+.landing-card .service-select-wrap { width: 100%; }
+/* Room for the longer names when the card is narrow (four across) */
+.landing-card .service-select-list { right: auto; width: max(100%, 18rem); max-width: calc(100vw - 2 * var(--space-md)); }
+.landing-go {
+  grid-row: span 3;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-xs);
+  text-align: center;
+}
+.landing-go-btn {
+  min-height: 60px;
+  padding: 0 var(--space-lg);
+  /* Same orange as the Search button (DESIGN.md: filled orange = deep) */
+  background: var(--petal-ember-deep);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+}
+.landing-go-btn:hover { filter: brightness(0.88); }
+.landing-go-count { font-size: var(--font-size-sm); color: var(--color-text); }
+.landing-go-clear {
+  min-height: var(--touch-target);
+  padding: 0 var(--space-xs);
+  background: none;
+  border: none;
+  color: var(--petal-slate-ink);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+@media (max-width: 1100px) {
+  .landing-card-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .landing-go { grid-column: 1 / -1; grid-row: auto; }
+  .landing-card { padding-inline: var(--space-md); }
+  .landing-go-btn { width: min(100%, 20rem); margin-inline: auto; }
+}
+@media (max-width: 560px) {
+  .landing-card-row { grid-template-columns: minmax(0, 1fr); }
+}
 .landing-browse { margin-top: var(--space-lg); }
 .landing-browse-btn {
   min-height: 56px;
@@ -3696,16 +3835,6 @@ html[data-text-size="3"] .filter-group--location .checkbox-option {
 }
 .landing-browse-btn:hover { background: var(--color-filter-active-dark); }
 .landing-browse-text { margin-top: var(--space-xs); color: var(--color-text); }
-@media (max-width: 700px) {
-  /* Two across on a phone, dropping to one across when a label no longer
-     fits; a fixed two-column grid left "Location" spilling out of its box
-     under large phone text (V5 usability, 2026-11-10). Flex rather than an
-     em-sized grid because Android's text scaling enlarges the text but not
-     em lengths; a flex item never shrinks below its own text. */
-  .landing-filter-grid { display: flex; flex-wrap: wrap; }
-  .landing-filter-btn { flex: 1 1 40%; max-width: 100%; }
-}
-
 /* ─── Help phone line (X-01) ─────────────────────────────────── */
 .help-phone {
   padding-top: var(--space-sm);
@@ -4004,13 +4133,31 @@ body:has(.wizard-landing) { background: var(--color-bg); }
 /* The skyline's ground line sits right on the footer's petal strip */
 body:has(.wizard-landing) .site-footer { margin-top: 0; }
 .wizard-landing { padding-bottom: 0; }
-.wizard-landing::after {
+/* The Calgary skyline sits behind the filter cards, as in Joel's mockup,
+   rather than at the foot of the page where few people scrolled to it
+   (2026-11-27). White line art on the page colour, so it stays faint. */
+.landing-filters {
+  position: relative;
+  isolation: isolate;
+}
+/* The browse button and About line come after the filters, so they need
+   their own layer to sit above the skyline that runs down behind them. */
+.landing-browse,
+.landing-about { position: relative; }
+.landing-filters::before {
   content: '';
-  display: block;
-  width: min(680px, 92%);
-  aspect-ratio: 532.14 / 278.34;
-  margin: var(--space-xl) auto 0;
+  position: absolute;
+  z-index: -1;
+  /* Starts under the heading, so the tower never reaches up into the
+     search band, and runs down behind the browse button: that height lets
+     the skyline grow wide enough to show on both sides of the cards. */
+  top: 3rem;
+  bottom: -8.5rem;
+  left: 50%;
+  width: min(1500px, 100vw);
+  transform: translateX(-50%);
   background: url("/calgary-skyline.svg") no-repeat center bottom / contain;
+  pointer-events: none;
 }
 body:has(.main-layout) {
   background:
@@ -4053,6 +4200,16 @@ body:has(.main-layout) {
 .about-btn,
 .home-btn,
 .a11y-toggle-btn { border-width: 2px; }
+/* Beside the large logo the header buttons read undersized; on wider
+   screens they step up to 48px tall (Impeccable review, 2026-11-27).
+   Larger type would push them onto a row of their own under the logo.
+   Phones keep their own sizes. */
+@media (min-width: 641px) {
+  .site-header .help-btn,
+  .site-header .about-btn,
+  .site-header .home-btn,
+  .site-header .a11y-toggle-btn { min-height: 48px; }
+}
 .about-btn,
 .home-btn,
 .a11y-toggle-btn {
@@ -4072,8 +4229,10 @@ body:has(.main-layout) {
   font-size: var(--font-size-lg);
   text-align: center;
 }
+/* Search band and filter cards share one column, so their edges line up
+   with each other and with the header (Impeccable review, 2026-11-27). */
 .landing-search,
-.landing-filters { max-width: 64rem; }
+.landing-filters { max-width: 72rem; }
 .landing-search {
   padding: 0;
   background: none;
@@ -4136,18 +4295,6 @@ body:has(.main-layout) {
 /* Orange focus on a peach band needs the ink ring to stay visible */
 .landing-search-band :focus-visible,
 .search-section :focus-visible { outline-color: var(--color-ink); }
-
-.landing-filter-btn {
-  border-color: var(--petal-slate);
-  color: var(--petal-slate-ink);
-  box-shadow: var(--shadow-card);
-}
-.landing-filter-btn--open,
-.landing-filter-btn--open:hover {
-  background: var(--petal-slate);
-  color: var(--color-text-inverse);
-}
-.landing-filter-options { border-color: var(--petal-slate); }
 
 /* Selected filter options: brand blue, as in the InternalPage mockup
    (white on #34647f is 6.4:1) */
@@ -4213,80 +4360,17 @@ body:has(.main-layout) {
 [data-contrast="high"] .landing-search-band .search-hint--ai,
 [data-contrast="high"] .landing-search-band .search-hint--error { color: #000000; }
 
-/* ─── Landing: choose several filters, then Apply (V5 round 3) ── */
-.landing-filter-option--on,
-.landing-filter-option--on:hover {
-  background: var(--opt-ink, var(--petal-slate-ink));
-  color: var(--color-text-inverse);
-}
-.landing-filter-btn--chosen:not(.landing-filter-btn--open) {
-  background: var(--petal-slate-tint);
-  border-width: 4px;
-}
-.landing-filter-count {
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-}
-.landing-apply {
-  margin-top: var(--space-md);
-  text-align: center;
-}
-.landing-apply-hint { color: var(--color-text); }
-.landing-apply-summary {
-  max-width: 60ch;
-  margin: 0 auto var(--space-sm);
-  font-size: var(--font-size-lg);
-  color: var(--color-ink);
-}
-.landing-apply-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: var(--space-sm) var(--space-md);
-}
-.landing-apply-btn {
-  min-height: 56px;
-  padding: 0 var(--space-xl);
-  background: var(--petal-ember-ink);
-  color: var(--color-text-inverse);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  cursor: pointer;
-}
-.landing-apply-btn:hover { filter: brightness(0.88); }
-.landing-apply-clear {
-  min-height: var(--touch-target);
-  padding: 0 var(--space-sm);
-  background: none;
-  border: none;
-  color: var(--petal-slate-ink);
-  font-size: var(--font-size-base);
-  font-weight: 700;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-/* ─── High contrast: landing filters and the results banner ───── */
-[data-contrast="high"] .landing-filter-option {
-  --opt-tint: #ffffff;
-  --opt-ink: #000000;
-}
-[data-contrast="high"] .landing-filter-option--on,
-[data-contrast="high"] .landing-filter-option--on:hover {
-  background: #00007a;
-  border-color: #00007a;
-  color: #ffffff;
-}
-[data-contrast="high"] .landing-filter-btn--chosen:not(.landing-filter-btn--open) {
-  background: #e6e6ff;
-  border-color: #00007a;
-}
-[data-contrast="high"] .landing-apply-btn { background: #00007a; }
-[data-contrast="high"] .landing-apply-btn:hover { background: #000055; }
-[data-contrast="high"] .landing-apply-btn:focus-visible { outline: 3px solid #000000; outline-offset: 3px; }
+/* ─── High contrast: landing filter cards and the results banner ── */
+[data-contrast="high"] .landing-card,
+[data-contrast="high"] .landing-card-num { border-color: #000000; }
+[data-contrast="high"] .landing-chip { border-color: #000000; color: #000000; }
+[data-contrast="high"] .landing-card { --acc: #000000; --acc-ink: #000000; --acc-tint: #ffffff; }
+[data-contrast="high"] .landing-chip--on,
+[data-contrast="high"] .landing-chip--on:hover { background: #00007a; border-color: #00007a; box-shadow: none; color: #ffffff; }
+[data-contrast="high"] .landing-chip--on::after { background: #000000; box-shadow: 0 0 0 2px #ffffff; }
+[data-contrast="high"] .landing-go-btn { background: #00007a; }
+[data-contrast="high"] .landing-go-btn:hover { background: #000055; }
+[data-contrast="high"] .landing-go-btn:focus-visible { outline: 3px solid #000000; outline-offset: 3px; }
 /* White banner on a white page needs a full black outline to stay visible */
 [data-contrast="high"] .results-header,
 [data-contrast="high"] .results-header--filtered {
@@ -4401,28 +4485,41 @@ body:has(.main-layout) {
    The intro was one centred paragraph with no headline, which on phones
    pushed the search below the first screen. The first sentence now
    carries the page; the rest is quieter supporting text. */
+/* Hero type (2026-11-27): the headline sits on two even lines a size
+   smaller, so it reads as a welcome rather than a shout, and the intro
+   reads as one paragraph: larger, darker, with paragraph spacing instead
+   of the site-wide relaxed 2.0 (still above the 1.5 minimum). Wide
+   headline over a narrower paragraph gives the block one clean shape. */
 .wizard-welcome-lead {
-  max-width: 30ch;
-  margin: 0 auto var(--space-sm);
-  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
+  max-width: 29em;
+  margin: 0 auto var(--space-md);
+  font-size: clamp(1.5rem, 1.05rem + 1.3vw, 1.875rem);
   font-weight: 700;
   line-height: 1.3;
   color: var(--color-ink);
   text-align: center;
   text-wrap: balance;
 }
+/* "trusted" carries the orange brush stroke from the EngAGE wordmark */
+.wizard-brush {
+  padding-bottom: 0.14em;
+  white-space: nowrap;
+  background: url("/brush-stroke.svg") no-repeat left bottom / 100% 0.26em;
+}
 .wizard-welcome .wizard-welcome-text {
-  max-width: 60ch;
-  font-size: var(--font-size-base);
-  color: var(--color-ink-soft);
+  max-width: 40em;
+  font-size: var(--font-size-lg);
+  line-height: 1.6;
+  color: var(--color-ink);
 }
 @media (max-width: 640px) {
   /* Bring the search up into the first screen on phones */
   .site-header--landing { padding-top: var(--space-md); }
   .site-header--landing .site-logo { height: 116px; }
-  .wizard-welcome-lead { font-size: 1.375rem; margin-bottom: var(--space-xs); }
+  .wizard-welcome-lead { font-size: 1.375rem; margin-bottom: var(--space-sm); }
   .wizard-welcome { margin-bottom: var(--space-md); }
-  .wizard-welcome .wizard-welcome-text { line-height: 1.55; }
+  /* Body size on phones so the search stays on the first screen */
+  .wizard-welcome .wizard-welcome-text { font-size: var(--font-size-base); line-height: 1.55; }
   .landing-section-title { margin-bottom: var(--space-sm); }
 }
 /* Keeps "community-based" from splitting at its hyphen, but still lets it
@@ -4475,10 +4572,15 @@ body:has(.main-layout) {
     margin-left: auto;
   }
   .site-header-actions .a11y-btn-wrap { margin-left: 0; }
-  .site-header--landing .site-logo { height: clamp(110px, 12vw, 190px); }
+  /* Capped at 168px: at its old 190px cap (any screen wider than about
+     1,500px) the logo plus the four buttons outgrew the 1280px page and
+     the buttons dropped under the logo (2026-11-27). */
+  .site-header--landing .site-logo { height: clamp(110px, 12vw, 168px); }
 }
 /* White skyline on a white high-contrast page is just a blank gap */
-[data-contrast="high"] .wizard-landing::after { display: none; }
+[data-contrast="high"] .landing-filters::before { display: none; }
+/* High contrast: a solid underline in place of the soft orange brush */
+[data-contrast="high"] .wizard-brush { background: none; text-decoration: underline 0.12em #b35000; text-underline-offset: 0.18em; }
 
 /* ─── How to Use panel: brand redesign (2026-11-06) ─────────────
    Branded header, the tour as the one filled button, five colour-coded
@@ -4642,6 +4744,13 @@ body:has(.main-layout) {
   .help-x-back { display: inline; }
   /* Full width for the text under each heading on a narrow screen. */
   .help-topic-body { padding-left: var(--space-md); }
+  /* The whole page scrolls on phones, so the phone number and "Got it"
+     sit at the end of the guide instead of pinned over it — pinned, they
+     took up much of a small screen (2026-11-26). The header with "← Back"
+     stays at the top. */
+  .help-drawer { overflow-y: auto; }
+  .help-drawer .help-header { position: sticky; top: 0; z-index: 1; }
+  .help-drawer-body { flex: none; overflow: visible; }
 }
 
 /* High contrast */
@@ -4695,7 +4804,6 @@ body:has(.main-layout)::before {
   .wizard-welcome-lead { max-width: 44ch; margin-bottom: var(--space-xs); }
   .wizard-welcome .wizard-welcome-text { max-width: 84ch; }
   .landing-search { margin-bottom: var(--space-md); }
-  .landing-filter-btn { min-height: 84px; }
 }
 
 /* ─── Very short laptop screens (2026-11-09) ────────────────────
@@ -4717,13 +4825,4 @@ body:has(.main-layout)::before {
     white-space: nowrap;
   }
   .landing-filters .landing-section-title { margin-bottom: var(--space-xs); }
-  .landing-filter-btn {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0 var(--space-xs);
-    min-height: 60px;
-    padding-block: var(--space-xs);
-  }
-  /* "✓ 2 selected" keeps its own line under the label */
-  .landing-filter-count { flex-basis: 100%; text-align: center; }
 }

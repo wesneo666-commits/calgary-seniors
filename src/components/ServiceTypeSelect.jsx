@@ -1,12 +1,42 @@
 import { useEffect, useRef, useState } from 'react'
 import { SERVICE_AREA_GROUPS, GROUP_ICONS, serviceAreaLabel, serviceGroupSlug } from '../utils/constants.js'
 
+// Every typed word must appear somewhere in the text, in any order, so
+// "education" finds "Learning & education" and "home care" finds "Home care".
+function matches(text, words) {
+  const t = text.toLowerCase()
+  return words.every((w) => t.includes(w))
+}
+
+// The groups and items left once the typed words are applied. A group whose
+// own name matches keeps all of its items.
+function filterGroups(query) {
+  const words = query.toLowerCase().replace(/&/g, ' ').split(/\s+/).filter(Boolean)
+  if (words.length === 0) return SERVICE_AREA_GROUPS
+  return SERVICE_AREA_GROUPS.flatMap((group) => {
+    if (matches(group.group, words)) return [group]
+    const items = group.items.filter((item) => matches(item.label, words))
+    return items.length ? [{ ...group, items }] : []
+  })
+}
+
 // Several service types can be ticked (V5, 2026-11-13): choosing one keeps
 // the list open; "All" clears them. `value` is an array of '_group_X' and
 // subcategory values.
 export default function ServiceTypeSelect({ value = [], onChange, labelledBy }) {
   const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
   const wrapRef = useRef(null)
+  const searchRef = useRef(null)
+
+  // Start each opening with an empty search box. Focus it straight away on
+  // a computer; on a phone that would pop the keyboard over the list, so
+  // people tap the box when they want to type.
+  useEffect(() => {
+    if (!open) return
+    setQuery('')
+    if (window.matchMedia?.('(pointer: fine)').matches) searchRef.current?.focus()
+  }, [open])
 
   useEffect(() => {
     function handleClick(e) {
@@ -36,6 +66,7 @@ export default function ServiceTypeSelect({ value = [], onChange, labelledBy }) 
       : `${value.length} service types`
 
   const isOn = (v) => value.includes(v)
+  const groups = filterGroups(query)
 
   function pick(v) {
     if (v === '') {
@@ -65,6 +96,22 @@ export default function ServiceTypeSelect({ value = [], onChange, labelledBy }) 
 
       {open && (
         <ul className="service-select-list" role="listbox" aria-label="Select service types" aria-multiselectable="true">
+          <li className="service-select-search" role="presentation">
+            <input
+              ref={searchRef}
+              type="search"
+              className="service-select-search-input"
+              placeholder="Type to search, e.g. education"
+              aria-label="Search service types"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                // Escape clears the typing first, then closes the list.
+                if (e.key === 'Escape' && query) { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); setQuery('') }
+              }}
+            />
+          </li>
+          {!query && (
           <li>
             <button
               type="button"
@@ -76,7 +123,13 @@ export default function ServiceTypeSelect({ value = [], onChange, labelledBy }) 
               All
             </button>
           </li>
-          {SERVICE_AREA_GROUPS.map((group) => {
+          )}
+          {query && groups.length === 0 && (
+            <li className="service-select-empty" role="presentation">
+              No service types match "{query}".
+            </li>
+          )}
+          {groups.map((group) => {
             const groupValue = `_group_${group.group}`
             // Each group wears the same petal colour as its service pills on
             // the cards (V5 F-05) so the dropdown and the cards read as one key.
